@@ -45,6 +45,14 @@ An example JSON is as follows:
             }
         }
     },
+    children_meta: {
+        min: -1,  // containment limits for all children
+        max: -1,
+        idOrPath: {
+            min: -1,  // containment limits for idOrPath nodes
+            max: -1
+        }
+    },
     children: [{...}]
 }
 ```
