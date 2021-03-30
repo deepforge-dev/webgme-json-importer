@@ -1,0 +1,17 @@
+{
+  "components": {
+    "plugins": {
+      "ImportFromJSON": {
+        "src": "src/plugins/ImportFromJSON",
+        "test": "test/plugins/ImportFromJSON"
+      },
+      "ExportToJSON": {
+        "src": "src/plugins/ExportToJSON",
+        "test": "test/plugins/ExportToJSON"
+      }
+    }
+  },
+  "dependencies": {
+    "plugins": {}
+  }
+}

@@ -1,0 +1,31 @@
+{
+    "attributes": {
+        "name": "Language"
+    },
+    "children": [
+        {
+            "id": "@meta:Node"
+        },
+        {
+            "id": "@meta:Edge",
+            "pointer_meta": {
+                "src": {
+                    "@meta:Node": {
+                        "min": -1,
+                        "max": 1
+                    },
+                    "min": 1,
+                    "max": 1
+                },
+                "dst": {
+                    "@meta:Node": {
+                        "min": -1,
+                        "max": 1
+                    },
+                    "min": 1,
+                    "max": 1
+                }
+            }
+        }
+    ]
+}
