@@ -325,6 +325,78 @@ describe('JSONImporter', function () {
             });
         });
 
+        describe('children meta', function() {
+            beforeEach(async () => {
+                core.setPointerMetaLimits(node2, 'myPtr', 1, 1);
+                core.setPointerMetaTarget(node2, 'myPtr', node3, -1, 1);
+                core.setPointerMetaTarget(node2, 'myPtr', node2, -1, 1);
+                original2 = await importer.toJSON(node2);
+            });
+
+            it('should include children_meta', async function() {
+                core.setChildMeta(node2, node3);
+                const json = await importer.toJSON(node2);
+                const nodeId = core.getPath(node3);
+                assert.deepEqual(json.children_meta[nodeId], {min: -1, max: -1});
+            });
+
+            it('should include children_meta w/ limits', async function() {
+                core.setChildMeta(node2, node3, 2, 5);
+                const json = await importer.toJSON(node2);
+                const nodeId = core.getPath(node3);
+                assert.deepEqual(json.children_meta[nodeId], {min: 2, max: 5});
+            });
+
+            it('should include children limits', async function() {
+                core.setChildMeta(node2, node3);
+                core.setChildrenMetaLimits(node2, 1, 4);
+                const json = await importer.toJSON(node2);
+                const nodeId = core.getPath(node3);
+                assert.equal(json.children_meta.min, 1);
+                assert.equal(json.children_meta.max, 4);
+            });
+
+            it('should set child type limit', async function() {
+                const nodeId = core.getPath(node3);
+                original2.children_meta = {min: -1, max: -1};
+                original2.children_meta[nodeId] = {min: -1, max: 1};
+                await importer.apply(node2, original2);
+                assert.deepEqual(
+                    core.getChildrenMeta(node2)[nodeId],
+                    {min: -1, max: 1}
+                );
+            });
+
+            it('should set child limit', async function() {
+                const nodeId = core.getPath(node3);
+                original2.children_meta = {min: 4, max: 9};
+                original2.children_meta[nodeId] = {min: -1, max: 1};
+                await importer.apply(node2, original2);
+                assert.equal(core.getChildrenMeta(node2).min, 4);
+                assert.equal(core.getChildrenMeta(node2).max, 9);
+            });
+
+            it('should clear containment rules', async function() {
+                core.setChildMeta(node2, node3);
+                core.setChildrenMetaLimits(node2, 1, 4);
+                const json = await importer.toJSON(node2);
+                json.children_meta = {};
+
+                await importer.apply(node2, json);
+                assert.equal(core.getChildrenMeta(node2), null);
+            });
+
+            it('should remove valid child type', async function() {
+                core.setChildMeta(node2, node3);
+                const json = await importer.toJSON(node2);
+                const nodeId = core.getPath(node3);
+                delete json.children_meta[nodeId];
+
+                await importer.apply(node2, json);
+                assert.equal(core.getChildrenMeta(node2), null);
+            });
+        });
+
         describe('sets', function() {
             const setName = 'someSet';
             let node4;

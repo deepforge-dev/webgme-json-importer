@@ -27,6 +27,7 @@ define([
                 sets: {},
                 member_attributes: {},
                 member_registry: {},
+                children_meta: {},
             };
 
             this.core.getOwnAttributeNames(node).forEach(name => {
@@ -80,6 +81,8 @@ define([
                 }
             }
 
+            json.children_meta = this.core.getChildrenMeta(node);
+
             return json;
         }
 
@@ -103,14 +106,19 @@ define([
             const current = await this.toJSON(node);
             const changes = compare(current, state);
             const keyOrder = [
+                'children_meta',
                 'pointer_meta',
                 'pointers',
                 'sets',
                 'member_attributes',
-                'member_registry'
+                'member_registry',
             ];
+            const singleKeyFields = ['children_meta'];
             const sortedChanges = changes
-                .filter(change => change.key.length > 1)
+                .filter(
+                    change => change.key.length > 1 ||
+                        (singleKeyFields.includes(change.key[0]) && change.type === 'put')
+                )
                 .map((change, index) => {
                     let order = 2 * keyOrder.indexOf(change.key[0]);
                     if (change.type === 'put') {
@@ -381,6 +389,35 @@ define([
             this.core.delPointerMeta(node, name);
         } else {
             this.core.delPointerMetaTarget(node, name, targetId);
+        }
+    };
+
+    Importer.prototype._put.children_meta = async function(node, change, resolvedSelectors) {
+        const [/*"children_meta"*/, idOrUndef] = change.key;
+        const isAddingContainment = !idOrUndef;
+        const isNewChildDefinition = typeof idOrUndef === 'string';
+        if (isAddingContainment) {
+            const {min, max} = change.value;
+            this.core.setChildrenMetaLimits(node, min, max);
+            const childEntries = Object.entries(change.value).filter(pair => !['min', 'max'].includes(pair[0]));
+            for (let i = 0; i < childEntries.length; i++) {
+                const [nodeId, {min, max}] = childEntries[i];
+                const childNode = await this.getNode(node, nodeId, resolvedSelectors);
+                this.core.setChildMeta(node, childNode, min, max);
+            }
+        } else if (isNewChildDefinition) {
+            const nodeId = idOrUndef;
+            const {min, max} = change.value;
+            const childNode = await this.getNode(node, nodeId, resolvedSelectors);
+            this.core.setChildMeta(node, childNode, min, max);
+        }
+    };
+
+    Importer.prototype._delete.children_meta = async function(node, change, resolvedSelectors) {
+        const [/*"children_meta"*/, idOrMinMax] = change.key;
+        const isNodeId = !['min', 'max'].includes(idOrMinMax);
+        if (isNodeId) {
+            this.core.delChildMeta(node, idOrMinMax);
         }
     };
 
