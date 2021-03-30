@@ -1,9 +1,9 @@
 {
   "components": {
     "plugins": {
-      "ImportFromJSON": {
-        "src": "src/plugins/ImportFromJSON",
-        "test": "test/plugins/ImportFromJSON"
+      "SetStateFromJSON": {
+        "src": "src/plugins/SetStateFromJSON",
+        "test": "test/plugins/SetStateFromJSON"
       },
       "ExportToJSON": {
         "src": "src/plugins/ExportToJSON",

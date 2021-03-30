@@ -1,6 +1,6 @@
 {
-  "id": "ImportFromJSON",
-  "name": "ImportFromJSON",
+  "id": "SetStateFromJSON",
+  "name": "SetStateFromJSON",
   "version": "0.1.0",
   "description": "",
   "icon": {

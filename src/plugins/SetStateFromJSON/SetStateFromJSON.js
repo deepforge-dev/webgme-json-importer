@@ -14,14 +14,7 @@ define([
 
     pluginMetadata = JSON.parse(pluginMetadata);
 
-    // FIXME: rename this plugin:
-    //   - SyncWithJSON?
-    //   - SetStateFromJSON (current fav)
-    //
-    // To Do:
-    //   - [ ] Create an example JSON to import (in the language node)
-    //     - [ ] add containment rule
-    class ImportFromJSON extends PluginBase {
+    class SetStateFromJSON extends PluginBase {
         constructor() {
             super();
             this.pluginMetadata = pluginMetadata;
@@ -41,7 +34,7 @@ define([
         }
     }
 
-    ImportFromJSON.metadata = pluginMetadata;
+    SetStateFromJSON.metadata = pluginMetadata;
 
-    return ImportFromJSON;
+    return SetStateFromJSON;
 });
