@@ -1,7 +1,7 @@
 # webgme-json-importer
 This repo contains a utilities for importing/exporting models as JSON. The main utility is the [JSON Importer](./src/common/JSONImporter.js) which enables a WebGME node to be synchronized with a JSON representation of the target state. This has been primarily used for programmatically creating (and updating) metamodels based off of an external representation. In these cases, the workflow is:
 - extract the language specification from the target domain
-- transform the specification into the specification (found [here](./src/common/)).
+- transform the specification into the expected JSON representation (documentation available [here](./src/common/)).
 - import the JSON representation into a project. If you first create a node to contain the language elements (conventionally named "Language"), this can be as simple as selecting this node and running the "SetStateFromJSON" plugin).
 
 For examples, check out the examples directory.
