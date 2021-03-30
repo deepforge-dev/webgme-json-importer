@@ -1,0 +1,54 @@
+{
+    "attributes": {
+        "name": "Example Graph"
+    },
+    "children": [
+        {
+            "id": "@id:A",
+            "attributes": {
+                "name": "A"
+            },
+            "pointers": {
+                "base": "@meta:Node"
+            }
+        },
+        {
+            "id": "@id:B",
+            "attributes": {
+                "name": "B"
+            },
+            "pointers": {
+                "base": "@meta:Node"
+            }
+        },
+        {
+            "id": "@id:C",
+            "attributes": {
+                "name": "C"
+            },
+            "pointers": {
+                "base": "@meta:Node"
+            }
+        },
+        {
+            "attributes": {
+                "name": "Edge from A-B"
+            },
+            "pointers": {
+                "src": "@id:A",
+                "dst": "@id:B",
+                "base": "@meta:Edge"
+            }
+        },
+        {
+            "attributes": {
+                "name": "Edge from B-C"
+            },
+            "pointers": {
+                "src": "@id:B",
+                "dst": "@id:C",
+                "base": "@meta:Edge"
+            }
+        }
+    ]
+}
