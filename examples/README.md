@@ -1,0 +1,1 @@
+This directory contains examples that can be loaded using the [SetStateFromJSON](src/plugins/SetStateFromJSON) plugin. Examples with the "\_meta" suffix are expected to be applied to a "Language" node contained in the root node.

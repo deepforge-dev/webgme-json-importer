@@ -1,4 +1,6 @@
 # webgme-json-meta
+This repo contains a META description language for WebGME which can be imported/exported using [JSON Importer](./src/common/JSONImporter.js). More information about the specification can be found [here](./src/common/). For examples, check out the examples directory.
+
 ## Installation
 First, install the webgme-json-meta following:
 - [NodeJS](https://nodejs.org/en/) (LTS recommended)
