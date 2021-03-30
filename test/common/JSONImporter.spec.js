@@ -6,7 +6,7 @@ describe('JSONImporter', function () {
     const testFixture = require('../globals');
     const _ = testFixture.requirejs('underscore');
     const Core = testFixture.requirejs('common/core/coreQ');
-    const Importer = testFixture.requirejs('webgme-json-meta/JSONImporter');
+    const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;

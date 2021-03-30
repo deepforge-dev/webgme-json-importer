@@ -1,5 +1,5 @@
 {
-  "name": "webgme-json-meta",
+  "name": "webgme-json-importer",
   "scripts": {
     "start": "node app.js",
     "test": "node ./node_modules/mocha/bin/mocha --recursive test",

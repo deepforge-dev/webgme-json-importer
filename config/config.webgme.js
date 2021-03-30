@@ -19,7 +19,7 @@ config.plugin.basePaths.push(__dirname + '/../src/plugins');
 
 // Add requirejs paths
 config.requirejsPaths = {
-  'webgme-json-meta': './src/common'
+  'webgme-json-importer': './src/common'
 };
 
 

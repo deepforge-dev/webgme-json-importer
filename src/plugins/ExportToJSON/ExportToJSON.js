@@ -2,7 +2,7 @@
 /*eslint-env node, browser*/
 
 define([
-    'webgme-json-meta/JSONImporter',
+    'webgme-json-importer/JSONImporter',
     'text!./metadata.json',
     'plugin/PluginBase'
 ], function (
