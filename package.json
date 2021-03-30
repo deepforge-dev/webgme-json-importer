@@ -18,8 +18,9 @@
     "webgme": "^2.23.0"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
     "mocha": "^5.2.0",
-    "webgme": "^2.23.0"
+    "webgme": "^2.42.1"
   },
   "dependencies": {}
 }
