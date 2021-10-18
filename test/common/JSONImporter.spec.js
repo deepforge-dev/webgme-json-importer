@@ -265,6 +265,25 @@ describe('JSONImporter', function () {
                 assert.equal(core.getAttribute(node, 'name'), 'NewMetaNodeName');
                 assert.equal(core.getPointerPath(fco, 'testPtr'), core.getPath(node));
             });
+
+            it('should set base correctly during structural inheritance', async function() {
+                const fco = await core.loadByPath(root, '/1');
+                const nodeA = core.createNode({base: fco, parent: root});
+                core.setAttribute(nodeA, 'name', 'A');
+
+                const nodeB = core.createNode({base: fco, parent: nodeA});
+                core.setAttribute(nodeB, 'name', 'B');
+
+                const nodeAp = core.createNode({base: nodeA, parent: root});
+                core.setAttribute(nodeAp, 'name', 'A prime');
+
+                const [childPath] = core.getChildrenPaths(nodeAp);
+                const nodeBp = await core.loadByPath(root, childPath);
+
+                const schemaAp = await importer.toJSON(nodeAp);
+                const [schemaBp] = schemaAp.children;
+                assert.equal(schemaBp.pointers.base, core.getPath(nodeB));
+            });
         });
 
         describe('pointer meta', function() {
