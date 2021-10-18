@@ -38,10 +38,11 @@ define([
                 json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
             });
 
-            json.pointers.base = this.core.getPointerPath(node, 'base');
             this.core.getOwnPointerNames(node).forEach(name => {
                 json.pointers[name] = this.core.getPointerPath(node, name);
             });
+            const baseNode = this.core.getBase(node);
+            json.pointers.base = baseNode && this.core.getPath(baseNode);
 
             this.core.getOwnValidPointerNames(node).forEach(name => {
                 json.pointer_meta[name] = this.core.getPointerMeta(node, name);
