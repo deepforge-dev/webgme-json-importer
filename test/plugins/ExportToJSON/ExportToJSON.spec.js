@@ -1,9 +1,10 @@
 /*eslint-env node, mocha*/
 
 describe('ExportToJSON', function () {
+    const {promisify} = require('util');
+    const assert = require('assert').strict;
     var testFixture = require('../../globals'),
         gmeConfig = testFixture.getGmeConfig(),
-        expect = testFixture.expect,
         logger = testFixture.logger.fork('ExportToJSON'),
         PluginCliManager = testFixture.WebGME.PluginCliManager,
         projectName = 'testProject',
@@ -13,43 +14,33 @@ describe('ExportToJSON', function () {
         storage,
         commitHash;
 
-    before(function (done) {
-        testFixture.clearDBAndGetGMEAuth(gmeConfig, projectName)
-            .then(function (gmeAuth_) {
-                gmeAuth = gmeAuth_;
-                // This uses in memory storage. Use testFixture.getMongoStorage to persist test to database.
-                storage = testFixture.getMemoryStorage(logger, gmeConfig, gmeAuth);
-                return storage.openDatabase();
-            })
-            .then(function () {
-                var importParam = {
-                    projectSeed: testFixture.path.join(testFixture.SEED_DIR, 'EmptyProject.webgmex'),
-                    projectName: projectName,
-                    branchName: 'master',
-                    logger: logger,
-                    gmeConfig: gmeConfig
-                };
+    const manager = new PluginCliManager(null, logger, gmeConfig);
+    manager.executePlugin = promisify(manager.executePlugin.bind(manager));
 
-                return testFixture.importProject(storage, importParam);
-            })
-            .then(function (importResult) {
-                project = importResult.project;
-                commitHash = importResult.commitHash;
-                return project.createBranch('test', commitHash);
-            })
-            .nodeify(done);
+    before(async function () {
+        gmeAuth = await testFixture.clearDBAndGetGMEAuth(gmeConfig, projectName)
+        storage = testFixture.getMemoryStorage(logger, gmeConfig, gmeAuth);
+        await storage.openDatabase();
+        const importParam = {
+            projectSeed: testFixture.path.join(testFixture.SEED_DIR, 'EmptyProject.webgmex'),
+            projectName: projectName,
+            branchName: 'master',
+            logger: logger,
+            gmeConfig: gmeConfig
+        };
+
+        const importResult = await testFixture.importProject(storage, importParam);
+        project = importResult.project;
+        commitHash = importResult.commitHash;
+        await project.createBranch('test', commitHash);
     });
 
-    after(function (done) {
-        storage.closeDatabase()
-            .then(function () {
-                return gmeAuth.unload();
-            })
-            .nodeify(done);
+    after(async function () {
+        await storage.closeDatabase()
+        await gmeAuth.unload();
     });
 
-    it('should run plugin and update the branch', function (done) {
-        var manager = new PluginCliManager(null, logger, gmeConfig),
+    it('should run plugin and update the branch', async function () {
             pluginConfig = {
             },
             context = {
@@ -59,21 +50,10 @@ describe('ExportToJSON', function () {
                 activeNode: '/1',
             };
 
-        manager.executePlugin(pluginName, pluginConfig, context, function (err, pluginResult) {
-            try {
-                expect(err).to.equal(null);
-                expect(typeof pluginResult).to.equal('object');
-                expect(pluginResult.success).to.equal(true);
-            } catch (e) {
-                done(e);
-                return;
-            }
-
-            project.getBranchHash('test')
-                .then(function (branchHash) {
-                    expect(branchHash).to.not.equal(commitHash);
-                })
-                .nodeify(done);
-        });
+        const pluginResult = await manager.executePlugin(pluginName, pluginConfig, context);
+        assert.equal(typeof pluginResult, 'object');
+        assert(pluginResult.success);
+        const branchHash = await project.getBranchHash('test');
+        assert.equal(branchHash, commitHash);
     });
 });
