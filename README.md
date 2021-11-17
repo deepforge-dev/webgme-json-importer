@@ -14,3 +14,6 @@ First, install the webgme-json-importer following:
 Second, start mongodb locally by running the `mongod` executable in your mongodb installation (you may need to create a `data` directory or set `--dbpath`).
 
 Then, install dependencies with `npm install` and start the server with `npm start`. Finally, navigate to `http://localhost:8888` to start using webgme-json-importer!
+
+## Specification
+The (informal) JSON specification can be found [here](./src/common/README.md).
