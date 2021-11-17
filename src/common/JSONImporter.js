@@ -601,7 +601,13 @@ define([
 
             if (this.tag === '@meta') {
                 core.setAttribute(node, 'name', this.value);
+
+                const metaSheetSet = core.getSetNames(rootNode)
+                    .find(name => name !== Constants.META_ASPECT_SET_NAME && name.startsWith(Constants.META_ASPECT_SET_NAME));
+
                 core.addMember(rootNode, Constants.META_ASPECT_SET_NAME, node);
+                core.addMember(rootNode, metaSheetSet, node);
+
                 const meta = await core.getAllMetaNodes(rootNode);
                 assert(meta[core.getPath(node)], 'New node not in the meta');
             }
@@ -688,5 +694,6 @@ define([
         }
     }
 
+    Importer.NodeSelector = NodeSelector;
     return Importer;
 });

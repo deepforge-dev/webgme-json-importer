@@ -11,7 +11,7 @@ describe('JSONImporter', function () {
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
     const Q = testFixture.Q;
-    const logger = testFixture.logger.fork('CreateKerasMeta');
+    const logger = testFixture.logger.fork('JSONImporter');
     const projectName = 'testProject';
     let project,
         gmeAuth,
@@ -876,6 +876,31 @@ describe('JSONImporter', function () {
                 core.getPath(node),
                 'Did not resolve guid'
             );
+        });
+
+        describe('prepare', function() {
+            it('should add @meta node to META', async function() {
+                const selector = new Importer.NodeSelector('@meta:TestMeta');
+                const fco = await core.loadByPath(root, '/1');
+                const node = core.createNode({base: fco, parent: root});
+                await selector.prepare(core, root, node);
+
+                const meta = await core.getAllMetaNodes(root);
+                assert(meta[core.getPath(node)], 'New node not in the meta');
+            });
+
+            it('should add @meta node to META sheet', async function() {
+                const selector = new Importer.NodeSelector('@meta:TestMetaSheet');
+                const fco = await core.loadByPath(root, '/1');
+                const node = core.createNode({base: fco, parent: root});
+                await selector.prepare(core, root, node);
+
+                const metaSetName = 'MetaAspectSet';
+                const metaSheetSetName = core.getSetNames(root)
+                    .find(name => name.startsWith(metaSetName) && name !== metaSetName);
+                const memberPaths = core.getMemberPaths(root, metaSheetSetName);
+                assert(memberPaths.includes(core.getPath(node)));
+            });
         });
     });
 
