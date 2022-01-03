@@ -885,6 +885,23 @@ describe('JSONImporter', function () {
             );
         });
 
+        it.only('should set guid when creating @guid nodes', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            core.setAttribute(node, 'name', 'MyNode!');
+            const guid = '0d2e0ef3-5b8f-9bc4-45a0-8abab4433565';
+            const container = {
+                id: `@guid:${guid}`,
+                attributes: {name: 'newguidtest'},
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getGuid(containerNode),
+                guid,
+                'Did not set guid on creation'
+            );
+        });
+
         describe('prepare', function() {
             it('should add @meta node to META', async function() {
                 const selector = new Importer.NodeSelector('@meta:TestMeta');
