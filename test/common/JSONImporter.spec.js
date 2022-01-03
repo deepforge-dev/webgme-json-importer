@@ -902,6 +902,40 @@ describe('JSONImporter', function () {
             );
         });
 
+        it('should set path when creating @path nodes', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            core.setAttribute(node, 'name', 'MyNode!');
+            const path = 'testPath';
+            const container = {
+                id: `@path:${path}`,
+                attributes: {name: 'newpathtest'},
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getPath(containerNode).split('/').pop(),
+                path,
+                'Did not set path on creation'
+            );
+        });
+
+        it('should set path when "path" set', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            core.setAttribute(node, 'name', 'MyNode!');
+            const path = 'testPath';
+            const container = {
+                path,
+                attributes: {name: 'newpathtest2'},
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getPath(containerNode).split('/').pop(),
+                path,
+                'Did not set path on creation'
+            );
+        });
+
         describe('prepare', function() {
             it('should add @meta node to META', async function() {
                 const selector = new Importer.NodeSelector('@meta:TestMeta');
