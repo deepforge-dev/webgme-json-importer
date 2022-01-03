@@ -885,7 +885,7 @@ describe('JSONImporter', function () {
             );
         });
 
-        it.only('should set guid when creating @guid nodes', async function() {
+        it('should set guid when creating @guid nodes', async function() {
             const fco = await core.loadByPath(root, '/1');
             const node = core.createNode({base: fco, parent: root});
             core.setAttribute(node, 'name', 'MyNode!');
