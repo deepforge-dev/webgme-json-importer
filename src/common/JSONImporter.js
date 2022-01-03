@@ -220,7 +220,7 @@ define([
             if (idString === undefined) {
                 return;
             }
-            assert(typeof idString === 'string');
+            assert(typeof idString === 'string', `Expected ID to be a string but found ${JSON.stringify(idString)}`);
 
             const parentId = this.core.getPath(parent);
             const selector = new NodeSelector(idString);
@@ -334,8 +334,15 @@ define([
             `Invalid key for pointer: ${change.key.slice(1).join(', ')}`
         );
         const [/*type*/, name] = change.key;
-        const target = await this.getNode(node, change.value, resolvedSelectors);
-        const hasChanged = this.core.getPath(target) !== this.core.getPointerPath(node, name);
+        let target = null;
+        let targetPath = null;
+        if (change.value !== null) {
+            target = change.value !== null ?
+                await this.getNode(node, change.value, resolvedSelectors)
+                : null;
+            targetPath = this.core.getPath(target);
+        }
+        const hasChanged = targetPath !== this.core.getPointerPath(node, name);
         if (hasChanged) {
             this.core.setPointer(node, name, target);
         }
