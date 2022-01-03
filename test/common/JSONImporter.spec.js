@@ -885,6 +885,57 @@ describe('JSONImporter', function () {
             );
         });
 
+        it('should set guid when creating @guid nodes', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            core.setAttribute(node, 'name', 'MyNode!');
+            const guid = '0d2e0ef3-5b8f-9bc4-45a0-8abab4433565';
+            const container = {
+                id: `@guid:${guid}`,
+                attributes: {name: 'newguidtest'},
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getGuid(containerNode),
+                guid,
+                'Did not set guid on creation'
+            );
+        });
+
+        it('should set path when creating @path nodes', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            core.setAttribute(node, 'name', 'MyNode!');
+            const path = 'testPath';
+            const container = {
+                id: `@path:${path}`,
+                attributes: {name: 'newpathtest'},
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getPath(containerNode).split('/').pop(),
+                path,
+                'Did not set path on creation'
+            );
+        });
+
+        it('should set path when "path" set', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            core.setAttribute(node, 'name', 'MyNode!');
+            const path = 'testPath';
+            const container = {
+                path,
+                attributes: {name: 'newpathtest2'},
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getPath(containerNode).split('/').pop(),
+                path,
+                'Did not set path on creation'
+            );
+        });
+
         describe('prepare', function() {
             it('should add @meta node to META', async function() {
                 const selector = new Importer.NodeSelector('@meta:TestMeta');

@@ -251,8 +251,13 @@ define([
             }
             const idString = state.id;
             const fco = await this.core.loadByPath(this.rootNode, '/1');
-            const node = this.core.createNode({base: base || fco, parent});
             const selector = new NodeSelector(idString);
+            const params = selector.prepareCreateParams({
+                    base: base || fco,
+                    parent,
+                    relid: state.path?.split('/').pop()
+                });
+            const node = this.core.createNode(params);
             await selector.prepare(this.core, this.rootNode, node);
             return node;
         }
@@ -278,7 +283,7 @@ define([
         }
 
         async import(parent, state) {
-            const node = await this.createNode(parent);
+            const node = await this.createNode(parent, state);
             await this.apply(node, state);
             return node;
         }
@@ -598,6 +603,17 @@ define([
                 this.tag = '@guid';
                 this.value = idString;
             }
+        }
+
+        prepareCreateParams(params) {
+            if (this.tag === '@guid') {
+                params.guid = this.value;
+            }
+
+            if (this.tag === '@path') {
+                params.relid = this.value.split('/').pop();
+            }
+            return params;
         }
 
         async prepare(core, rootNode, node) {
