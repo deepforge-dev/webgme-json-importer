@@ -188,6 +188,7 @@ describe('JSONImporter', function () {
             node2 = core.createNode({base, parent});
             core.setAttribute(node2, 'name', 'Node2');
             node3 = core.createNode({base, parent});
+            core.setPointer(node2, 'existingPtr', node3);
             core.setAttribute(node3, 'name', 'Node3');
             original2 = await importer.toJSON(node2);
         });
@@ -211,6 +212,12 @@ describe('JSONImporter', function () {
                 delete original2.pointers.base;
                 await importer.apply(node2, original2);
                 assert.equal(core.getPointerPath(node2, 'base'), null);
+            });
+
+            it('should set pointer to null', async function() {
+                original2.pointers.existingPtr = null;
+                await importer.apply(node2, original2);
+                assert.equal(core.getPointerPath(node2, 'existingPtr'), null);
             });
 
             it('should change pointer', async function() {
