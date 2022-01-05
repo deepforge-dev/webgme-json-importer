@@ -15,6 +15,17 @@ define([
             this.rootNode = rootNode;
         }
 
+        async _metaDictToGuids(meta_dict){
+            if (meta_dict === null) return meta_dict;
+            return Object.fromEntries(
+                await Promise.all(Object.entries(meta_dict).map(async ([key, value]) => {
+                    if (key === 'min' || key === 'max') return [key, value];
+                    const node = await this.core.loadByPath(this.rootNode, key);
+                    return [this.core.getGuid(node), value];
+                }))
+            );
+        }
+
         async toJSON (node, shallow=false) {
             const json = {
                 id: this.core.getGuid(node),
@@ -29,6 +40,7 @@ define([
                 member_registry: {},
                 children_meta: {},
             };
+            const asyncTasks = [];
 
             this.core.getOwnAttributeNames(node).forEach(name => {
                 json.attributes[name] = this.core.getAttribute(node, name);
@@ -38,41 +50,52 @@ define([
                 json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
             });
 
-            this.core.getOwnPointerNames(node).forEach(name => {
-                json.pointers[name] = this.core.getPointerPath(node, name);
-            });
+            asyncTasks.push(...this.core.getOwnPointerNames(node).map(async name => {
+                const path = this.core.getPointerPath(node, name);
+                if (path) {
+                    const target = await this.core.loadByPath(this.rootNode, path);
+                    json.pointers[name] = this.core.getGuid(target);
+                } else {
+                    json.pointers[name] = path;
+                }
+            }));
             const baseNode = this.core.getBase(node);
-            json.pointers.base = baseNode && this.core.getPath(baseNode);
+            json.pointers.base = baseNode && this.core.getGuid(baseNode);
 
-            this.core.getOwnValidPointerNames(node).forEach(name => {
-                json.pointer_meta[name] = this.core.getPointerMeta(node, name);
-            });
+            asyncTasks.push(...this.core.getOwnValidPointerNames(node).map(async name => {
+                const ptr_meta = this.core.getPointerMeta(node, name);
+                json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
+            }));
 
             this.core.getOwnRegistryNames(node).forEach(name => {
                 json.registry[name] = this.core.getRegistry(node, name);
             });
 
-            this.core.getOwnSetNames(node).forEach(name => {
-                const members = this.core.getMemberPaths(node, name);
-                json.sets[name] = members;
+            asyncTasks.push(...this.core.getOwnSetNames(node).map(async name => {
+                const paths = this.core.getMemberPaths(node, name);
+                const members = await Promise.all(paths.map(path => this.core.loadByPath(this.rootNode, path)));
+                const memberGuids = members.map(member => this.core.getGuid(member));
+                json.sets[name] = memberGuids;
 
                 members.forEach(member => {
+                    let guid = this.core.getGuid(member);
+                    let memberPath = this.core.getPath(member);
                     json.member_attributes[name] = {};
-                    json.member_attributes[name][member] = {};
+                    json.member_attributes[name][guid] = {};
 
-                    this.core.getMemberAttributeNames(node, name, member).forEach(attrName => {
-                        const value = this.core.getMemberAttribute(node, name, member, attrName);
-                        json.member_attributes[name][member][attrName] = value;
+                    this.core.getMemberAttributeNames(node, name, memberPath).forEach(attrName => {
+                        const value = this.core.getMemberAttribute(node, name, memberPath, attrName);
+                        json.member_attributes[name][guid][attrName] = value;
                     });
 
                     json.member_registry[name] = {};
-                    json.member_registry[name][member] = {};
-                    this.core.getMemberRegistryNames(node, name, member).forEach(regName => {
-                        const value = this.core.getMemberRegistry(node, name, member, regName);
-                        json.member_registry[name][member][regName] = value;
+                    json.member_registry[name][guid] = {};
+                    this.core.getMemberRegistryNames(node, name, memberPath).forEach(regName => {
+                        const value = this.core.getMemberRegistry(node, name, memberPath, regName);
+                        json.member_registry[name][guid][regName] = value;
                     });
                 });
-            });
+            }));
 
             if (!shallow) {
                 json.children = [];
@@ -82,8 +105,11 @@ define([
                 }
             }
 
-            json.children_meta = this.core.getChildrenMeta(node);
-
+            asyncTasks.push(
+                this._metaDictToGuids(this.core.getChildrenMeta(node))
+                    .then(children_meta => json.children_meta = children_meta)
+            );
+            await Promise.all(asyncTasks);
             return json;
         }
 
@@ -387,21 +413,25 @@ define([
             this.core.setPointerMetaLimits(node, name, meta.min, meta.max);
         } else {
             const meta = this.core.getPointerMeta(node, name);
-            setNested(meta, change.key.slice(2), change.value);
-
-            const targetMeta = meta[idOrMinMax];
             const target = await this.getNode(node, idOrMinMax, resolvedSelectors);
+            const gmeId = await this.core.getPath(target);
+            const keys = change.key.slice(2);
+            keys[0] = gmeId;
+            setNested(meta, keys, change.value);
+
+            const targetMeta = meta[gmeId];
             this.core.setPointerMetaTarget(node, name, target, targetMeta.min, targetMeta.max);
         }
     };
 
-    Importer.prototype._delete.pointer_meta = function(node, change) {
+    Importer.prototype._delete.pointer_meta = async function(node, change, resolvedSelectors) {
         const [/*type*/, name, targetId] = change.key;
         const removePointer = targetId === undefined;
         if (removePointer) {
             this.core.delPointerMeta(node, name);
         } else {
-            this.core.delPointerMetaTarget(node, name, targetId);
+            const gmeId = await this.getNodeId(node, targetId, resolvedSelectors);
+            this.core.delPointerMetaTarget(node, name, gmeId);
         }
     };
 
@@ -430,7 +460,8 @@ define([
         const [/*"children_meta"*/, idOrMinMax] = change.key;
         const isNodeId = !['min', 'max'].includes(idOrMinMax);
         if (isNodeId) {
-            this.core.delChildMeta(node, idOrMinMax);
+            const gmeId = await this.getNodeId(node, idOrMinMax, resolvedSelectors);
+            this.core.delChildMeta(node, gmeId);
         }
     };
 
@@ -483,14 +514,15 @@ define([
         }
     };
 
-    Importer.prototype._delete.member_attributes = function(node, change) {
+    Importer.prototype._delete.member_attributes = async function(node, change, resolvedSelectors) {
         const [/*type*/, set, nodeId, name] = change.key;
+        const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllAttributes = name === undefined;
         const attributeNames = deleteAllAttributes ?
-            this.core.getMemberAttributeNames(node, set, nodeId) : [name];
+            this.core.getMemberAttributeNames(node, set, gmeId) : [name];
 
         attributeNames.forEach(name => {
-            this.core.delMemberAttribute(node, set, nodeId, name);
+            this.core.delMemberAttribute(node, set, gmeId, name);
         });
     };
 
@@ -522,14 +554,15 @@ define([
         }
     };
 
-    Importer.prototype._delete.member_registry = function(node, change) {
+    Importer.prototype._delete.member_registry = async function(node, change, resolvedSelectors) {
         const [/*type*/, set, nodeId, name] = change.key;
+        const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllRegistryValues = name === undefined;
         const attributeNames = deleteAllRegistryValues ?
-            this.core.getMemberRegistryNames(node, set, nodeId) : [name];
+            this.core.getMemberRegistryNames(node, set, gmeId) : [name];
 
         attributeNames.forEach(name => {
-            this.core.delMemberRegistry(node, set, nodeId, name);
+            this.core.delMemberRegistry(node, set, gmeId, name);
         });
     };
 

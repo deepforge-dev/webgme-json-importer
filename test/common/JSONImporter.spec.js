@@ -289,7 +289,7 @@ describe('JSONImporter', function () {
 
                 const schemaAp = await importer.toJSON(nodeAp);
                 const [schemaBp] = schemaAp.children;
-                assert.equal(schemaBp.pointers.base, core.getPath(nodeB));
+                assert.equal(schemaBp.pointers.base, core.getGuid(nodeB));
             });
         });
 
@@ -318,20 +318,22 @@ describe('JSONImporter', function () {
             });
 
             it('should delete pointer meta target', async function() {
-                const nodeId = core.getPath(node2);
-                delete original2.pointer_meta.myPtr[nodeId];
+                const nodePath = core.getPath(node2);
+                const nodeGuid = core.getGuid(node2);
+                delete original2.pointer_meta.myPtr[nodeGuid];
                 await importer.apply(node2, original2);
                 const meta = core.getPointerMeta(node2, 'myPtr');
-                assert.equal(meta[nodeId], undefined);
+                assert.equal(meta[nodePath], undefined);
                 assert.notEqual(meta[core.getPath(node3)], undefined);
             });
 
             it('should update pointer target limits', async function() {
-                const nodeId = core.getPath(node2);
-                original2.pointer_meta.myPtr[nodeId].min = 1;
+                const nodeGuid = core.getGuid(node2);
+                original2.pointer_meta.myPtr[nodeGuid].min = 1;
                 await importer.apply(node2, original2);
                 const meta = core.getPointerMeta(node2, 'myPtr');
-                assert.equal(meta[nodeId].min, 1);
+                const nodePath = core.getPath(node2);
+                assert.equal(meta[nodePath].min, 1);
             });
 
             it('should update pointer limits', async function() {
@@ -362,15 +364,15 @@ describe('JSONImporter', function () {
             it('should include children_meta', async function() {
                 core.setChildMeta(node2, node3);
                 const json = await importer.toJSON(node2);
-                const nodeId = core.getPath(node3);
-                assert.deepEqual(json.children_meta[nodeId], {min: -1, max: -1});
+                const nodeGuid = core.getGuid(node3);
+                assert.deepEqual(json.children_meta[nodeGuid], {min: -1, max: -1});
             });
 
             it('should include children_meta w/ limits', async function() {
                 core.setChildMeta(node2, node3, 2, 5);
                 const json = await importer.toJSON(node2);
-                const nodeId = core.getPath(node3);
-                assert.deepEqual(json.children_meta[nodeId], {min: 2, max: 5});
+                const nodeGuid = core.getGuid(node3);
+                assert.deepEqual(json.children_meta[nodeGuid], {min: 2, max: 5});
             });
 
             it('should include children limits', async function() {
@@ -415,8 +417,8 @@ describe('JSONImporter', function () {
             it('should remove valid child type', async function() {
                 core.setChildMeta(node2, node3);
                 const json = await importer.toJSON(node2);
-                const nodeId = core.getPath(node3);
-                delete json.children_meta[nodeId];
+                const nodeGuid = core.getGuid(node3);
+                delete json.children_meta[nodeGuid];
 
                 await importer.apply(node2, json);
                 assert.equal(core.getChildrenMeta(node2), null);
@@ -467,7 +469,10 @@ describe('JSONImporter', function () {
                 const newMembers = original2.sets[setName].slice();
                 await importer.apply(node2, original2);
                 const members = core.getMemberPaths(node2, setName);
-                assert.deepEqual(members, newMembers);
+                assert.equal(members.length, 1);
+                const [memberPath] = members;
+                const member = await core.loadByPath(root, memberPath)
+                assert.equal(core.getGuid(member), newMembers[0])
             });
 
             it('should create empty set', async function() {
@@ -487,18 +492,19 @@ describe('JSONImporter', function () {
 
             describe('attributes', function() {
                 const attrName = 'myAttr';
-                let nodeId;
+                let nodeGuid, nodePath;
                 beforeEach(async () => {
-                    nodeId = core.getPath(node3);
-                    core.setMemberAttribute(node2, setName, nodeId, attrName, 'hello');
+                    nodePath = core.getPath(node3);
+                    nodeGuid = core.getGuid(node3);
+                    core.setMemberAttribute(node2, setName, nodePath, attrName, 'hello');
                     original2 = await importer.toJSON(node2);
                 });
 
                 it('should set member attributes', async function() {
-                    original2.member_attributes[setName][nodeId][attrName] = 'world';
+                    original2.member_attributes[setName][nodeGuid][attrName] = 'world';
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberAttribute(node2, setName, nodeId, attrName),
+                        core.getMemberAttribute(node2, setName, nodePath, attrName),
                         'world'
                     );
                 });
@@ -530,26 +536,26 @@ describe('JSONImporter', function () {
                 });
 
                 it('should delete member attributes', async function() {
-                    delete original2.member_attributes[setName][nodeId][attrName];
+                    delete original2.member_attributes[setName][nodeGuid][attrName];
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberAttribute(node2, setName, nodeId, attrName),
+                        core.getMemberAttribute(node2, setName, nodePath, attrName),
                         undefined
                     );
                 });
 
                 it('should delete all member attributes for set', async function() {
-                    core.setMemberAttribute(node2, setName, nodeId, 'attr2', 'world');
+                    core.setMemberAttribute(node2, setName, nodePath, 'attr2', 'world');
                     original2 = await importer.toJSON(node2);
 
-                    delete original2.member_attributes[setName][nodeId];
+                    delete original2.member_attributes[setName][nodeGuid];
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberAttribute(node2, setName, nodeId, attrName),
+                        core.getMemberAttribute(node2, setName, nodePath, attrName),
                         undefined
                     );
                     assert.equal(
-                        core.getMemberAttribute(node2, setName, nodeId, 'attr2'),
+                        core.getMemberAttribute(node2, setName, nodePath, 'attr2'),
                         undefined
                     );
                 });
@@ -557,78 +563,80 @@ describe('JSONImporter', function () {
 
             describe('registry', function() {
                 const regName = 'myReg';
-                let nodeId;
+                let nodePath;
+                let nodeGuid;
                 beforeEach(async () => {
-                    nodeId = core.getPath(node3);
+                    nodePath = core.getPath(node3);
+                    nodeGuid = core.getGuid(node3);
                     const position = {x: 1, y: 2};
-                    core.setMemberRegistry(node2, setName, nodeId, regName, position);
+                    core.setMemberRegistry(node2, setName, nodePath, regName, position);
                     original2 = await importer.toJSON(node2);
                 });
 
                 it('should set member registry values', async function() {
-                    original2.member_registry[setName][nodeId][regName] = 'world';
+                    original2.member_registry[setName][nodeGuid][regName] = 'world';
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberRegistry(node2, setName, nodeId, regName),
+                        core.getMemberRegistry(node2, setName, nodePath, regName),
                         'world'
                     );
                 });
 
                 it('should set new member registry values', async function() {
-                    const nodeId = core.getPath(node4);
-                    original2.sets[setName] = [nodeId];
-                    original2.member_registry[setName][nodeId] = {};
-                    original2.member_registry[setName][nodeId][regName] = 'world';
+                    const nodePath = core.getPath(node4);
+                    original2.sets[setName] = [nodePath];
+                    original2.member_registry[setName][nodePath] = {};
+                    original2.member_registry[setName][nodePath][regName] = 'world';
 
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberRegistry(node2, setName, nodeId, regName),
+                        core.getMemberRegistry(node2, setName, nodePath, regName),
                         'world'
                     );
                 });
 
                 it('should set member registry on new set', async function() {
-                    const nodeId = core.getPath(node4);
-                    original2.sets[setName] = [nodeId];
-                    original2.member_registry[setName][nodeId] = {};
-                    original2.member_registry[setName][nodeId][regName] = 'world';
+                    const nodePath = core.getPath(node4);
+                    original2.sets[setName] = [nodePath];
+                    original2.member_registry[setName][nodePath] = {};
+                    original2.member_registry[setName][nodePath][regName] = 'world';
 
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberRegistry(node2, setName, nodeId, regName),
+                        core.getMemberRegistry(node2, setName, nodePath, regName),
                         'world'
                     );
                 });
 
                 it('should delete member registry values', async function() {
-                    delete original2.member_registry[setName][nodeId][regName];
+                    delete original2.member_registry[setName][nodeGuid][regName];
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberRegistry(node2, setName, nodeId, regName),
+                        core.getMemberRegistry(node2, setName, nodePath, regName),
                         undefined
                     );
                 });
 
                 it('should delete all member registry values for set', async function() {
-                    core.setMemberRegistry(node2, setName, nodeId, 'attr2', 'world');
+                    core.setMemberRegistry(node2, setName, nodePath, 'attr2', 'world');
                     original2 = await importer.toJSON(node2);
 
-                    delete original2.member_registry[setName][nodeId];
+                    delete original2.member_registry[setName][nodeGuid];
                     await importer.apply(node2, original2);
                     assert.equal(
-                        core.getMemberRegistry(node2, setName, nodeId, regName),
+                        core.getMemberRegistry(node2, setName, nodePath, regName),
                         undefined
                     );
                     assert.equal(
-                        core.getMemberRegistry(node2, setName, nodeId, 'attr2'),
+                        core.getMemberRegistry(node2, setName, nodePath, 'attr2'),
                         undefined
                     );
                 });
 
                 it('should set nested member registry', async function() {
-                    original2.member_registry[setName][nodeId][regName].x = 3;
+                    original2.member_registry[setName][nodeGuid][regName].x = 3;
                     await importer.apply(node2, original2);
-                    const newPosition = core.getMemberRegistry(node2, setName, nodeId, regName);
+                    const newPosition = core.getMemberRegistry(node2, setName, nodePath, regName);
                     assert.equal(
                         newPosition.x,
                         3
