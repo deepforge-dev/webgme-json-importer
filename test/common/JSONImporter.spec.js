@@ -274,6 +274,13 @@ describe('JSONImporter', function () {
             });
 
             it('should set base correctly during structural inheritance', async function() {
+                // Create nodes: A, B, and A' where 
+                //   - B is contained in A
+                //   - A' inherits from A
+                //
+                // Check that:
+                //   - B' exists (ie, it is created)
+                //   - B' inherits from B
                 const fco = await core.loadByPath(root, '/1');
                 const nodeA = core.createNode({base: fco, parent: root});
                 core.setAttribute(nodeA, 'name', 'A');
