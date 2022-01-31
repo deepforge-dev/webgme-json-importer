@@ -566,6 +566,18 @@ describe('JSONImporter', function () {
                         undefined
                     );
                 });
+
+                it('should delete all member attributes when member removed', async function() {
+                    core.setMemberAttribute(node2, setName, nodePath, 'attr2', 'world');
+                    original2 = await importer.toJSON(node2);
+
+                    // remove member from set
+                    original2.sets[setName] = [];
+                    delete original2.member_attributes[setName][nodeGuid];
+                    delete original2.member_registry[setName][nodeGuid];
+
+                    await importer.apply(node2, original2);
+                });
             });
 
             describe('registry', function() {
