@@ -518,12 +518,25 @@ define([
         const [/*type*/, set, nodeId, name] = change.key;
         const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllAttributes = name === undefined;
-        const attributeNames = deleteAllAttributes ?
-            this.core.getMemberAttributeNames(node, set, gmeId) : [name];
+        const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
 
-        attributeNames.forEach(name => {
-            this.core.delMemberAttribute(node, set, gmeId, name);
-        });
+        if (isMember) {
+            const attributeNames = deleteAllAttributes ?
+                this.core.getMemberAttributeNames(node, set, gmeId) : [name];
+
+            attributeNames.forEach(name => {
+                this.core.delMemberAttribute(node, set, gmeId, name);
+            });
+        } else {
+            if (!deleteAllAttributes) {
+                const member = await this.core.loadByPath(this.rootNode, gmeId);
+                const memberName = this.core.getAttribute(member, 'name');
+                const memberDisplay = `${memberName} (${gmeId})`;
+
+                throw new Error(`Cannot delete partial member attributes for ${memberDisplay}`);
+            }
+        }
+
     };
 
     Importer.prototype._put.member_registry = async function(node, change, resolvedSelectors) {
@@ -558,12 +571,25 @@ define([
         const [/*type*/, set, nodeId, name] = change.key;
         const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllRegistryValues = name === undefined;
-        const attributeNames = deleteAllRegistryValues ?
-            this.core.getMemberRegistryNames(node, set, gmeId) : [name];
+        const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
 
-        attributeNames.forEach(name => {
-            this.core.delMemberRegistry(node, set, gmeId, name);
-        });
+        if (isMember) {
+            const attributeNames = deleteAllRegistryValues ?
+                this.core.getMemberRegistryNames(node, set, gmeId) : [name];
+
+            attributeNames.forEach(name => {
+                this.core.delMemberRegistry(node, set, gmeId, name);
+            });
+        } else {
+            if (!deleteAllRegistryValues) {
+                const member = await this.core.loadByPath(this.rootNode, gmeId);
+                const memberName = this.core.getAttribute(member, 'name');
+                const memberDisplay = `${memberName} (${gmeId})`;
+
+                throw new Error(`Cannot delete partial member registry values for ${memberDisplay}`);
+            }
+        }
+
     };
 
     Importer.prototype._put.registry = function(node, change) {
