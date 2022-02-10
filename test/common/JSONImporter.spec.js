@@ -10,6 +10,7 @@ describe('JSONImporter', function () {
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
+    const SEED_DIR = path.join(__dirname, '..', '..', 'src', 'seeds');
     const Q = testFixture.Q;
     const logger = testFixture.logger.fork('JSONImporter');
     const projectName = 'testProject';
@@ -25,7 +26,7 @@ describe('JSONImporter', function () {
         storage = testFixture.getMemoryStorage(logger, gmeConfig, gmeAuth);
         await storage.openDatabase();
         const importParam = {
-            projectSeed: path.join(testFixture.SEED_DIR, 'EmptyProject.webgmex'),
+            projectSeed: path.join(SEED_DIR, 'test', 'test.webgmex'),
             projectName: projectName,
             branchName: 'master',
             logger: logger,
@@ -58,10 +59,12 @@ describe('JSONImporter', function () {
     let importer,
         node,
         original,
-        root;
+        root,
+        fco;
 
     beforeEach(async () => {
         root = await getNewRootNode(core);
+        fco = await core.loadByPath(root, '/1');
         importer = new Importer(core, root);
         node = (await core.loadChildren(root))[0];
         original = await importer.toJSON(node);
@@ -75,27 +78,33 @@ describe('JSONImporter', function () {
         });
 
         it('should set attributes using @name', async function() {
-            const rootSchema = await importer.toJSON(root);
-            rootSchema.children = [
+            const container = core.createNode({base: fco, parent: root});
+            const child = core.createNode({base: fco, parent: container});
+            core.setAttribute(child, 'name', 'TEST!');
+            const schema = await importer.toJSON(container);
+            schema.children = [
                 {
-                    id: '@name:FCO',
+                    id: '@name:TEST!',
                     attributes: {name: 'NewName'},
                 }
             ];
-            await importer.apply(root, rootSchema);
-            assert.equal(core.getAttribute(node, 'name'), 'NewName');
+            await importer.apply(container, schema);
+            assert.equal(core.getAttribute(child, 'name'), 'NewName');
         });
 
-        it('should set attributes using @attribute:name:FCO', async function() {
-            const rootSchema = await importer.toJSON(root);
-            rootSchema.children = [
+        it('should set attributes using @attribute:name:<name>', async function() {
+            const container = core.createNode({base: fco, parent: root});
+            const child = core.createNode({base: fco, parent: container});
+            core.setAttribute(child, 'name', 'TEST!');
+            const schema = await importer.toJSON(container);
+            schema.children = [
                 {
-                    id: '@attribute:name:FCO',
+                    id: '@attribute:name:TEST!',
                     attributes: {name: 'NewName'},
                 }
             ];
-            await importer.apply(root, rootSchema);
-            assert.equal(core.getAttribute(node, 'name'), 'NewName');
+            await importer.apply(container, schema);
+            assert.equal(core.getAttribute(child, 'name'), 'NewName');
         });
 
         it('should delete attributes', async function() {
@@ -228,7 +237,6 @@ describe('JSONImporter', function () {
             });
 
             it('should preserve children on base change', async function() {
-                const fco = await core.loadByPath(root, '/1');
                 const childNode = core.createNode({base: fco, parent: node2});
                 const childPath = core.getPath(childNode);
                 core.setAttribute(childNode, 'name', 'ChildNode');
@@ -246,12 +254,14 @@ describe('JSONImporter', function () {
 
             it('should resolve @meta tag even if renamed during changes', async function() {
                 const fco = await core.loadByPath(root, '/1');
-                const node = core.createNode({base: fco, parent: root});
-                core.setAttribute(node, 'name', 'MetaNode');
-                core.addMember(root, 'MetaAspectSet', node);
+                const metanode = core.createNode({base: fco, parent: root});
+                core.setAttribute(metanode, 'name', 'MetaNode');
+                core.addMember(root, 'MetaAspectSet', metanode);
+                const container = core.createNode({base: fco, parent: root});
+                const node = core.createNode({base: fco, parent: container});
+                core.setAttribute(node, 'name', 'testNode');
 
                 const newJSON = {
-                    attributes: {name: 'root'},
                     children: [
                         {
                             id: '@meta:MetaNode',
@@ -260,17 +270,35 @@ describe('JSONImporter', function () {
                             }
                         },
                         {
-                            id: '@meta:FCO',
+                            id: '@name:testNode',
                             pointers: {
+                                base: '@meta:MetaNode',
                                 testPtr: '@meta:MetaNode',
                             }
                         },
                     ]
                 };
 
-                await importer.apply(root, newJSON);
-                assert.equal(core.getAttribute(node, 'name'), 'NewMetaNodeName');
-                assert.equal(core.getPointerPath(fco, 'testPtr'), core.getPath(node));
+                await importer.apply(container, newJSON);
+                assert.equal(core.getAttribute(metanode, 'name'), 'NewMetaNodeName');
+                assert.equal(core.getPointerPath(node, 'testPtr'), core.getPath(metanode));
+            });
+
+            it('should resolve @meta tag when library prefix used', async function() {
+                const node = core.createNode({parent: root, base: fco});
+                core.setAttribute(node, 'name', 'libPrefixTest');
+                const state = {
+                    pointers: {
+                        base: '@meta:FCO',
+                        ptr: '@meta:myLibrary.A',
+                    }
+                };
+                await importer.apply(node, state);
+                const libraryAPath = '/f/n';
+                assert.equal(
+                    core.getPointerPath(node, 'ptr'),
+                    libraryAPath
+                );
             });
 
             it('should set base correctly during structural inheritance', async function() {
@@ -1040,7 +1068,7 @@ describe('JSONImporter', function () {
         });
 
         it('should create new node', async function() {
-            assert.equal(children.length, 2);
+            assert.equal(children.length, 3);
         });
 
         it('should apply changes to new node', async function() {
