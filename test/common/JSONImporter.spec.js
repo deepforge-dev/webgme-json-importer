@@ -839,6 +839,40 @@ describe('JSONImporter', function () {
             );
         });
 
+        it('should resolve @id to alias', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const state = {
+                children: [
+                    {
+                        id: "@name:Hello",
+                        alias: "test"
+                    },
+                    {
+                        children: [
+                            {pointers: {base: "@id:test"}}
+                        ]
+                    }
+                ]
+            };
+
+            const container = core.createNode({base: fco, parent: root});
+            const helloNode = core.createNode({base: fco, parent: container});
+            core.setAttribute(helloNode, 'name', 'Hello');
+            const helloGuid = core.getGuid(helloNode);
+            await importer.apply(container, state);
+
+            const children = await core.loadChildren(container);
+            const [[newHelloNode], [otherNode]] = _.partition(
+                children,
+                child => core.getAttribute(child, 'name') === 'Hello'
+            );
+            assert(newHelloNode);
+            assert.equal(helloGuid, core.getGuid(newHelloNode));
+            const [instanceNode] = await core.loadChildren(otherNode);
+            assert.equal(core.getBase(instanceNode), newHelloNode);
+
+        });
+
         it('should resolve @id when used before target\'s DFS order', async () => {
             const container = {
                 attributes: {name: 'test'},

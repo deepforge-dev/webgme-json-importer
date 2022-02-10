@@ -181,6 +181,10 @@ define([
                 const parentId = this.core.getPath(parent);
                 const selector = new NodeSelector(state.id);
                 resolvedSelectors.record(parentId, selector, node);
+                if (state.alias) {
+                    const selector = new NodeSelector('@id:' + state.alias);
+                    resolvedSelectors.record(parentId, selector, node);
+                }
             }
         }
 
