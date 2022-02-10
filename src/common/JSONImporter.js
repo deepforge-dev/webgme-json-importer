@@ -705,9 +705,30 @@ define([
             }
 
             if (this.tag === '@meta') {
-                const meta = await core.getAllMetaNodes(rootNode);
-                return Object.values(meta)
-                    .find(child => core.getAttribute(child, 'name') === this.value);
+                const metanodes = Object.values(core.getAllMetaNodes(rootNode));
+                const libraries = core.getLibraryNames(rootNode)
+                    .map(name => [
+                        core.getPath(core.getLibraryRoot(rootNode, name)),
+                        name,
+                    ]);
+
+                function getFullyQualifiedName(node) {
+                    const name = core.getAttribute(node, 'name');
+                    const path = core.getPath(node);
+                    const libraryPair = libraries.find(([rootPath,]) => path.startsWith(rootPath));
+                    if (libraryPair) {
+                        const [,libraryName] = libraryPair;
+                        return libraryName + '.' + name;
+                    }
+                    return name;
+                }
+
+                return metanodes
+                    .find(child => {
+                        const name = core.getAttribute(child, 'name');
+                        const fullName = getFullyQualifiedName(child);
+                        return name === this.value || fullName === this.value;
+                    });
             }
 
             if (this.tag === '@attribute') {

@@ -8,6 +8,7 @@ var config = require('webgme/config/config.default'),
 
 // The paths can be loaded from the webgme-setup.json
 config.plugin.basePaths.push(__dirname + '/../src/plugins');
+config.seedProjects.basePaths.push(__dirname + '/../src/seeds/test');
 
 
 
@@ -23,6 +24,6 @@ config.requirejsPaths = {
 };
 
 
-config.mongo.uri = 'mongodb://127.0.0.1:27017/webgme_json';
+config.mongo.uri = 'mongodb://127.0.0.1:27017/webgme_json_importer';
 validateConfig(config);
 module.exports = config;

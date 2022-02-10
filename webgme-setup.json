@@ -9,9 +9,15 @@
         "src": "src/plugins/ExportToJSON",
         "test": "test/plugins/ExportToJSON"
       }
+    },
+    "seeds": {
+      "test": {
+        "src": "src/seeds/test"
+      }
     }
   },
   "dependencies": {
-    "plugins": {}
+    "plugins": {},
+    "seeds": {}
   }
 }
