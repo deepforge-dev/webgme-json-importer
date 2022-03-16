@@ -510,6 +510,14 @@ describe('JSONImporter', function () {
                 assert(mixins.includes(nodeId));
                 assert.equal(mixins.length, 1);
             });
+
+            it('should throw error on invalid mixin', async function() {
+                original2.mixins.push('@meta:FCO');
+                await assert.rejects(
+                    () => importer.apply(node2, original2),
+                    /Cannot set .* as mixin/
+                );
+            });
         });
 
         describe('sets', function() {
