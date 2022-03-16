@@ -34,6 +34,7 @@ define([
                 attribute_meta: {},
                 pointers: {},
                 pointer_meta: {},
+                mixins: [],
                 registry: {},
                 sets: {},
                 member_attributes: {},
@@ -61,6 +62,7 @@ define([
             }));
             const baseNode = this.core.getBase(node);
             json.pointers.base = baseNode && this.core.getGuid(baseNode);
+            json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
 
             asyncTasks.push(...this.core.getOwnValidPointerNames(node).map(async name => {
                 const ptr_meta = this.core.getPointerMeta(node, name);
@@ -71,7 +73,9 @@ define([
                 json.registry[name] = this.core.getRegistry(node, name);
             });
 
-            asyncTasks.push(...this.core.getOwnSetNames(node).map(async name => {
+            asyncTasks.push(...this.core.getOwnSetNames(node)
+                    .filter(name => name !== '_mixins')
+                    .map(async name => {
                 const paths = this.core.getMemberPaths(node, name);
                 const members = await Promise.all(paths.map(path => this.core.loadByPath(this.rootNode, path)));
                 const memberGuids = members.map(member => this.core.getGuid(member));
@@ -136,6 +140,7 @@ define([
                 'children_meta',
                 'pointer_meta',
                 'pointers',
+                'mixins',
                 'sets',
                 'member_attributes',
                 'member_registry',
@@ -319,6 +324,25 @@ define([
         }
     }
 
+    Importer.prototype._put.mixins = async function(node, change, resolvedSelectors) {
+            const [, index] = change.key;
+            const oldMixinPath = this.core.getMixinPaths(node)[index];
+            if (oldMixinPath) {
+                console.log('deleting old mixin', oldMixinPath);
+                this.core.delMixin(node, oldMixinPath);
+            }
+
+            const mixinId = change.value;
+            const mixinPath = await this.getNodeId(node, mixinId, resolvedSelectors);
+            if (this.core.canSetAsMixin(node, mixinPath)) {
+                console.log('adding mixin', mixinPath);
+                this.core.addMixin(node, mixinPath);
+                console.log('mixin paths:', this.core.getMixinPaths(node));
+            } else {
+                throw new Error(`Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}`);
+            }
+    };
+
     Importer.prototype._put.attributes = function(node, change) {
         assert(
             change.key.length === 2,
@@ -437,6 +461,14 @@ define([
             const gmeId = await this.getNodeId(node, targetId, resolvedSelectors);
             this.core.delPointerMetaTarget(node, name, gmeId);
         }
+    };
+
+    Importer.prototype._delete.mixins = async function(node, change, resolvedSelectors) {
+            // TODO: look up the mixin at the given index. Is getMixinPaths stable?
+            const [, index] = change.key;
+            const mixinPath = this.core.getMixinPaths(node)[index];
+            console.log('deleting mixin', mixinPath);
+            this.core.delMixin(node, mixinPath);
     };
 
     Importer.prototype._put.children_meta = async function(node, change, resolvedSelectors) {

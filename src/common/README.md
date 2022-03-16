@@ -18,6 +18,7 @@ An example JSON is as follows:
         name: idOrPath,
         base: idOrPath,
     },
+    mixins: [idOrPath, ...],
     pointer_meta: {
         name: {
             idOrPath: {min=-1, max=1},  // max=-1 if it defines a set

@@ -460,6 +460,43 @@ describe('JSONImporter', function () {
             });
         });
 
+        describe('mixins', function() {
+            it('should add mixin', async function() {
+                const nodeId = core.getPath(node);
+                original2.mixins.push(nodeId);
+                await importer.apply(node2, original2);
+                const mixins = Object.keys(core.getMixinNodes(node2));
+                assert(mixins.includes(nodeId));
+                assert.equal(mixins.length, 1);
+            });
+
+            it('should remove mixin', async function() {
+                const nodeId = core.getPath(node);
+                core.addMixin(node2, nodeId);
+                await importer.apply(node2, original2);
+                const mixins = Object.keys(core.getMixinNodes(node2));
+                assert.equal(mixins.length, 0);
+            });
+
+            it.only('should change mixin', async function() {
+                const nodeId = core.getPath(node);
+                core.addMixin(node2, nodeId);
+                original2.mixins.push(core.getPath(node3));
+                await importer.apply(node2, original2);
+                const mixins = Object.keys(core.getMixinNodes(node2));
+                assert.deepEqual(mixins, original2.mixins);
+            });
+
+            it('should add mixin using ID', async function() {
+                const nodeId = core.getPath(node);
+                original2.mixins.push(nodeId);
+                await importer.apply(node2, original2);
+                const mixins = Object.keys(core.getMixinNodes(node2));
+                assert(mixins.includes(nodeId));
+                assert.equal(mixins.length, 1);
+            });
+        });
+
         describe('sets', function() {
             const setName = 'someSet';
             let node4;
