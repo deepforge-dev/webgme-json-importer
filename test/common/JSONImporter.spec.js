@@ -460,6 +460,66 @@ describe('JSONImporter', function () {
             });
         });
 
+        describe('mixins', function() {
+            let node4;
+
+            beforeEach(() => {
+                const base = node;
+                const parent = root;
+                node4 = core.createNode({base, parent});
+                core.setAttribute(node4, 'name', 'Node4');
+                core.addMember(root, 'MetaAspectSet', node4);
+
+              });
+
+            it('should add mixin', async function() {
+                const nodeId = core.getPath(node4);
+                original2.mixins.push(nodeId);
+                await importer.apply(node2, original2);
+                const mixins = core.getMixinPaths(node2);
+                assert(mixins.includes(nodeId));
+                assert.equal(mixins.length, 1);
+            });
+
+            it('should remove mixin', async function() {
+                const nodeId = core.getPath(node4);
+                core.addMixin(node2, nodeId);
+                await importer.apply(node2, original2);
+                const mixins = core.getMixinPaths(node2);
+                assert.equal(mixins.length, 0);
+            });
+
+            it('should change mixin', async function() {
+                const node5 = core.createNode({base: node, parent: root});
+                core.setAttribute(node5, 'name', 'Node5');
+                core.addMember(root, 'MetaAspectSet', node5);
+
+                const nodeId = core.getPath(node4);
+                core.addMixin(node2, nodeId);
+                original2.mixins.push(core.getPath(node5));
+                await importer.apply(node2, original2);
+                const mixins = core.getMixinPaths(node2);
+                assert.deepEqual(mixins, original2.mixins);
+            });
+
+            it('should add mixin using ID', async function() {
+                original2.mixins.push('@meta:Node4');
+                await importer.apply(node2, original2);
+                const mixins = core.getMixinPaths(node2);
+                const nodeId = core.getPath(node4);
+                assert(mixins.includes(nodeId));
+                assert.equal(mixins.length, 1);
+            });
+
+            it('should throw error on invalid mixin', async function() {
+                original2.mixins.push('@meta:FCO');
+                await assert.rejects(
+                    () => importer.apply(node2, original2),
+                    /Cannot set .* as mixin/
+                );
+            });
+        });
+
         describe('sets', function() {
             const setName = 'someSet';
             let node4;
