@@ -328,18 +328,16 @@ define([
             const [, index] = change.key;
             const oldMixinPath = this.core.getMixinPaths(node)[index];
             if (oldMixinPath) {
-                console.log('deleting old mixin', oldMixinPath);
                 this.core.delMixin(node, oldMixinPath);
             }
 
             const mixinId = change.value;
             const mixinPath = await this.getNodeId(node, mixinId, resolvedSelectors);
-            if (this.core.canSetAsMixin(node, mixinPath)) {
-                console.log('adding mixin', mixinPath);
+            const canSet = this.core.canSetAsMixin(node, mixinPath);
+            if (canSet.isOk) {
                 this.core.addMixin(node, mixinPath);
-                console.log('mixin paths:', this.core.getMixinPaths(node));
             } else {
-                throw new Error(`Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}`);
+                throw new Error(`Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}: ${canSet.reason}`);
             }
     };
 
@@ -464,10 +462,8 @@ define([
     };
 
     Importer.prototype._delete.mixins = async function(node, change, resolvedSelectors) {
-            // TODO: look up the mixin at the given index. Is getMixinPaths stable?
             const [, index] = change.key;
             const mixinPath = this.core.getMixinPaths(node)[index];
-            console.log('deleting mixin', mixinPath);
             this.core.delMixin(node, mixinPath);
     };
 
