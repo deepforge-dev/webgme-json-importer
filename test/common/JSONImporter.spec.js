@@ -853,6 +853,37 @@ describe('JSONImporter', function () {
         });
     });
 
+    describe('guid', function() {
+        it('should set guid for new nodes', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const guid = '0d2e0ef3-5b8f-9bc4-45a0-8abab4433565';
+            const container = {
+                guid,
+            };
+            const containerNode = await importer.import(root, container);
+            assert.equal(
+                core.getGuid(containerNode),
+                guid,
+                'Did not set guid on creation'
+            );
+        });
+
+        it('should change guid for existing nodes', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const node = core.createNode({base: fco, parent: root});
+            const guid = '0d2e0ef3-5b8f-9bc4-45a0-8abab4433565';
+            const nodeJson = {
+                guid,
+            };
+            await importer.apply(node, nodeJson);
+            assert.equal(
+                core.getGuid(node),
+                guid,
+                'Did not change guid'
+            );
+        });
+    });
+
     describe('findNode', function() {
         it('should find nodes using @meta', async function() {
             const fco = await importer.findNode(node, '@meta:FCO');

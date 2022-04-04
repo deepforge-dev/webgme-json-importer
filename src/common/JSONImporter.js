@@ -30,6 +30,7 @@ define([
             const json = {
                 id: this.core.getGuid(node),
                 path: this.core.getPath(node),
+                guid: this.core.getGuid(node),
                 attributes: {},
                 attribute_meta: {},
                 pointers: {},
@@ -145,7 +146,7 @@ define([
                 'member_attributes',
                 'member_registry',
             ];
-            const singleKeyFields = ['children_meta'];
+            const singleKeyFields = ['children_meta', 'guid'];
             const sortedChanges = changes
                 .filter(
                     change => change.key.length > 1 ||
@@ -292,6 +293,10 @@ define([
                     parent,
                     relid: state.path?.split('/').pop()
                 });
+
+            if (state.guid) {
+                params.guid = state.guid;
+            }
             const node = this.core.createNode(params);
             await selector.prepare(this.core, this.rootNode, node);
             return node;
@@ -323,6 +328,11 @@ define([
             return node;
         }
     }
+
+    Importer.prototype._put.guid = async function(node, change, resolvedSelectors) {
+        const {value} = change;
+        this.core.setGuid(node, value);
+    };
 
     Importer.prototype._put.mixins = async function(node, change, resolvedSelectors) {
             const [, index] = change.key;
