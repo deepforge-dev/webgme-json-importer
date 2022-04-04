@@ -264,7 +264,7 @@ define([
                 return resolved;
             }
 
-            return await selector.findNode(this.core, this.rootNode, parent);
+            return await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors.cache);
         }
 
         async getNode(parent, idString, resolvedSelectors) {
@@ -727,7 +727,7 @@ define([
             }
         }
 
-        async findNode(core, rootNode, parent) {
+        async findNode(core, rootNode, parent, nodeCache) {
             if (this.tag === '@path') {
                 return await core.loadByPath(rootNode, this.value);
             }
@@ -771,14 +771,35 @@ define([
             }
 
             if (this.tag === '@guid') {
-                return await this.findNodeWhere(
+                const getCacheKey = node => new NodeSelector(`@guid:${core.getGuid(node)}`);
+                return await this.cachedSearch(
                     core,
                     rootNode,
-                    node => core.getGuid(node) === this.value
+                    node => core.getGuid(node) === this.value,
+                    getCacheKey,
+                    nodeCache
                 );
             }
 
             throw new Error(`Unknown tag: ${this.tag}`);
+        }
+
+        async cachedSearch(core, node, fn, cacheKey, nodeCache) {
+            return await this.findNodeWhere(
+                core,
+                node,
+                node => {
+                    if (fn(node)) {
+                        return true;
+                    } else {
+                        const key = cacheKey(node);
+                        const parent = core.getParent(node);
+                        if (parent) {
+                            nodeCache.record(core.getPath(parent), key, node);
+                        }
+                    }
+                },
+            );
         }
 
         async findNodeWhere(core, node, fn) {
@@ -807,8 +828,11 @@ define([
     }
 
     class NodeSelections {
-        constructor() {
+        constructor(withCache=true) {
             this.selections = {};
+            if (withCache) {
+                this.cache = new NodeCache(500);
+            }
         }
 
         getAbsoluteTag(parentId, selector) {
@@ -825,7 +849,38 @@ define([
         }
 
         get(parentId, selector) {
+            const cachedValue = this.cache?.get(parentId, selector);
+            if (cachedValue) return cachedValue;
             return this.selections[this.getAbsoluteTag(parentId, selector)];
+        }
+    }
+
+    class NodeCache extends NodeSelections {
+        constructor(maxSize) {
+            super(false);
+            this.maxSize = maxSize;
+            this.length = 0;
+        }
+
+        record(parentId, selector, node) {
+            if (this.length < this.maxSize) {
+                super.record(parentId, selector, node);
+                this.length++;
+            }
+        }
+
+        get(parentId, selector) {
+            const value = super.get(parentId, selector);
+            if (value) {
+                this.remove(parentId, selector);
+            }
+            return value;
+        }
+
+        remove(parentId, selector) {
+            const absTag = this.getAbsoluteTag(parentId, selector);
+            delete this.selections[absTag];
+            this.length--;
         }
     }
 
