@@ -819,11 +819,16 @@ define([
 
             let skipNodes = [];
             if (searchOpts.startHint) {
-                const match = await this.findNodeWhere(core, searchOpts.startHint, fn);
-                if (match) {
-                    return match;
+                let startNode = searchOpts.startHint;
+                let match = null;
+                while (startNode) {
+                    match = await this.findNodeWhere(core, startNode, fn, skipNodes);
+                    if (match) {
+                        return match;
+                    }
+                    skipNodes.push(startNode);
+                    startNode = core.getParent(startNode);
                 }
-                skipNodes.push(searchOpts.startHint);
             }
 
             return await this.findNodeWhere(core, node, fn, skipNodes);
