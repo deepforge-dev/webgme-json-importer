@@ -772,16 +772,52 @@ define([
 
             if (this.tag === '@guid') {
                 const getCacheKey = node => new NodeSelector(`@guid:${core.getGuid(node)}`);
-                return await this.cachedSearch(
+                const opts = (new NodeSearchOpts())
+                    .withCache(
+                        nodeCache,
+                        getCacheKey
+                    )
+                    .firstCheck(parent);
+
+                return await this.nodeSearch(
                     core,
                     rootNode,
                     node => core.getGuid(node) === this.value,
-                    getCacheKey,
-                    nodeCache
+                    opts,
                 );
             }
 
             throw new Error(`Unknown tag: ${this.tag}`);
+        }
+
+        async nodeSearch(core, node, fn, searchOpts = new NodeSearchOpts()) {
+            if (searchOpts.cache && searchOpts.cacheKey) {
+                const {cache, cacheKey} = searchOpts;
+                const checkNode = fn;
+                fn = node => {
+                    if (checkNode(node)) {
+                        return true;
+                    } else {
+                        const key = cacheKey(node);
+                        const parent = core.getParent(node);
+                        if (parent) {
+                            cache.record(core.getPath(parent), key, node);
+                        }
+                    }
+                };
+            }
+
+            let skipNodes = [];
+            if (searchOpts.startHint) {
+                const match = await this.findNodeWhere(core, searchOpts.startHint, fn);
+                console.log('found match in start hint?', !!match, core.getPath(searchOpts.startHint));
+                if (match) {
+                    return match;
+                }
+                skipNodes.push(searchOpts.startHint);
+            }
+
+            return await this.findNodeWhere(core, node, fn, skipNodes);
         }
 
         async cachedSearch(core, node, fn, cacheKey, nodeCache) {
@@ -802,14 +838,18 @@ define([
             );
         }
 
-        async findNodeWhere(core, node, fn) {
+        async findNodeWhere(core, node, fn, skipNodes = []) {
+            if (skipNodes.includes(node)) {
+                return;
+            }
+
             if (await fn(node)) {
                 return node;
             }
 
             const children = await core.loadChildren(node);
             for (let i = 0; i < children.length; i++) {
-                const match = await this.findNodeWhere(core, children[i], fn);
+                const match = await this.findNodeWhere(core, children[i], fn, skipNodes);
                 if (match) {
                     return match;
                 }
@@ -831,7 +871,7 @@ define([
         constructor(withCache=true) {
             this.selections = {};
             if (withCache) {
-                this.cache = new NodeCache(500);
+                this.cache = new NodeCache(1000);
             }
         }
 
@@ -884,6 +924,26 @@ define([
         }
     }
 
+    class NodeSearchOpts {
+        constructor() {
+            this.cache = null;
+            this.startHint = null;
+            this.cacheKey = null;
+        }
+
+        firstCheck(startNode) {
+            this.startHint = startNode;
+            return this;
+        }
+
+        withCache(cache, cacheKey) {
+            this.cache = cache;
+            this.cacheKey = cacheKey;
+            return this;
+        }
+    }
+
     Importer.NodeSelector = NodeSelector;
+    Importer.NodeSelections = NodeSelections;
     return Importer;
 });
