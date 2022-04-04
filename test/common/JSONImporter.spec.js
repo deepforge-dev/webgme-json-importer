@@ -7,6 +7,7 @@ describe('JSONImporter', function () {
     const _ = testFixture.requirejs('underscore');
     const Core = testFixture.requirejs('common/core/coreQ');
     const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
+    const NodeSelections = Importer.NodeSelections;
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
@@ -1063,6 +1064,43 @@ describe('JSONImporter', function () {
                 core.getPath(node),
                 'Did not resolve guid'
             );
+        });
+
+        it('should search children for @guid first', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const parent = core.createNode({base: fco, parent: root});
+            const node = core.createNode({base: fco, parent});
+            const guid = core.getGuid(node);
+
+            const parentJson = {
+                children: [
+                    {
+                        id: `@guid:${guid}`
+                    }
+                ]
+            };
+            const selectors = new NodeSelections();
+            await importer.resolveSelectors(parent, parentJson, selectors);
+            assert.equal(selectors.cache.length, 1);
+        });
+
+        it('should search children of ancestors for @guid next', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const gparent = core.createNode({base: fco, parent: root});
+            const parent = core.createNode({base: fco, parent: gparent});
+            const node = core.createNode({base: fco, parent: gparent});
+            const guid = core.getGuid(node);
+
+            const parentJson = {
+                children: [
+                    {
+                        id: `@guid:${guid}`
+                    }
+                ]
+            };
+            const selectors = new NodeSelections();
+            await importer.resolveSelectors(parent, parentJson, selectors);
+            assert.equal(selectors.cache.length, 2);
         });
 
         it('should set guid when creating @guid nodes', async function() {
