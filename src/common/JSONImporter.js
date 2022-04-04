@@ -810,7 +810,6 @@ define([
             let skipNodes = [];
             if (searchOpts.startHint) {
                 const match = await this.findNodeWhere(core, searchOpts.startHint, fn);
-                console.log('found match in start hint?', !!match, core.getPath(searchOpts.startHint));
                 if (match) {
                     return match;
                 }
