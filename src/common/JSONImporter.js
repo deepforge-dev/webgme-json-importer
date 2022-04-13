@@ -13,6 +13,7 @@ define([
         constructor(core, rootNode) {
             this.core = core;
             this.rootNode = rootNode;
+            this._nodeIDCounter = 1;
         }
 
         async _metaDictToGuids(meta_dict){
@@ -283,7 +284,7 @@ define([
 
         async createNode(parent, state={}, base) {
             if (!state.id) {
-                state.id = `@id:${Date.now() + Math.floor(100*Math.random())}`;
+                state.id = `@internal:${this._nodeIDCounter++}`;
             }
             const idString = state.id;
             const fco = await this.core.loadByPath(this.rootNode, '/1');
@@ -776,7 +777,7 @@ define([
                     .find(child => core.getAttribute(child, attr) === value);
             }
 
-            if (this.tag === '@id') {
+            if (this.tag === '@id' || this.tag === '@internal') {
                 return null;
             }
 
@@ -877,7 +878,7 @@ define([
 
         isAbsolute() {
             return this.tag === '@meta' || this.tag === '@path' ||
-                this.tag === '@id' || this.tag === '@guid';
+                this.tag === '@id' || this.tag === '@guid' || this.tag === '@internal';
         }
     }
 
