@@ -1154,6 +1154,17 @@ describe('JSONImporter', function () {
             );
         });
 
+        it('should not have collisions for auto-gen IDs', async function() {
+            const fco = await core.loadByPath(root, '/1');
+            const container = core.createNode({base: fco, parent: root});
+            const childCount = 1000;
+            const schema = {
+                children: [...new Array(childCount)].map(() => ({})),
+            };
+            await importer.apply(container, schema);
+            assert.equal(childCount, core.getChildrenPaths(container).length);
+        });
+
         describe('prepare', function() {
             it('should add @meta node to META', async function() {
                 const selector = new Importer.NodeSelector('@meta:TestMeta');
