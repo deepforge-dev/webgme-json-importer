@@ -5,6 +5,7 @@ const testFixture = require('../test/globals');
 const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
 const {Command, Option} = require('commander');
 const NodeSelections = Importer.NodeSelections;
+const fs = require('fs');
 
 function asyncBench(fn) {
     return {
@@ -39,8 +40,16 @@ async function benchMarkGuids({root, fco, core, importer, suite}) {
     }));
 }
 
-async function benchMarkAnnotations({root, fco, core, importer, suite}) {
-    // ToDo: Implement
+async function benchMarkAnnotations({root, resetProject, core, importer, suite}) {
+    const newStatePath = testFixture.path.join(testFixture.TESTS_SEED_DIR, 'annotations', 'annotationSubTree.json');
+    const newState = JSON.parse(fs.readFileSync(newStatePath, 'utf-8'));
+    const imageNodeId = '/g/o';
+    const imageNode = await core.loadByPath(root, imageNodeId);
+    const prevState = await importer.toJSON(imageNode);
+    suite.add('apply new state to existing image using @guid selectors', asyncBench(async function() {
+        await importer.apply(imageNode, newState);
+        await importer.apply(imageNode, prevState); // ToDo: How to account this change there an after Each function
+    }));
 }
 
 const benchmarks = {

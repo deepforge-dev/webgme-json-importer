@@ -5,8 +5,6 @@ const _ = testFixture.requirejs('underscore');
 const Core = testFixture.requirejs('common/core/coreQ');
 const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
 const gmeConfig = testFixture.getGmeConfig();
-const path = testFixture.path;
-const SEED_DIR = path.join(__dirname, '..', 'src', 'seeds');
 const Q = testFixture.Q;
 const logger = testFixture.logger.fork('JSONImporter');
 const projectName = 'testProject';
@@ -52,7 +50,7 @@ class WJIBenchmark {
         this.storage = testFixture.getMemoryStorage(logger, gmeConfig, this.gmeAuth);
         await this.storage.openDatabase();
         const importParam = {
-            projectSeed: path.join(SEED_DIR, this.projectSeedName, `${this.projectSeedName}.webgmex`),
+            projectSeed: testFixture.path.join(testFixture.TESTS_SEED_DIR, this.projectSeedName, `${this.projectSeedName}.webgmex`),
             projectName: projectName,
             branchName: 'master',
             logger: logger,
@@ -76,7 +74,7 @@ class WJIBenchmark {
     async run() {
         await this.before();
         const {root, fco, importer} = await this.getNewProject();
-        await this.callable({root, fco, importer, core: this.core, suite: this.suite});
+        await this.callable({root, fco, importer, core: this.core, suite: this.suite, resetProject: async () => await this.getNewProject()});
         this.suite.on('complete', function() {
             this.forEach(bench => console.log(bench.stats));
         }).run({ 'async': true }); // runAsync
