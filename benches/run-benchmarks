@@ -74,4 +74,3 @@ const program = new Command('WJI benchmark')
     });
 
 program.parse();
-
