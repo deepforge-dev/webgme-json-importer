@@ -1,0 +1,85 @@
+#! /usr/bin/env node
+
+const WJIBenchmark = require('./benchmark');
+const testFixture = require('../test/globals');
+const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
+const {Command, Option} = require('commander');
+const NodeSelections = Importer.NodeSelections;
+const fs = require('fs');
+
+function asyncBench(fn) {
+    return {
+        defer: true,
+        async fn(deferred) {
+            await fn();
+            deferred.resolve();
+        }
+    }
+}
+
+async function benchMarkGuids({root, fco, core, importer, suite}) {
+    const parent = root;
+    const base = fco;
+    for (let i = 0; i < 900; i++) {
+        const node = core.createNode({parent, base});
+        core.setAttribute(node, 'name', `node_${i}`);
+    }
+
+    const guids = [...new Array(100)].map((_, i) => {
+        const node = core.createNode({parent, base});
+        core.setAttribute(node, 'name', `selected_node_${i}`);
+        return core.getGuid(node);
+    });
+
+    const json = {
+        children: guids.map(guid => ({id: `@guid:${guid}`})),
+    };
+    suite.add('resolve 100 @guid nodes (among 1000 children)', asyncBench(async function () {
+        const selectors = new NodeSelections();
+        await importer.resolveSelectors(root, json, selectors);
+    }));
+}
+
+async function benchMarkAnnotations({root, /* fco, */ core, importer, suite}) {
+    const newStatePath = testFixture.path.join(testFixture.TESTS_SEED_DIR, 'annotations', 'annotationSubTree.json');
+    const newState = JSON.parse(fs.readFileSync(newStatePath, 'utf-8'));
+    const imageNodeId = '/g/o';
+    const imageNode = await core.loadByPath(root, imageNodeId);
+    const prevState = await importer.toJSON(imageNode);
+    suite.add('apply new state to existing image using @guid selectors', asyncBench(async function() {
+        await importer.apply(imageNode, newState);
+        await importer.apply(imageNode, prevState); // FixMe: Should this be changed with random children removal?
+    }));
+}
+
+const benchmarks = {
+    guidSelectors: new WJIBenchmark('test', benchMarkGuids),
+    applyGuidSubtree: new WJIBenchmark('annotations', benchMarkAnnotations)
+}
+
+const program = new Command('WJI benchmark')
+    .addOption(
+        new Option('-n --benchmark-name <name>', 'the benchmark to run')
+            .default('all')
+            .choices(Object.keys(benchmarks).concat('all'))
+    ).action(async () => {
+        const {benchmarkName} = program.opts();
+
+        async function runBenchmark(name) {
+            console.log(`about to run benchmark ${name}`);
+            const benchmark = benchmarks[name];
+            try {
+                await benchmark.run()
+            } catch (err) {
+                console.error(err);
+                process.exit(1);
+            }
+        }
+
+        const toRun = benchmarkName === 'all' ? Object.keys(benchmarks) : [benchmarkName];
+        for (let name of toRun) {
+            await runBenchmark(name);
+        }
+    });
+
+program.parse();

@@ -1,0 +1,5022 @@
+{
+  "children": [
+    {
+      "id": "@guid:5a859816-6161-1a8e-f297-21bca429c076",
+      "guid": "5a859816-6161-1a8e-f297-21bca429c076",
+      "attributes": {
+        "canonical": "#9d3fc7cd-1be2-408f-ba38-dce2c078ca5b",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:934.0419311523438,975.7670288085938)\",\"translation(dx,dy)=pixel:-0.92620849609375,509.2669677734375\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:853.0,1443.0,160.2314453125,84.0679931640625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:bc2fa5e2-714f-b2b4-aa67-f84eac4f3f8a",
+      "guid": "bc2fa5e2-714f-b2b4-aa67-f84eac4f3f8a",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:853.9262084960938,933.7330322265625,160.2314453125,84.0679931640625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:1c4c300c-e105-a993-3dda-88d5725aebe3",
+      "guid": "1c4c300c-e105-a993-3dda-88d5725aebe3",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1118.094970703125,1692.38720703125,169.531982421875,64.108642578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:5bf5a2a9-a0e3-9b63-81b9-d9132e44e7d4",
+      "guid": "5bf5a2a9-a0e3-9b63-81b9-d9132e44e7d4",
+      "attributes": {
+        "canonical": "#15eba670-4afb-4e3e-9e72-9e26ece103ac",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1202.8609619140625,1724.4415283203125)\",\"translation(dx,dy)=pixel:-0.094970703125,-540.38720703125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1118.0,1152.0,169.531982421875,64.108642578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:b5bb92c5-d96f-4f90-d6d9-6394e099a3cd",
+      "guid": "b5bb92c5-d96f-4f90-d6d9-6394e099a3cd",
+      "attributes": {
+        "canonical": "#15eba670-4afb-4e3e-9e72-9e26ece103ac",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1202.8609619140625,1724.4415283203125)\",\"translation(dx,dy)=pixel:-0.094970703125,-1050.38720703125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1118.0,642.0,169.531982421875,64.108642578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:6d62038d-94f6-c031-6efe-820f0a51c627",
+      "guid": "6d62038d-94f6-c031-6efe-820f0a51c627",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1127.4898681640625,2237.108642578125,156.314453125,54.413330078125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:e671195c-2109-2b75-d635-34df86a24e91",
+      "guid": "e671195c-2109-2b75-d635-34df86a24e91",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:848.9779663085938,406.9220275878906,139.08978271484375,55.635894775390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:fe6422e4-e8e4-42a4-828f-a02197bb0a9a",
+      "guid": "fe6422e4-e8e4-42a4-828f-a02197bb0a9a",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2246.084716796875,814.696044921875,129.4736328125,58.4193115234375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:a0a87f24-0f11-4a7c-a06e-56653f1f415f",
+      "guid": "a0a87f24-0f11-4a7c-a06e-56653f1f415f",
+      "attributes": {
+        "canonical": "#f820d233-fe02-4e2c-99bf-df4128a199cb",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1871.744384765625,582.0579833984375)\",\"translation(dx,dy)=pixel:-0.2803955078125,1588.4744873046875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1811.0,2141.0,120.927978515625,59.06494140625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:f820d233-fe02-4e2c-99bf-df4128a199cb",
+      "guid": "f820d233-fe02-4e2c-99bf-df4128a199cb",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1811.2803955078125,552.5255126953125,120.927978515625,59.06494140625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:574cb864-02f7-f758-42e9-14e9413c6e9b",
+      "guid": "574cb864-02f7-f758-42e9-14e9413c6e9b",
+      "attributes": {
+        "canonical": "#aae6a97c-bf6b-4286-bdd6-6519fa6c8ff0",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:711.4052429199219,700.2839050292969)\",\"translation(dx,dy)=pixel:-0.40130615234375,509.31072998046875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "LED"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": "True"
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:665.0,1172.0,92.00787353515625,75.18927001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:8914d90a-344e-40b4-b4ec-f32839256a89",
+      "guid": "8914d90a-344e-40b4-b4ec-f32839256a89",
+      "attributes": {
+        "canonical": "#aae6a97c-bf6b-4286-bdd6-6519fa6c8ff0",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:711.4052429199219,700.2839050292969)\",\"translation(dx,dy)=pixel:-0.40130615234375,1019.3107299804688\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "LED"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": "True"
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:665.0,1682.0,92.00787353515625,75.18927001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:95f8ffef-bf00-4ec8-f109-9e6cef9c839e",
+      "guid": "95f8ffef-bf00-4ec8-f109-9e6cef9c839e",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "LED"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:665.4013061523438,662.6892700195312,92.00787353515625,75.18927001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:99f6b69a-3649-5640-3207-7da1a0f52955",
+      "guid": "99f6b69a-3649-5640-3207-7da1a0f52955",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:285.40838623046875,370.30859375,105.46246337890625,65.26144409179688"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:0e1655ef-fc83-8d41-d26b-7fb39291f7f0",
+      "guid": "0e1655ef-fc83-8d41-d26b-7fb39291f7f0",
+      "attributes": {
+        "canonical": "#6341773b-83bb-416e-91ef-c67b739837ad",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:338.1396179199219,402.93931579589844)\",\"translation(dx,dy)=pixel:-0.40838623046875,1558.69140625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:285.0,1929.0,105.46246337890625,65.26144409179688"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:8c2bd2bc-8d13-cc3e-7f21-c4492e225fe4",
+      "guid": "8c2bd2bc-8d13-cc3e-7f21-c4492e225fe4",
+      "attributes": {
+        "canonical": "#8365732b-cfd1-4ff8-9293-6140a0f388ce",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:334.56475830078125,944.7401428222656)\",\"translation(dx,dy)=pixel:-0.747039794921875,509.23760986328125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:286.0,1421.0,95.63543701171875,65.95550537109375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:46e5593e-f607-94bf-4a14-1c6f2c495470",
+      "guid": "46e5593e-f607-94bf-4a14-1c6f2c495470",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:286.7470397949219,911.7623901367188,95.63543701171875,65.95550537109375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:6c71a585-67f6-4f33-a341-36818b129023",
+      "guid": "6c71a585-67f6-4f33-a341-36818b129023",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2199.93017578125,1165.0433349609375,158.549072265625,38.5361328125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "guid": "9e303883-ee96-4747-b860-3bef137f903c",
+      "attributes": {
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2863.970947265625,1105.61767578125,157.44287109375,38.1680908203125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:f091a2a9-1e7a-4349-a93b-c0631ce11202",
+      "guid": "f091a2a9-1e7a-4349-a93b-c0631ce11202",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2201.566162109375,1045.388671875,161.56982421875,36.725341796875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:883585f8-925c-4799-913a-4b047067eaff",
+      "guid": "883585f8-925c-4799-913a-4b047067eaff",
+      "attributes": {
+        "canonical": "#2923380e-4f33-410f-9221-ece02c05870d",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2941.1510009765625,973.9207153320312)\",\"translation(dx,dy)=pixel:-1730.199951171875,209.5135498046875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1143.0,1162.0,135.902099609375,42.8685302734375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:2923380e-4f33-410f-9221-ece02c05870d",
+      "guid": "2923380e-4f33-410f-9221-ece02c05870d",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2873.199951171875,952.4864501953125,135.902099609375,42.8685302734375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:158407ca-b2c4-4c1d-8f71-0c129b50b641",
+      "guid": "158407ca-b2c4-4c1d-8f71-0c129b50b641",
+      "attributes": {
+        "canonical": "#2923380e-4f33-410f-9221-ece02c05870d",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2941.1510009765625,973.9207153320312)\",\"translation(dx,dy)=pixel:-1730.199951171875,749.5135498046875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1143.0,1702.0,135.902099609375,42.8685302734375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:4155e61a-d934-4303-92b6-69d9d582cb92",
+      "guid": "4155e61a-d934-4303-92b6-69d9d582cb92",
+      "attributes": {
+        "canonical": "#2923380e-4f33-410f-9221-ece02c05870d",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2941.1510009765625,973.9207153320312)\",\"translation(dx,dy)=pixel:-0.199951171875,59.5135498046875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2873.0,1012.0,135.902099609375,42.8685302734375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:a58c86f7-ca4e-433e-af62-6232f24ffeec",
+      "guid": "a58c86f7-ca4e-433e-af62-6232f24ffeec",
+      "attributes": {
+        "canonical": "#2923380e-4f33-410f-9221-ece02c05870d",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2941.1510009765625,973.9207153320312)\",\"translation(dx,dy)=pixel:-0.199951171875,29.5135498046875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2873.0,982.0,135.902099609375,42.8685302734375"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:1dc537f4-85d1-481d-a265-ba837367f958",
+      "guid": "1dc537f4-85d1-481d-a265-ba837367f958",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2230.3173828125,949.9005737304688,127.57177734375,45.301513671875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:efb0858d-35bc-a33c-3eed-b5de7c4dc151",
+      "guid": "efb0858d-35bc-a33c-3eed-b5de7c4dc151",
+      "attributes": {
+        "canonical": "#b18184c9-d083-420b-9ff2-38aaec248a5a",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1867.8108520507812,583.8971252441406)\",\"translation(dx,dy)=pixel:-0.8572998046875,1588.8468627929688\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1807.0,2149.0,119.9071044921875,47.48797607421875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:dfeaeccc-e68c-46fc-9877-e5abc0a1b1bc",
+      "guid": "dfeaeccc-e68c-46fc-9877-e5abc0a1b1bc",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2829.22216796875,724.0072021484375,81.07177734375,69.9693603515625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:7578e667-b23c-410f-b2ec-060558bbb79c",
+      "guid": "7578e667-b23c-410f-b2ec-060558bbb79c",
+      "attributes": {
+        "canonical": "#dfeaeccc-e68c-46fc-9877-e5abc0a1b1bc",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2869.758056640625,758.9918823242188)\",\"translation(dx,dy)=pixel:-2129.22216796875,629.9927978515625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:700.0,1354.0,81.07177734375,69.9693603515625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:8c4cc98c-818c-4238-aead-7bb174f1af84",
+      "guid": "8c4cc98c-818c-4238-aead-7bb174f1af84",
+      "attributes": {
+        "canonical": "#dfeaeccc-e68c-46fc-9877-e5abc0a1b1bc",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2869.758056640625,758.9918823242188)\",\"translation(dx,dy)=pixel:-2099.22216796875,119.9927978515625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:730.0,844.0,81.07177734375,69.9693603515625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:239ee64d-6513-4b8d-bbfe-14310a4d0bff",
+      "guid": "239ee64d-6513-4b8d-bbfe-14310a4d0bff",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1808.2135009765625,1070.540283203125,124.0677490234375,44.0369873046875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:901570c2-4224-47ee-888d-a58c28865ed5",
+      "guid": "901570c2-4224-47ee-888d-a58c28865ed5",
+      "attributes": {
+        "canonical": "#12dfc570-9af6-4478-8bcf-5cc732d9cf30",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1872.4085083007812,1093.349609375)\",\"translation(dx,dy)=pixel:-0.33837890625,539.119384765625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1814.0,1609.0,116.1402587890625,46.93798828125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:888741f9-1bbc-1ebd-7b48-de6a186de010",
+      "guid": "888741f9-1bbc-1ebd-7b48-de6a186de010",
+      "attributes": {
+        "canonical": "#98693f65-2840-4b2c-b849-dff683a8e1e8",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1501.4142456054688,669.9993591308594)\",\"translation(dx,dy)=pixel:-0.2076416015625,509.87945556640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "NPN"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1474.0,1130.0,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:a204e34f-cff8-99c0-f6ed-a7e0d57be9e9",
+      "guid": "a204e34f-cff8-99c0-f6ed-a7e0d57be9e9",
+      "attributes": {
+        "canonical": "#98693f65-2840-4b2c-b849-dff683a8e1e8",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1501.4142456054688,669.9993591308594)\",\"translation(dx,dy)=pixel:269.7923583984375,869.8794555664062\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "PNP"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1744.0,1490.0,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:024973f5-fd95-be4b-9bdc-2cfc0ddafc57",
+      "guid": "024973f5-fd95-be4b-9bdc-2cfc0ddafc57",
+      "attributes": {
+        "canonical": "#98693f65-2840-4b2c-b849-dff683a8e1e8",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1501.4142456054688,669.9993591308594)\",\"translation(dx,dy)=pixel:-0.2076416015625,1049.8794555664062\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": "True"
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "NPN"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1474.0,1670.0,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:82157990-e000-c133-ee40-6daf10d2c604",
+      "guid": "82157990-e000-c133-ee40-6daf10d2c604",
+      "attributes": {
+        "canonical": "#98693f65-2840-4b2c-b849-dff683a8e1e8",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1501.4142456054688,669.9993591308594)\",\"translation(dx,dy)=pixel:-0.2076416015625,1588.8794555664062\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "NPN"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": "True"
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1474.0,2209.0,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:0a125366-51cf-fcbc-f71c-4601e69f58a2",
+      "guid": "0a125366-51cf-fcbc-f71c-4601e69f58a2",
+      "attributes": {
+        "canonical": "#98693f65-2840-4b2c-b849-dff683a8e1e8",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1501.4142456054688,669.9993591308594)\",\"translation(dx,dy)=pixel:-0.2076416015625,509.87945556640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "NPN"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1474.0,1130.0,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:319bacb8-f88d-230c-3576-7cdcb624f089",
+      "guid": "319bacb8-f88d-230c-3576-7cdcb624f089",
+      "attributes": {
+        "canonical": "#98693f65-2840-4b2c-b849-dff683a8e1e8",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1501.4142456054688,669.9993591308594)\",\"translation(dx,dy)=pixel:269.7923583984375,299.87945556640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "PNP"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1744.0,920.0,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:462c3ea5-503d-4702-ffdd-f13a02f7b02d",
+      "guid": "462c3ea5-503d-4702-ffdd-f13a02f7b02d",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "NPN"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1474.2076416015625,620.1205444335938,54.4132080078125,99.75762939453125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:80492036-ab1a-1b48-e0bc-05420d70f03c",
+      "guid": "80492036-ab1a-1b48-e0bc-05420d70f03c",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1397.5775146484375,273.28472900390625,66.28515625,69.25323486328125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:8cdb9263-8fab-980f-7fe0-9890f6f9d947",
+      "guid": "8cdb9263-8fab-980f-7fe0-9890f6f9d947",
+      "attributes": {
+        "canonical": "#91a8cf47-2acb-4124-85a5-97f93e260e5f",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1430.7200927734375,307.9113464355469)\",\"translation(dx,dy)=pixel:-30.5775146484375,1588.7152709960938\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1367.0,1862.0,66.28515625,69.25323486328125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:406b6890-b509-beee-984c-45fe092caf4e",
+      "guid": "406b6890-b509-beee-984c-45fe092caf4e",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1481.5999755859375,2373.275146484375,78.1572265625,57.38134765625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:235e84ac-6e49-1703-1e6a-9a169cb82bc5",
+      "guid": "235e84ac-6e49-1703-1e6a-9a169cb82bc5",
+      "attributes": {
+        "canonical": "#cc01e164-f658-4086-97ec-92e96850f175",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1520.6785888671875,2401.9658203125)\",\"translation(dx,dy)=pixel:269.4000244140625,-540.275146484375\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1751.0,1833.0,78.1572265625,57.38134765625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:a01485f6-d769-0d91-f8d8-6d72fa7608c4",
+      "guid": "a01485f6-d769-0d91-f8d8-6d72fa7608c4",
+      "attributes": {
+        "canonical": "#cc01e164-f658-4086-97ec-92e96850f175",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1520.6785888671875,2401.9658203125)\",\"translation(dx,dy)=pixel:269.4000244140625,-0.275146484375\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1751.0,2373.0,78.1572265625,57.38134765625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:b967e72a-ebb2-7830-e3df-f1576ce6b988",
+      "guid": "b967e72a-ebb2-7830-e3df-f1576ce6b988",
+      "attributes": {
+        "canonical": "#cc01e164-f658-4086-97ec-92e96850f175",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:1520.6785888671875,2401.9658203125)\",\"translation(dx,dy)=pixel:-0.5999755859375,-540.275146484375\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1481.0,1833.0,78.1572265625,57.38134765625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:fc6a99e5-e78b-5669-c3d5-ef866faf4968",
+      "guid": "fc6a99e5-e78b-5669-c3d5-ef866faf4968",
+      "attributes": {
+        "canonical": "#f3d830b5-2d8b-4df9-ad4f-8a169bd6c03b",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:739.1907043457031,339.68409729003906)\",\"translation(dx,dy)=pixel:29.67645263671875,1558.5254516601562\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:738.0,1862.0,61.73431396484375,72.41909790039062"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:2e24e548-db23-ce97-f832-855c6ab2c1b5",
+      "guid": "2e24e548-db23-ce97-f832-855c6ab2c1b5",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Port"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:708.3235473632812,303.47454833984375,61.73431396484375,72.41909790039062"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:95af0ab2-3f60-fd9b-3613-98d8daaf2558",
+      "guid": "95af0ab2-3f60-fd9b-3613-98d8daaf2558",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:481.3854064941406,1563.0123291015625,87.06124877929688,49.4666748046875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:aa5047ae-e323-a0a3-b11c-ed0144c0eee4",
+      "guid": "aa5047ae-e323-a0a3-b11c-ed0144c0eee4",
+      "attributes": {
+        "canonical": "#26053a4d-e037-4fc9-8984-03e094358005",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.9160308837891,1587.7456665039062)\",\"translation(dx,dy)=pixel:2314.6145935058594,-90.0123291015625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2796.0,1473.0,87.06124877929688,49.4666748046875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:8aca5e49-598b-c622-aa3d-301077fe7b2f",
+      "guid": "8aca5e49-598b-c622-aa3d-301077fe7b2f",
+      "attributes": {
+        "canonical": "#26053a4d-e037-4fc9-8984-03e094358005",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.9160308837891,1587.7456665039062)\",\"translation(dx,dy)=pixel:299.6145935058594,-750.0123291015625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:781.0,813.0,87.06124877929688,49.4666748046875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:fe66b525-86e9-b8b2-c931-efaf9721e5c6",
+      "guid": "fe66b525-86e9-b8b2-c931-efaf9721e5c6",
+      "attributes": {
+        "canonical": "#26053a4d-e037-4fc9-8984-03e094358005",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.9160308837891,1587.7456665039062)\",\"translation(dx,dy)=pixel:299.6145935058594,-240.0123291015625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:781.0,1323.0,87.06124877929688,49.4666748046875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:ea538420-bdd2-c175-4571-6c63a5fa7949",
+      "guid": "ea538420-bdd2-c175-4571-6c63a5fa7949",
+      "attributes": {
+        "canonical": "#26053a4d-e037-4fc9-8984-03e094358005",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.9160308837891,1587.7456665039062)\",\"translation(dx,dy)=pixel:-0.385406494140625,-510.0123291015625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:481.0,1053.0,87.06124877929688,49.4666748046875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:e9779ab6-dc90-31f6-f7fb-097795c7e7be",
+      "guid": "e9779ab6-dc90-31f6-f7fb-097795c7e7be",
+      "attributes": {
+        "canonical": "#80b3759e-f4c6-4fbd-b201-6a5c4492c08a",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2392.280029296875,1498.2111206054688)\",\"translation(dx,dy)=pixel:-600.2333984375,-180.983154296875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1750.0,1292.0,84.09326171875,50.4559326171875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:d0e30a33-4c67-6d01-3c53-9c8432d1d48f",
+      "guid": "d0e30a33-4c67-6d01-3c53-9c8432d1d48f",
+      "attributes": {
+        "canonical": "#80b3759e-f4c6-4fbd-b201-6a5c4492c08a",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2392.280029296875,1498.2111206054688)\",\"translation(dx,dy)=pixel:-870.2333984375,-180.983154296875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1480.0,1292.0,84.09326171875,50.4559326171875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:de2bb326-ed30-9797-9519-947d69352a38",
+      "guid": "de2bb326-ed30-9797-9519-947d69352a38",
+      "attributes": {
+        "canonical": "#80b3759e-f4c6-4fbd-b201-6a5c4492c08a",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2392.280029296875,1498.2111206054688)\",\"translation(dx,dy)=pixel:-600.2333984375,-690.983154296875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1750.0,782.0,84.09326171875,50.4559326171875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:71124055-cdda-9626-32fe-92f7dc3a7840",
+      "guid": "71124055-cdda-9626-32fe-92f7dc3a7840",
+      "attributes": {
+        "canonical": "#80b3759e-f4c6-4fbd-b201-6a5c4492c08a",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:2392.280029296875,1498.2111206054688)\",\"translation(dx,dy)=pixel:-870.2333984375,-690.983154296875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1480.0,782.0,84.09326171875,50.4559326171875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:cb0cf3d9-f63b-ef69-d324-6bc0cbddb7ba",
+      "guid": "cb0cf3d9-f63b-ef69-d324-6bc0cbddb7ba",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:2350.2333984375,1472.983154296875,84.09326171875,50.4559326171875"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:869a991c-46de-b851-461e-884f80ab6267",
+      "guid": "869a991c-46de-b851-461e-884f80ab6267",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:270,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1318.6817474365234,240.5895233154297\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1769.0,1139.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:0092cfd3-60ef-03f2-de9c-393e2448ea71",
+      "guid": "0092cfd3-60ef-03f2-de9c-393e2448ea71",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1137.1574401855469,122.11383056640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1562.0,1046.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:a595a5b9-778e-c8a7-5560-8b171a3062ea",
+      "guid": "a595a5b9-778e-c8a7-5560-8b171a3062ea",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:424.8425598144531,923.8861694335938,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:16ac156a-5303-606c-af72-52b0a1b0d1ec",
+      "guid": "16ac156a-5303-606c-af72-52b0a1b0d1ec",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:897.1574401855469,782.1138305664062\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1322.0,1706.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:fb720244-21ba-8faa-c99c-29595fc21935",
+      "guid": "fb720244-21ba-8faa-c99c-29595fc21935",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:957.1574401855469,692.1138305664062\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1382.0,1616.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:708514e6-2fb9-bb06-25d5-24882fd9a43d",
+      "guid": "708514e6-2fb9-bb06-25d5-24882fd9a43d",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1137.1574401855469,662.1138305664062\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1562.0,1586.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:381b5576-3da0-373f-1578-d370a6526e1d",
+      "guid": "381b5576-3da0-373f-1578-d370a6526e1d",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:897.1574401855469,242.11383056640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1322.0,1166.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:40780d1c-6086-2c74-e803-5c97df227636",
+      "guid": "40780d1c-6086-2c74-e803-5c97df227636",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:957.1574401855469,152.11383056640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1382.0,1076.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:b86c6e63-6107-9310-48db-665a331cc19a",
+      "guid": "b86c6e63-6107-9310-48db-665a331cc19a",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:897.1574401855469,-267.88616943359375\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1322.0,656.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:4ca990ba-9108-4d58-04ad-8aa2b87dbb06",
+      "guid": "4ca990ba-9108-4d58-04ad-8aa2b87dbb06",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:90,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1315.6817474365234,1318.5895233154297\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1766.0,2217.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:5d5a686b-9445-3af6-28fb-646ac31e823f",
+      "guid": "5d5a686b-9445-3af6-28fb-646ac31e823f",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:90,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1045.6817474365234,1108.5895233154297\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1496.0,2007.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:e502ae08-118a-6b83-2242-3a4388cc01b3",
+      "guid": "e502ae08-118a-6b83-2242-3a4388cc01b3",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:90,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1045.6817474365234,-480.4104766845703\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1496.0,418.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:0b2e922c-3800-b247-7d4a-5f230c00ecf6",
+      "guid": "0b2e922c-3800-b247-7d4a-5f230c00ecf6",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:-0.842559814453125,509.11383056640625\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:424.0,1433.0,88.74398803710938,37.7926025390625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:977f5c4a-22da-098f-058b-8fa1a2028e87",
+      "guid": "977f5c4a-22da-098f-058b-8fa1a2028e87",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:270,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1318.6817474365234,-269.4104766845703\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1769.0,629.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:5eac0537-5df7-4c4b-cfc0-7db8bf1f5baf",
+      "guid": "5eac0537-5df7-4c4b-cfc0-7db8bf1f5baf",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:270,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1048.6817474365234,570.5895233154297\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1499.0,1469.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:ec39aea1-24cf-2b16-6bd2-924b545bb2e5",
+      "guid": "ec39aea1-24cf-2b16-6bd2-924b545bb2e5",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:270,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1318.6817474365234,780.5895233154297\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1769.0,1679.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:e5f37cca-6266-5092-5070-e5290530c1ed",
+      "guid": "e5f37cca-6266-5092-5070-e5290530c1ed",
+      "attributes": {
+        "canonical": "#27972f29-d142-48e6-9320-7a6f214c49ab",
+        "via": "[\"rotation(angle,center)=(radians:270,xy=pixel:469.2145538330078,942.782470703125)\",\"translation(dx,dy)=pixel:1048.6817474365234,30.589523315429688\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1499.0,929.0,37.7926025390625,88.74398803710938"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:b2e44387-33a6-2933-b7c2-0df95f1eff8c",
+      "guid": "b2e44387-33a6-2933-b7c2-0df95f1eff8c",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:717.6435546875,510.19482421875,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:46bed435-6f10-f9a1-5baf-4ccf8f001d0f",
+      "guid": "46bed435-6f10-f9a1-5baf-4ccf8f001d0f",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:3.3564453125,1018.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:721.0,1529.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:96b87a16-fbdb-e2c7-48c2-ad2f6514e69b",
+      "guid": "96b87a16-fbdb-e2c7-48c2-ad2f6514e69b",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:89.3564453125,59.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:807.0,570.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:17cd261a-c380-3fab-12f2-e10ba5060fdc",
+      "guid": "17cd261a-c380-3fab-12f2-e10ba5060fdc",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:-0.6435546875,1528.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:717.0,2039.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:9229a207-31aa-14fe-5118-f1ca270d93f9",
+      "guid": "9229a207-31aa-14fe-5118-f1ca270d93f9",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:3.3564453125,508.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:721.0,1019.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:7a256de0-0bc7-ad52-2190-8e3d41565ed0",
+      "guid": "7a256de0-0bc7-ad52-2190-8e3d41565ed0",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:89.3564453125,1588.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:807.0,2099.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:6d1d7109-6f36-7a19-5acb-1650c25b4ea3",
+      "guid": "6d1d7109-6f36-7a19-5acb-1650c25b4ea3",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:93.3564453125,568.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:811.0,1079.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:5cc3110a-5df0-43e5-b348-906923f3efad",
+      "guid": "5cc3110a-5df0-43e5-b348-906923f3efad",
+      "attributes": {
+        "canonical": "#34d01116-3d86-4814-8a9d-da76ea518c89",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:735.5065002441406,554.8521728515625)\",\"translation(dx,dy)=pixel:93.3564453125,1078.80517578125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:811.0,1589.0,35.72589111328125,89.314697265625"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:afa76d67-c254-6d35-c570-5bea1c906068",
+      "guid": "afa76d67-c254-6d35-c570-5bea1c906068",
+      "attributes": {
+        "canonical": "#efb3ca86-39f1-4cbf-ad1a-887edc6dcd27",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.4213714599609,2097.746337890625)\",\"translation(dx,dy)=pixel:299.6999206542969,-240.486328125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:789.0,1835.0,70.24258422851562,44.52001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:9d4feb02-dc6c-ca37-0a1e-68a205b788da",
+      "guid": "9d4feb02-dc6c-ca37-0a1e-68a205b788da",
+      "attributes": {
+        "canonical": "#efb3ca86-39f1-4cbf-ad1a-887edc6dcd27",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.4213714599609,2097.746337890625)\",\"translation(dx,dy)=pixel:299.6999206542969,269.513671875\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:789.0,2345.0,70.24258422851562,44.52001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:c817a010-3b65-9b5f-59de-ac7364883fe8",
+      "guid": "c817a010-3b65-9b5f-59de-ac7364883fe8",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:489.3000793457031,2075.486328125,70.24258422851562,44.52001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:cd612d8a-b12a-1024-02c0-8c7423b4644f",
+      "guid": "cd612d8a-b12a-1024-02c0-8c7423b4644f",
+      "attributes": {
+        "canonical": "#efb3ca86-39f1-4cbf-ad1a-887edc6dcd27",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:524.4213714599609,2097.746337890625)\",\"translation(dx,dy)=pixel:-0.300079345703125,-1499.486328125\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Ground"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:489.0,576.0,70.24258422851562,44.52001953125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:a3d1829e-8e82-4c7e-877a-405aab990345",
+      "guid": "a3d1829e-8e82-4c7e-877a-405aab990345",
+      "attributes": {
+        "canonical": "#2bdc93f0-4733-4539-bd15-75a48b77fd6e",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:468.5201416015625,403.92698669433594)\",\"translation(dx,dy)=pixel:957.5401000976562,179.64529418945312\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1381.0,568.0,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:1385c99a-8ea1-12b0-a4bd-d8b9c661f20f",
+      "guid": "1385c99a-8ea1-12b0-a4bd-d8b9c661f20f",
+      "attributes": {
+        "canonical": "#2bdc93f0-4733-4539-bd15-75a48b77fd6e",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:468.5201416015625,403.92698669433594)\",\"translation(dx,dy)=pixel:1137.5401000976562,1738.6452941894531\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1561.0,2127.0,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:08d3f68d-dd28-214a-bfc2-b9189a8cef69",
+      "guid": "08d3f68d-dd28-214a-bfc2-b9189a8cef69",
+      "attributes": {
+        "canonical": "#2bdc93f0-4733-4539-bd15-75a48b77fd6e",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:468.5201416015625,403.92698669433594)\",\"translation(dx,dy)=pixel:1137.5401000976562,149.64529418945312\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1561.0,538.0,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:5731b504-29c8-5d71-2b79-16b4cc4714e8",
+      "guid": "5731b504-29c8-5d71-2b79-16b4cc4714e8",
+      "attributes": {
+        "canonical": "#2bdc93f0-4733-4539-bd15-75a48b77fd6e",
+        "via": "[\"rotation(angle,center)=(radians:0,xy=pixel:468.5201416015625,403.92698669433594)\",\"translation(dx,dy)=pixel:-0.45989990234375,1558.6452941894531\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:423.0,1947.0,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:eb50d2cb-bc83-96d7-a2d3-e20d487b29d7",
+      "guid": "eb50d2cb-bc83-96d7-a2d3-e20d487b29d7",
+      "attributes": {
+        "canonical": "",
+        "via": null
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:423.45989990234375,388.3547058105469,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "@guid:6e16f145-e688-415b-1a6f-075d1d75b44b",
+      "guid": "6e16f145-e688-415b-1a6f-075d1d75b44b",
+      "attributes": {
+        "canonical": "#2bdc93f0-4733-4539-bd15-75a48b77fd6e",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:468.5201416015625,403.92698669433594)\",\"translation(dx,dy)=pixel:957.5401000976562,1768.6452941894531\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1381.0,2157.0,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    },
+    {
+      "id": "@guid:52c11f26-181d-36ae-bcf4-39355781363f",
+      "guid": "52c11f26-181d-36ae-bcf4-39355781363f",
+      "attributes": {
+        "canonical": "#2bdc93f0-4733-4539-bd15-75a48b77fd6e",
+        "via": "[\"rotation(angle,center)=(radians:180,xy=pixel:468.5201416015625,403.92698669433594)\",\"translation(dx,dy)=pixel:897.5401000976562,1858.6452941894531\"]"
+      },
+      "pointers": {
+        "base": "@meta:Annotation"
+      },
+      "children": [
+        {
+          "id": "@attribute:purpose:confirmed",
+          "attributes": {
+            "purpose": "confirmed",
+            "value": true
+          },
+          "pointers": {
+            "base": "@meta:BooleanBody"
+          }
+        },
+        {
+          "id": "@attribute:purpose:tagging",
+          "attributes": {
+            "purpose": "tagging",
+            "value": "Resistor"
+          },
+          "pointers": {
+            "base": "@meta:TextualBody"
+          }
+        },
+        {
+          "attributes": {
+            "source": "http://localhost:8889/rest/blob/download/83999277e9a7a2cb778f3de4473078dcb1263fe9/"
+          },
+          "pointers": {
+            "base": "@meta:Target"
+          },
+          "children": [
+            {
+              "id": "@attribute:type:FragmentSelector",
+              "attributes": {
+                "conformsTo": "http://www.w3.org/TR/media-frags/",
+                "type": "FragmentSelector",
+                "value": "xywh=pixel:1321.0,2247.0,90.1204833984375,31.144561767578125"
+              },
+              "pointers": {
+                "base": "@meta:Selector"
+              }
+            }
+          ]
+        },
+        {
+          "id": "@attribute:id:circuit_recognizer.detect_components",
+          "attributes": {
+            "id": "circuit_recognizer.detect_components",
+            "type": "Agent",
+            "name": "circuit_recognizer.detect_components"
+          },
+          "pointers": {
+            "base": "@meta:Creator"
+          }
+        }
+      ]
+    }
+  ]
+}
