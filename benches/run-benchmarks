@@ -40,12 +40,12 @@ async function benchMarkGuids({root, fco, core, importer, suite}) {
 }
 
 async function benchMarkAnnotations({root, fco, core, importer, suite}) {
-    // ToDo: Add this to the suite
+    // ToDo: Implement
 }
 
 const benchmarks = {
-    guids: new WJIBenchmark('test', benchMarkGuids),
-    import: new WJIBenchmark('annotations', benchMarkAnnotations)
+    guidSelectors: new WJIBenchmark('test', benchMarkGuids),
+    applyGuidSubtree: new WJIBenchmark('annotations', benchMarkAnnotations)
 }
 
 const program = new Command('WJI benchmark')
@@ -73,5 +73,5 @@ const program = new Command('WJI benchmark')
         }
     });
 
-program.parse()
+program.parse();
 
