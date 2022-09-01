@@ -74,7 +74,7 @@ class WJIBenchmark {
     async run() {
         await this.before();
         const {root, fco, importer} = await this.getNewProject();
-        await this.callable({root, fco, importer, core: this.core, suite: this.suite, resetProject: async () => await this.getNewProject()});
+        await this.callable({root, fco, importer, core: this.core, suite: this.suite});
         this.suite.on('complete', function() {
             this.forEach(bench => console.log(bench.stats));
         }).run({ 'async': true }); // runAsync

@@ -40,7 +40,7 @@ async function benchMarkGuids({root, fco, core, importer, suite}) {
     }));
 }
 
-async function benchMarkAnnotations({root, resetProject, core, importer, suite}) {
+async function benchMarkAnnotations({root, /* fco, */ core, importer, suite}) {
     const newStatePath = testFixture.path.join(testFixture.TESTS_SEED_DIR, 'annotations', 'annotationSubTree.json');
     const newState = JSON.parse(fs.readFileSync(newStatePath, 'utf-8'));
     const imageNodeId = '/g/o';
@@ -48,7 +48,7 @@ async function benchMarkAnnotations({root, resetProject, core, importer, suite})
     const prevState = await importer.toJSON(imageNode);
     suite.add('apply new state to existing image using @guid selectors', asyncBench(async function() {
         await importer.apply(imageNode, newState);
-        await importer.apply(imageNode, prevState); // ToDo: How to account this change there an after Each function
+        await importer.apply(imageNode, prevState); // FixMe: Should this be changed with random children removal?
     }));
 }
 
