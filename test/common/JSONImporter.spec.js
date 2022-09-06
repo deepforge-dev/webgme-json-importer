@@ -1265,16 +1265,16 @@ describe('JSONImporter', function () {
         });
 
         it('should omit string properties', () => {
-            const stringWJIOmittedProperties = Importer.OmittedWJIProperties.fromString('children, children_meta, ');
-            const omitted = stringWJIOmittedProperties.getWithRelatedProperties();
+            const omittedWJIProperties = Importer.OmittedWJIProperties.fromString('children, children_meta, ');
+            const omitted = omittedWJIProperties.getWithRelatedProperties();
             assert(omitted.has('children'));
             assert(omitted.has('children_meta'));
             assert(omitted.size === 2);
         });
 
         it('should filter related properties for children', () => {
-            const wjiOmittedProperties = new Importer.OmittedWJIProperties(['children']);
-            assert(wjiOmittedProperties.getWithRelatedProperties().has('children_meta'));
+            const omittedWJIProperties = new Importer.OmittedWJIProperties(['children']);
+            assert(omittedWJIProperties.getWithRelatedProperties().has('children_meta'));
         });
 
         it('should throw an error for invalid properties', () => {
