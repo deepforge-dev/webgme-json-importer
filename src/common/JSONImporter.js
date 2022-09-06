@@ -74,8 +74,6 @@ define([
 
             omit.forEach(key => delete json[key]);
 
-            const asyncTasks = [];
-
             const exporters = {
                 attributes: (node, json, /*promiseQueue*/) => {
                     this.core.getOwnAttributeNames(node).forEach(name => {
@@ -177,6 +175,7 @@ define([
                 }
             };
 
+            const asyncTasks = [];
             Object.keys(json).forEach(key => {
                 if(exporters[key]) {
                     exporters[key](node, json, asyncTasks);
