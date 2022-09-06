@@ -9,44 +9,50 @@ define([
         META_ASPECT_SET_NAME: 'MetaAspectSet',
     };
 
-    class NodeAttributesFilter {
-        constructor(omit, dependents={}) {
-            if(!omit) {
-                omit = new Set();
-            } // Sentinel
-
-            if(!dependents) {
-                dependents = {};
-            }
-
-            if(typeof omit === 'string') {
-                omit = new Set([omit]);
-            }
-
-            if(typeof omit === 'boolean' && omit === true) {
-                omit = new Set(['children']);
-            } // Backwards compatible with shallow
-
+    class OmittedProperties {
+        constructor(omit, relatedProperties={}, invalidProps=[]) {
             if(Array.isArray(omit)) {
                 omit = new Set(omit);
             }
 
-            Object.keys(dependents).forEach(key => {
-                if(omit.has(key)) {
-                    const deps = dependents[key];
-                    deps.forEach(dep => omit.add(dep));
-                }
-            });
+            const invalidPropertiesInOmit = invalidProps.filter(prop => omit.has(prop));
 
+            if(invalidPropertiesInOmit.length) {
+                throw new Error(`Invalid properties to omit: ${invalidPropertiesInOmit}`);
+            }
+            this.relatedProperties = relatedProperties;
             this.omit = omit;
         }
 
-        filter(json) {
-            this.omit.forEach(key => delete json[key]);
+        get() {
+            return new Set(this.omit);
         }
 
-        has(attribute) {
-            return !this.omit.has(attribute);
+        getWithRelatedProperties() {
+            const omitted = this.get();
+            Object.keys(this.relatedProperties).forEach(key => {
+                if(omitted.has(key)) {
+                    const deps = this.relatedProperties[key];
+                    deps.forEach(dep => omitted.add(dep));
+                }
+            });
+            return omitted;
+        }
+    }
+
+    class OmittedWJIProperties extends OmittedProperties {
+        constructor(omit) {
+            super(omit, {
+                    sets: ['member_attributes', 'member_registry'],
+                    children: ['children_meta']
+                },
+                ['id', 'guid', 'path']
+            );
+        }
+
+        static fromString(omit) {
+            omit = omit.split(',').map(o => o.trim());
+            return new OmittedWJIProperties(omit);
         }
     }
 
@@ -68,12 +74,19 @@ define([
             );
         }
 
-        async toJSON(node, omit=new Set()) {
-            const attributesFilter = new NodeAttributesFilter(omit, {
-                sets: ['member_attributes', 'member_registry'],
-                children: ['children_meta']
-            });
+        async toJSON(node, omit=[]) {
+            if(typeof omit === 'boolean') {
+                omit = omit ? ['children'] : [];
+            } // Backwards compatible with shallow
 
+            const omittedProperties = (
+                typeof omit === 'string' ? OmittedWJIProperties.fromString(omit) : new OmittedWJIProperties(omit)
+            ).getWithRelatedProperties();
+
+            return await this._toJSON(node, omittedProperties);
+        }
+
+        async _toJSON(node, toOmit) {
             const json = {
                 id: this.core.getGuid(node),
                 path: this.core.getPath(node),
@@ -91,7 +104,7 @@ define([
                 children_meta: {},
             };
 
-            attributesFilter.filter(json);
+            toOmit.forEach(prop => delete json[prop]);
 
             const exporters = {
                 attributes: (node, json, /*promiseQueue*/) => {
@@ -146,7 +159,7 @@ define([
                             const memberGuids = members.map(member => this.core.getGuid(member));
                             json.sets[name] = memberGuids;
 
-                            if (attributesFilter.has('member_attributes')) { // Alternatives to this closure variable?
+                            if (!toOmit.has('member_attributes')) { // Alternatives to this closure variable?
                                 members.forEach(member => {
                                     let guid = this.core.getGuid(member);
                                     let memberPath = this.core.getPath(member);
@@ -159,7 +172,7 @@ define([
                                     });
                                 });
                             }
-                            if (attributesFilter.has('member_registry')) {
+                            if (!toOmit.has('member_registry')) {
                                 members.forEach(member => {
                                     let guid = this.core.getGuid(member);
                                     let memberPath = this.core.getPath(member);
@@ -181,7 +194,7 @@ define([
                         json.children = [];
                         const children = await this.core.loadChildren(node);
                         for (let i = 0; i < children.length; i++) {
-                            json.children.push(await this.toJSON(children[i], omit));
+                            json.children.push(await this.toJSON(children[i], toOmit));
                         }
                     })());
                 },
@@ -1046,5 +1059,6 @@ define([
 
     Importer.NodeSelector = NodeSelector;
     Importer.NodeSelections = NodeSelections;
+    Importer.OmittedWJIProperties = OmittedWJIProperties;
     return Importer;
 });

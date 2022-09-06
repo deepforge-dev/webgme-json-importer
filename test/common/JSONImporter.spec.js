@@ -1256,4 +1256,32 @@ describe('JSONImporter', function () {
             assert(json.attribute_meta === undefined);
         });
     });
+
+    describe('omitted properties', function () {
+        it('should filter related properties for sets', () => {
+            const wjiOmittedProperties = new Importer.OmittedWJIProperties(['sets']);
+            assert(wjiOmittedProperties.getWithRelatedProperties().has('member_registry'));
+            assert(wjiOmittedProperties.getWithRelatedProperties().has('member_attributes'));
+        });
+
+        it('should omit string properties', () => {
+            const stringWJIOmittedProperties = Importer.OmittedWJIProperties.fromString('children, children_meta');
+            const omitted = stringWJIOmittedProperties.getWithRelatedProperties();
+            assert(omitted.has('children'));
+            assert(omitted.has('children_meta'));
+        });
+
+        it('should filter related properties for children', () => {
+            const wjiOmittedProperties = new Importer.OmittedWJIProperties(['children']);
+            assert(wjiOmittedProperties.getWithRelatedProperties().has('children_meta'));
+        });
+
+        it('should throw an error for invalid properties', () => {
+            try {
+                new Importer.OmittedWJIProperties(['id']);
+            } catch (e) {
+                assert(e.message.includes('Invalid properties to omit'));
+            }
+        });
+    });
 });
