@@ -9,6 +9,47 @@ define([
         META_ASPECT_SET_NAME: 'MetaAspectSet',
     };
 
+    class NodeAttributesFilter {
+        constructor(omit, dependents={}) {
+            if(!omit) {
+                omit = new Set();
+            } // Sentinel
+
+            if(!dependents) {
+                dependents = {};
+            }
+
+            if(typeof omit === 'string') {
+                omit = new Set([omit]);
+            }
+
+            if(typeof omit === 'boolean' && omit === true) {
+                omit = new Set(['children']);
+            } // Backwards compatible with shallow
+
+            if(Array.isArray(omit)) {
+                omit = new Set(omit);
+            }
+
+            Object.keys(dependents).forEach(key => {
+                if(omit.has(key)) {
+                    const deps = dependents[key];
+                    deps.forEach(dep => omit.add(dep));
+                }
+            });
+
+            this.omit = omit;
+        }
+
+        filter(json) {
+            this.omit.forEach(key => delete json[key]);
+        }
+
+        has(attribute) {
+            return !this.omit.has(attribute);
+        }
+    }
+
     class Importer {
         constructor(core, rootNode) {
             this.core = core;
@@ -28,23 +69,10 @@ define([
         }
 
         async toJSON(node, omit=new Set()) {
-            if(!omit) {
-                omit = new Set();
-            } // Sentinel
-
-            if(typeof omit === 'string') {
-                omit = new Set([omit]);
-            }
-
-            if(typeof omit === 'boolean' && omit === true) {
-                omit = new Set(['children']);
-            } // Backwards compatible with shallow
-
-            if(Array.isArray(omit)) {
-                omit = new Set(omit);
-            }
-
-            ['id', 'path', 'guid'].forEach(attr => omit.delete(attr));
+            const attributesFilter = new NodeAttributesFilter(omit, {
+                sets: ['member_attributes', 'member_registry'],
+                children: ['children_meta']
+            });
 
             const json = {
                 id: this.core.getGuid(node),
@@ -63,16 +91,7 @@ define([
                 children_meta: {},
             };
 
-            if(omit.has('sets')) {
-                omit.add('member_attributes');
-                omit.add('member_registry');
-            }
-
-            if(omit.has('children')) {
-                omit.add('children_meta');
-            }
-
-            omit.forEach(key => delete json[key]);
+            attributesFilter.filter(json);
 
             const exporters = {
                 attributes: (node, json, /*promiseQueue*/) => {
@@ -127,7 +146,7 @@ define([
                             const memberGuids = members.map(member => this.core.getGuid(member));
                             json.sets[name] = memberGuids;
 
-                            if (!omit.has('member_attributes')) { // Alternatives to this closure variable?
+                            if (attributesFilter.has('member_attributes')) { // Alternatives to this closure variable?
                                 members.forEach(member => {
                                     let guid = this.core.getGuid(member);
                                     let memberPath = this.core.getPath(member);
@@ -140,7 +159,7 @@ define([
                                     });
                                 });
                             }
-                            if (!omit.has('member_registry')) {
+                            if (attributesFilter.has('member_registry')) {
                                 members.forEach(member => {
                                     let guid = this.core.getGuid(member);
                                     let memberPath = this.core.getPath(member);
