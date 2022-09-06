@@ -194,7 +194,7 @@ define([
                         json.children = [];
                         const children = await this.core.loadChildren(node);
                         for (let i = 0; i < children.length; i++) {
-                            json.children.push(await this.toJSON(children[i], toOmit));
+                            json.children.push(await this._toJSON(children[i], toOmit));
                         }
                     })());
                 },
