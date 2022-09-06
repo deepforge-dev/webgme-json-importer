@@ -51,7 +51,7 @@ define([
         }
 
         static fromString(omit) {
-            omit = omit.split(',').map(o => o.trim());
+            omit = omit.split(',').map(o => o.trim()).filter(o => !!o);
             return new OmittedWJIProperties(omit);
         }
     }
