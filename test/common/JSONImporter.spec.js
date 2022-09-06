@@ -1217,4 +1217,43 @@ describe('JSONImporter', function () {
             assert(newNode);
         });
     });
+
+    describe('omits', function () {
+        before(async () => {
+            root = await getNewRootNode(core);
+            importer = new Importer(core, root);
+            const state = {attributes: {name: 'hello'}};
+            await importer.import(root, state);
+        });
+
+        it('should omit children in toJSON', async function () {
+            const json = await importer.toJSON(root, ['children']);
+            assert(json.children === undefined);
+        });
+
+        it('should omit pointers in toJSON', async function() {
+            const json = await importer.toJSON(root, 'pointers');
+            assert(json.pointers === undefined);
+        });
+
+        it('should omit sets and associated attributes in toJSON', async function() {
+            const json = await importer.toJSON(root, ['sets']);
+            ['sets', 'member_attributes', 'member_registry'].forEach(attr => assert(json[attr] === undefined));
+        });
+
+        it('should omit only member_registry', async function() {
+            const json = await importer.toJSON(root, ['member_registry']);
+            assert(json.member_registry === undefined);
+        });
+
+        it('should omit only attributes', async function() {
+            const json = await importer.toJSON(root, ['attributes']);
+            assert(json.attributes === undefined);
+        });
+
+        it('should omit only attribute_meta', async function() {
+            const json = await importer.toJSON(root, ['attribute_meta']);
+            assert(json.attribute_meta === undefined);
+        });
+    });
 });
