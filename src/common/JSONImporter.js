@@ -9,8 +9,11 @@ define([
         META_ASPECT_SET_NAME: 'MetaAspectSet',
     };
 
-    class OmittedProperties {
-        constructor(omit, relatedProperties={}, invalidProps=[]) {
+    class OmittedWJIProperties {
+        constructor(omit, relatedProperties = {
+            sets: ['member_attributes', 'member_registry'],
+            children: ['children_meta']
+        }, invalidProps = ['id', 'guid', 'path']) {
             if(Array.isArray(omit)) {
                 omit = new Set(omit);
             }
@@ -40,22 +43,6 @@ define([
         }
     }
 
-    class OmittedWJIProperties extends OmittedProperties {
-        constructor(omit) {
-            super(omit, {
-                    sets: ['member_attributes', 'member_registry'],
-                    children: ['children_meta']
-                },
-                ['id', 'guid', 'path']
-            );
-        }
-
-        static fromString(omit) {
-            omit = omit.split(',').map(o => o.trim()).filter(o => !!o);
-            return new OmittedWJIProperties(omit);
-        }
-    }
-
     class Importer {
         constructor(core, rootNode) {
             this.core = core;
@@ -79,9 +66,7 @@ define([
                 omit = omit ? ['children'] : [];
             } // Backwards compatible with shallow
 
-            const omittedProperties = (
-                typeof omit === 'string' ? OmittedWJIProperties.fromString(omit) : new OmittedWJIProperties(omit)
-            ).getWithRelatedProperties();
+            const omittedProperties = new OmittedWJIProperties(omit).getWithRelatedProperties();
 
             return await this._toJSON(node, omittedProperties);
         }
@@ -193,9 +178,7 @@ define([
                     promiseQueue.push((async () => {
                         json.children = [];
                         const children = await this.core.loadChildren(node);
-                        for (let i = 0; i < children.length; i++) {
-                            json.children.push(await this._toJSON(children[i], toOmit));
-                        }
+                        json.children = await Promise.all(children.map(async child => await this._toJSON(child, toOmit)));
                     })());
                 },
 

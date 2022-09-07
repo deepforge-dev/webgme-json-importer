@@ -1232,7 +1232,7 @@ describe('JSONImporter', function () {
         });
 
         it('should omit pointers in toJSON', async function() {
-            const json = await importer.toJSON(root, 'pointers');
+            const json = await importer.toJSON(root, ['pointers']);
             assert(json.pointers === undefined);
         });
 
@@ -1262,14 +1262,6 @@ describe('JSONImporter', function () {
             const wjiOmittedProperties = new Importer.OmittedWJIProperties(['sets']);
             assert(wjiOmittedProperties.getWithRelatedProperties().has('member_registry'));
             assert(wjiOmittedProperties.getWithRelatedProperties().has('member_attributes'));
-        });
-
-        it('should omit string properties', () => {
-            const omittedWJIProperties = Importer.OmittedWJIProperties.fromString('children, children_meta, ');
-            const omitted = omittedWJIProperties.getWithRelatedProperties();
-            assert(omitted.has('children'));
-            assert(omitted.has('children_meta'));
-            assert(omitted.size === 2);
         });
 
         it('should filter related properties for children', () => {
