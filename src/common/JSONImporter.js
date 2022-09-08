@@ -141,9 +141,10 @@ define([
 
                 children: (node, json, promiseQueue) => {
                     promiseQueue.push((async () => {
-                        json.children = [];
                         const children = await this.core.loadChildren(node);
-                        json.children = await Promise.all(children.map(async child => await this._toJSON(child, toOmit)));
+                        json.children = await Promise.all(
+                            children.map(child => this._toJSON(child, toOmit))
+                        );
                     })());
                 },
 
