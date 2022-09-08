@@ -7,7 +7,7 @@ describe('JSONImporter', function () {
     const _ = testFixture.requirejs('underscore');
     const Core = testFixture.requirejs('common/core/coreQ');
     const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
-    const NodeSelections = Importer.NodeSelections;
+    const {OmittedProperties, NodeSelections} = Importer;
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
@@ -1227,51 +1227,52 @@ describe('JSONImporter', function () {
         });
 
         it('should omit children in toJSON', async function () {
-            const json = await importer.toJSON(root, ['children']);
+            const json = await importer.toJSON(root, new OmittedProperties(['children']));
             assert(json.children === undefined);
         });
 
         it('should omit pointers in toJSON', async function() {
-            const json = await importer.toJSON(root, ['pointers']);
+            const json = await importer.toJSON(root, new OmittedProperties(['pointers']));
             assert(json.pointers === undefined);
         });
 
         it('should omit sets and associated attributes in toJSON', async function() {
-            const json = await importer.toJSON(root, ['sets']);
+            const omitProps = new OmittedProperties(['sets']);
+            const json = await importer.toJSON(root, omitProps.withRelatedProperties());
             ['sets', 'member_attributes', 'member_registry'].forEach(attr => assert(json[attr] === undefined));
         });
 
         it('should omit only member_registry', async function() {
-            const json = await importer.toJSON(root, ['member_registry']);
+            const json = await importer.toJSON(root, new OmittedProperties(['member_registry']));
             assert(json.member_registry === undefined);
         });
 
         it('should omit only attributes', async function() {
-            const json = await importer.toJSON(root, ['attributes']);
+            const json = await importer.toJSON(root, new OmittedProperties(['attributes']));
             assert(json.attributes === undefined);
         });
 
         it('should omit only attribute_meta', async function() {
-            const json = await importer.toJSON(root, ['attribute_meta']);
+            const json = await importer.toJSON(root, new OmittedProperties(['attribute_meta']));
             assert(json.attribute_meta === undefined);
         });
     });
 
     describe('omitted properties', function () {
         it('should filter related properties for sets', () => {
-            const wjiOmittedProperties = new Importer.OmittedWJIProperties(['sets']);
-            assert(wjiOmittedProperties.getWithRelatedProperties().has('member_registry'));
-            assert(wjiOmittedProperties.getWithRelatedProperties().has('member_attributes'));
+            const wjiOmittedProperties = new OmittedProperties(['sets']);
+            assert(wjiOmittedProperties.withRelatedProperties().has('member_registry'));
+            assert(wjiOmittedProperties.withRelatedProperties().has('member_attributes'));
         });
 
         it('should filter related properties for children', () => {
-            const omittedWJIProperties = new Importer.OmittedWJIProperties(['children']);
-            assert(omittedWJIProperties.getWithRelatedProperties().has('children_meta'));
+            const omittedWJIProperties = new OmittedProperties(['children']);
+            assert(omittedWJIProperties.withRelatedProperties().has('children_meta'));
         });
 
         it('should throw an error for invalid properties', () => {
             try {
-                new Importer.OmittedWJIProperties(['id']);
+                new OmittedProperties(['id']);
             } catch (e) {
                 assert(e.message.includes('Invalid properties to omit'));
             }

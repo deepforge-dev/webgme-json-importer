@@ -9,40 +9,6 @@ define([
         META_ASPECT_SET_NAME: 'MetaAspectSet',
     };
 
-    class OmittedWJIProperties {
-        constructor(omit, relatedProperties = {
-            sets: ['member_attributes', 'member_registry'],
-            children: ['children_meta']
-        }, invalidProps = ['id', 'guid', 'path']) {
-            if(Array.isArray(omit)) {
-                omit = new Set(omit);
-            }
-
-            const invalidPropertiesInOmit = invalidProps.filter(prop => omit.has(prop));
-
-            if(invalidPropertiesInOmit.length) {
-                throw new Error(`Invalid properties to omit: ${invalidPropertiesInOmit}`);
-            }
-            this.relatedProperties = relatedProperties;
-            this.omit = omit;
-        }
-
-        get() {
-            return new Set(this.omit);
-        }
-
-        getWithRelatedProperties() {
-            const omitted = this.get();
-            Object.keys(this.relatedProperties).forEach(key => {
-                if(omitted.has(key)) {
-                    const deps = this.relatedProperties[key];
-                    deps.forEach(dep => omitted.add(dep));
-                }
-            });
-            return omitted;
-        }
-    }
-
     class Importer {
         constructor(core, rootNode) {
             this.core = core;
@@ -61,14 +27,13 @@ define([
             );
         }
 
-        async toJSON(node, omit=[]) {
+        async toJSON(node, omit=new OmittedProperties()) {
             if(typeof omit === 'boolean') {
-                omit = omit ? ['children'] : [];
+                const omitList = omit ? ['children'] : [];
+                omit = new OmittedProperties(omitList);
             } // Backwards compatible with shallow
 
-            const omittedProperties = new OmittedWJIProperties(omit).getWithRelatedProperties();
-
-            return await this._toJSON(node, omittedProperties);
+            return await this._toJSON(node, omit);
         }
 
         async _toJSON(node, toOmit) {
@@ -1040,8 +1005,35 @@ define([
         }
     }
 
+    const RELATED_PROPERTIES = {
+        sets: ['member_attributes', 'member_registry'],
+        children: ['children_meta'],
+        attributes: ['attributes_meta'],
+        pointers: ['pointer_meta'],
+    };
+    const INVALID_PROPS = ['id', 'guid', 'path'];
+    class OmittedProperties extends Set {
+        constructor(...args) {
+            super(...args);
+            const invalidProperties = INVALID_PROPS.filter(prop => this.has(prop));
+
+            if(invalidProperties.length) {
+                throw new Error(`Invalid properties to omit: ${invalidProperties.join(', ')}`);
+            }
+        }
+
+        withRelatedProperties() {
+            const relatedProps = Object.keys(RELATED_PROPERTIES)
+                .filter(key => this.has(key))
+                .flatMap(key => RELATED_PROPERTIES[key]);
+
+            relatedProps.forEach(dep => this.add(dep));
+            return this;
+        }
+    }
+
     Importer.NodeSelector = NodeSelector;
     Importer.NodeSelections = NodeSelections;
-    Importer.OmittedWJIProperties = OmittedWJIProperties;
+    Importer.OmittedProperties = OmittedProperties;
     return Importer;
 });
