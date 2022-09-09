@@ -183,33 +183,8 @@ define([
 
                 await this.apply(child, children[i], resolvedSelectors);
             }
-
             const current = await this.toJSON(node);
-            const changes = compare(current, state);
-            const keyOrder = [
-                'children_meta',
-                'pointer_meta',
-                'pointers',
-                'mixins',
-                'sets',
-                'member_attributes',
-                'member_registry',
-            ];
-            const singleKeyFields = ['children_meta', 'guid'];
-            const sortedChanges = changes
-                .filter(
-                    change => change.key.length > 1 ||
-                        (singleKeyFields.includes(change.key[0]) && change.type === 'put')
-                )
-                .map((change, index) => {
-                    let order = 2 * keyOrder.indexOf(change.key[0]);
-                    if (change.type === 'put') {
-                        order += 1;
-                    }
-                    return [order, index];
-                })
-                .sort((p1, p2) => p1[0] - p2[0])
-                .map(pair => changes[pair[1]]);
+            const sortedChanges = this._getSortedStateChanges(current, state);
 
             for (let i = 0; i < sortedChanges.length; i++) {
                 if (sortedChanges[i].type === 'put') {
@@ -224,6 +199,90 @@ define([
                     this.core.deleteNode(currentChildren[i]);
                 }
             }
+        }
+
+        getDiffs(prevState, newState) {
+            const rootPatch = new NodePatch(
+                new NodeSelector(prevState.id)
+            );
+            this._getDiffs(prevState, newState, rootPatch);
+            return rootPatch;
+        }
+
+        _getDiffs(prevState, newState, rootPatch) {
+            const children = newState.children || [];
+            const currentChildren = prevState.children || [];
+
+            const oldChildrenIds = new Set(currentChildren.map(currentChild => currentChild.id));
+            const newChildrenIds = new Set(children.map(child => child.id))
+            const [additions, updates]  = partition(children, child => !oldChildrenIds.has(child.id));
+            const deletions = currentChildren.filter(currentChild => !newChildrenIds.has(currentChild.id));
+            rootPatch.children.push(
+                ...additions.map(nodeState => {
+                    return new NodePatch(
+                        new NodeSelector(nodeState.id),
+                        NODE_PATCH_TYPES.ADD,
+                        [nodeState]
+                    )
+                })
+            );
+
+            rootPatch.children.push(
+                ...deletions.map(nodeState => {
+                    return new NodePatch(
+                        new NodeSelector(nodeState.id),
+                        NODE_PATCH_TYPES.REMOVE,
+                        [nodeState]
+                    )
+                })
+            );
+
+            updates.forEach(updateState => {
+                const childPatch = new NodePatch(updateState.id, NODE_PATCH_TYPES.NO_CHANGE);
+                const oldState = currentChildren.find(currentChild => currentChild.id === updateState.id);
+                rootPatch.children.push(childPatch);
+                this.getDiffs(oldState, updateState, childPatch);
+            });
+
+            const sortedChanges = this._getSortedStateChanges(prevState, newState);
+
+            if(sortedChanges.length) {
+                rootPatch.type = NODE_PATCH_TYPES.UPDATES
+                rootPatch.patches = sortedChanges;
+            }
+        }
+
+        async patch(node, patch, resolvedSelectors=new NodeSelections()) {
+            // ToDo: Implement Patching
+        }
+
+        _getSortedStateChanges(prevState, newState) {
+            const keyOrder = [
+                'children_meta',
+                'pointer_meta',
+                'pointers',
+                'mixins',
+                'sets',
+                'member_attributes',
+                'member_registry',
+            ];
+
+            const changes = compare(prevState, newState);
+            const singleKeyFields = ['children_meta', 'guid'];
+            const sortedChanges = changes.filter(
+                change => change.key.length > 1 ||
+                    (singleKeyFields.includes(change.key[0]) && change.type === 'put')
+            )
+                .map((change, index) => {
+                    let order = 2 * keyOrder.indexOf(change.key[0]);
+                    if (change.type === 'put') {
+                        order += 1;
+                    }
+                    return [order, index];
+                })
+                .sort((p1, p2) => p1[0] - p2[0])
+                .map(pair => changes[pair[1]]);
+            return sortedChanges;
         }
 
         async resolveSelector(node, state, resolvedSelectors) {
@@ -732,6 +791,13 @@ define([
         return object;
     }
 
+    function partition(array, fn) {
+        return array.reduce((arr, next, index, records) => {
+            arr[fn(next, index, records) ? 0 : 1].push(next);
+            return arr;
+        }, [[], []]);
+    }
+
     class NodeSelector {
         constructor(idString='') {
             if (idString.startsWith('/')) {
@@ -1003,6 +1069,22 @@ define([
             this.cache = cache;
             this.cacheKey = cacheKey;
             return this;
+        }
+    }
+
+    const NODE_PATCH_TYPES = {
+        REMOVE: 'remove',
+        ADD: 'add',
+        UPDATES: 'updates',
+        NO_CHANGE: 'noChange'
+    };
+
+    class NodePatch {
+        constructor(selector, type=NODE_PATCH_TYPES.NO_CHANGE, patches=[], children=[]) {
+            this.selector = selector;
+            this.type = type;
+            this.patches = patches;
+            this.children = children;
         }
     }
 

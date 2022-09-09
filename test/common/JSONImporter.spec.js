@@ -11,7 +11,9 @@ describe('JSONImporter', function () {
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
+    const fs = require('fs');
     const SEED_DIR = path.join(__dirname, '..', '..', 'src', 'seeds');
+    const ASSETS_DIR = path.join(__dirname, '..', 'assets');
     const Q = testFixture.Q;
     const logger = testFixture.logger.fork('JSONImporter');
     const projectName = 'testProject';
@@ -1276,6 +1278,28 @@ describe('JSONImporter', function () {
             } catch (e) {
                 assert(e.message.includes('Invalid properties to omit'));
             }
+        });
+    });
+
+    describe.only('diff', function() {
+        let diffStates;
+        before(function () {
+            diffStates = JSON.parse(
+                fs.readFileSync(path.join(ASSETS_DIR, 'DiffStates.json'), 'utf-8')
+            );
+        });
+
+        it('should add single key children', () => {
+            const {prevState, newState} = diffStates.putNewChildren;
+            const diff = importer.getDiffs(prevState, newState);
+            console.log(JSON.stringify(diff));
+
+        });
+
+        it('should remove single key children', () => {
+            const {prevState, newState} = diffStates.putNewChildren;
+            const diff = importer.getDiffs(newState, prevState);
+            console.log(JSON.stringify(diff));
         });
     });
 });
