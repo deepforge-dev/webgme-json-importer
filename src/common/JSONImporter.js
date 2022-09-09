@@ -27,7 +27,16 @@ define([
             );
         }
 
-        async toJSON (node, shallow=false) {
+        async toJSON(node, omit=new OmittedProperties()) {
+            if(typeof omit === 'boolean') {
+                const omitList = omit ? ['children'] : [];
+                omit = new OmittedProperties(omitList);
+            } // Backwards compatible with shallow
+
+            return await this._toJSON(node, omit);
+        }
+
+        async _toJSON(node, toOmit) {
             const json = {
                 id: this.core.getGuid(node),
                 path: this.core.getPath(node),
@@ -41,80 +50,119 @@ define([
                 sets: {},
                 member_attributes: {},
                 member_registry: {},
+                children: [],
                 children_meta: {},
             };
+
+            toOmit.forEach(prop => delete json[prop]);
+
+            const exporters = {
+                attributes: (node, json, /*promiseQueue*/) => {
+                    this.core.getOwnAttributeNames(node).forEach(name => {
+                        json.attributes[name] = this.core.getAttribute(node, name);
+                    });
+                },
+
+                attribute_meta: (node, json, /*promiseQueue*/) => {
+                    this.core.getOwnValidAttributeNames(node).forEach(name => {
+                        json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
+                    });
+                },
+
+                pointers: (node, json, promiseQueue) => {
+                    promiseQueue.push(...this.core.getOwnPointerNames(node).map(async name => {
+                        const path = this.core.getPointerPath(node, name);
+                        if (path) {
+                            const target = await this.core.loadByPath(this.rootNode, path);
+                            json.pointers[name] = this.core.getGuid(target);
+                        } else {
+                            json.pointers[name] = path;
+                        }
+                    }));
+                    const baseNode = this.core.getBase(node);
+                    json.pointers.base = baseNode && this.core.getGuid(baseNode);
+                },
+
+                mixins: (node, json, /*promiseQueue*/) => {
+                    json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
+                },
+
+                pointer_meta: (node, json, promiseQueue) => {
+                    promiseQueue.push(...this.core.getOwnValidPointerNames(node).map(async name => {
+                        const ptr_meta = this.core.getPointerMeta(node, name);
+                        json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
+                    }));
+                },
+
+                registry: (node, json, /*promiseQueue*/) => {
+                    this.core.getOwnRegistryNames(node).forEach(name => {
+                        json.registry[name] = this.core.getRegistry(node, name);
+                    });
+                },
+
+                sets: (node, json, promiseQueue) => {
+                    promiseQueue.push(...this.core.getOwnSetNames(node)
+                        .filter(name => name !== '_mixins')
+                        .map(async name => {
+                            const paths = this.core.getMemberPaths(node, name);
+                            const members = await Promise.all(paths.map(path => this.core.loadByPath(this.rootNode, path)));
+                            const memberGuids = members.map(member => this.core.getGuid(member));
+                            json.sets[name] = memberGuids;
+
+                            if (!toOmit.has('member_attributes')) { // Alternatives to this closure variable?
+                                members.forEach(member => {
+                                    let guid = this.core.getGuid(member);
+                                    let memberPath = this.core.getPath(member);
+
+                                    json.member_attributes[name] = {};
+                                    json.member_attributes[name][guid] = {};
+                                    this.core.getMemberAttributeNames(node, name, memberPath).forEach(attrName => {
+                                        const value = this.core.getMemberAttribute(node, name, memberPath, attrName);
+                                        json.member_attributes[name][guid][attrName] = value;
+                                    });
+                                });
+                            }
+                            if (!toOmit.has('member_registry')) {
+                                members.forEach(member => {
+                                    let guid = this.core.getGuid(member);
+                                    let memberPath = this.core.getPath(member);
+
+                                    json.member_registry[name] = {};
+                                    json.member_registry[name][guid] = {};
+                                    this.core.getMemberRegistryNames(node, name, memberPath).forEach(regName => {
+                                        const value = this.core.getMemberRegistry(node, name, memberPath, regName);
+                                        json.member_registry[name][guid][regName] = value;
+                                    });
+                                });
+                            }
+
+                        }));
+                },
+
+                children: (node, json, promiseQueue) => {
+                    promiseQueue.push((async () => {
+                        const children = await this.core.loadChildren(node);
+                        json.children = await Promise.all(
+                            children.map(child => this._toJSON(child, toOmit))
+                        );
+                    })());
+                },
+
+                children_meta: (node, json, promiseQueue) => {
+                    promiseQueue.push(
+                        this._metaDictToGuids(this.core.getChildrenMeta(node))
+                            .then(children_meta => json.children_meta = children_meta)
+                    );
+                }
+            };
+
             const asyncTasks = [];
-
-            this.core.getOwnAttributeNames(node).forEach(name => {
-                json.attributes[name] = this.core.getAttribute(node, name);
-            });
-
-            this.core.getOwnValidAttributeNames(node).forEach(name => {
-                json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
-            });
-
-            asyncTasks.push(...this.core.getOwnPointerNames(node).map(async name => {
-                const path = this.core.getPointerPath(node, name);
-                if (path) {
-                    const target = await this.core.loadByPath(this.rootNode, path);
-                    json.pointers[name] = this.core.getGuid(target);
-                } else {
-                    json.pointers[name] = path;
+            Object.keys(json).forEach(key => {
+                if(exporters[key]) {
+                    exporters[key](node, json, asyncTasks);
                 }
-            }));
-            const baseNode = this.core.getBase(node);
-            json.pointers.base = baseNode && this.core.getGuid(baseNode);
-            json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
-
-            asyncTasks.push(...this.core.getOwnValidPointerNames(node).map(async name => {
-                const ptr_meta = this.core.getPointerMeta(node, name);
-                json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
-            }));
-
-            this.core.getOwnRegistryNames(node).forEach(name => {
-                json.registry[name] = this.core.getRegistry(node, name);
             });
 
-            asyncTasks.push(...this.core.getOwnSetNames(node)
-                    .filter(name => name !== '_mixins')
-                    .map(async name => {
-                const paths = this.core.getMemberPaths(node, name);
-                const members = await Promise.all(paths.map(path => this.core.loadByPath(this.rootNode, path)));
-                const memberGuids = members.map(member => this.core.getGuid(member));
-                json.sets[name] = memberGuids;
-
-                members.forEach(member => {
-                    let guid = this.core.getGuid(member);
-                    let memberPath = this.core.getPath(member);
-                    json.member_attributes[name] = {};
-                    json.member_attributes[name][guid] = {};
-
-                    this.core.getMemberAttributeNames(node, name, memberPath).forEach(attrName => {
-                        const value = this.core.getMemberAttribute(node, name, memberPath, attrName);
-                        json.member_attributes[name][guid][attrName] = value;
-                    });
-
-                    json.member_registry[name] = {};
-                    json.member_registry[name][guid] = {};
-                    this.core.getMemberRegistryNames(node, name, memberPath).forEach(regName => {
-                        const value = this.core.getMemberRegistry(node, name, memberPath, regName);
-                        json.member_registry[name][guid][regName] = value;
-                    });
-                });
-            }));
-
-            if (!shallow) {
-                json.children = [];
-                const children = await this.core.loadChildren(node);
-                for (let i = 0; i < children.length; i++) {
-                    json.children.push(await this.toJSON(children[i]));
-                }
-            }
-
-            asyncTasks.push(
-                this._metaDictToGuids(this.core.getChildrenMeta(node))
-                    .then(children_meta => json.children_meta = children_meta)
-            );
             await Promise.all(asyncTasks);
             return json;
         }
@@ -958,7 +1006,35 @@ define([
         }
     }
 
+    const RELATED_PROPERTIES = {
+        sets: ['member_attributes', 'member_registry'],
+        children: ['children_meta'],
+        attributes: ['attributes_meta'],
+        pointers: ['pointer_meta'],
+    };
+    const INVALID_PROPS = ['id', 'guid', 'path'];
+    class OmittedProperties extends Set {
+        constructor(...args) {
+            super(...args);
+            const invalidProperties = INVALID_PROPS.filter(prop => this.has(prop));
+
+            if(invalidProperties.length) {
+                throw new Error(`Invalid properties to omit: ${invalidProperties.join(', ')}`);
+            }
+        }
+
+        withRelatedProperties() {
+            const relatedProps = Object.keys(RELATED_PROPERTIES)
+                .filter(key => this.has(key))
+                .flatMap(key => RELATED_PROPERTIES[key]);
+
+            relatedProps.forEach(dep => this.add(dep));
+            return this;
+        }
+    }
+
     Importer.NodeSelector = NodeSelector;
     Importer.NodeSelections = NodeSelections;
+    Importer.OmittedProperties = OmittedProperties;
     return Importer;
 });
