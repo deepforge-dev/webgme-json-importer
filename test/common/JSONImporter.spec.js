@@ -246,7 +246,6 @@ describe('JSONImporter', function () {
                 original2 = await importer.toJSON(node2);
                 const nodePath = core.getPath(node3);
                 original2.pointers.base = nodePath;
-
                 await importer.apply(node2, original2);
                 assert.equal(core.getPointerPath(node2, 'base'), nodePath);
                 assert(
@@ -305,7 +304,7 @@ describe('JSONImporter', function () {
             });
 
             it('should set base correctly during structural inheritance', async function() {
-                // Create nodes: A, B, and A' where 
+                // Create nodes: A, B, and A' where
                 //   - B is contained in A
                 //   - A' inherits from A
                 //
@@ -1082,7 +1081,7 @@ describe('JSONImporter', function () {
                 ]
             };
             const selectors = new NodeSelections();
-            await importer.resolveSelectors(parent, parentJson, selectors);
+            await importer.resolveSelectorsForExistingNodes(parent, parentJson, selectors);
             assert.equal(selectors.cache.length, 1);
         });
 
@@ -1101,7 +1100,7 @@ describe('JSONImporter', function () {
                 ]
             };
             const selectors = new NodeSelections();
-            await importer.resolveSelectors(parent, parentJson, selectors);
+            await importer.resolveSelectorsForExistingNodes(parent, parentJson, selectors);
             assert.equal(selectors.cache.length, 2);
         });
 
@@ -1281,25 +1280,7 @@ describe('JSONImporter', function () {
         });
     });
 
-    describe.only('diff', function() {
-        let diffStates;
-        before(function () {
-            diffStates = JSON.parse(
-                fs.readFileSync(path.join(ASSETS_DIR, 'DiffStates.json'), 'utf-8')
-            );
-        });
-
-        it('should add single key children', () => {
-            const {prevState, newState} = diffStates.putNewChildren;
-            const diff = importer.getDiffs(prevState, newState);
-            console.log(JSON.stringify(diff));
-
-        });
-
-        it('should remove single key children', () => {
-            const {prevState, newState} = diffStates.putNewChildren;
-            const diff = importer.getDiffs(newState, prevState);
-            console.log(JSON.stringify(diff));
-        });
+    describe('diff', function() {
+       // ToDo: add testing;
     });
 });

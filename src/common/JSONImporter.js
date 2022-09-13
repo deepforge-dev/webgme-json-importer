@@ -167,131 +167,79 @@ define([
             return json;
         }
 
-        // async apply (node, state, resolvedSelectors=new NodeSelections()) {
-        //     await this.resolveSelectors(node, state, resolvedSelectors);
-        //
-        //     const children = state.children || [];
-        //     const currentChildren = await this.core.loadChildren(node);
-        //
-        //     for (let i = 0; i < children.length; i++) {
-        //         const idString = children[i].id;
-        //         const child = await this.findNode(node, idString, resolvedSelectors);
-        //         const index = currentChildren.indexOf(child);
-        //         if (index > -1) {
-        //             currentChildren.splice(index, 1);
-        //         }
-        //
-        //         await this.apply(child, children[i], resolvedSelectors);
-        //     }
-        //     const current = await this.toJSON(node);
-        //     const sortedChanges = this._getSortedStateChanges(current, state);
-        //
-        //     for (let i = 0; i < sortedChanges.length; i++) {
-        //         if (sortedChanges[i].type === 'put') {
-        //             await this._put(node, sortedChanges[i], resolvedSelectors);
-        //         } else if (sortedChanges[i].type === 'del') {
-        //             await this._delete(node, sortedChanges[i], resolvedSelectors);
-        //         }
-        //     }
-        //
-        //     if (state.children) {
-        //         for (let i = currentChildren.length; i--;) {
-        //             this.core.deleteNode(currentChildren[i]);
-        //         }
-        //     }
-        // }
-
         async apply(node, state, resolvedSelectors = new NodeSelections()) {
-            const toOmit = state.children?.length === 0 ? ['children']: [];
-            const prevState = await this.toJSON(node, new OmittedProperties(toOmit));
-            const diffs = await this.getDiffs(prevState, state, resolvedSelectors, this.core.getParent(node));
-            await this.patch(node, diffs, resolvedSelectors);
+            const diff = await this.getDiffs(node, state, resolvedSelectors);
+            await this._patch(diff, resolvedSelectors);
         }
 
-        async getDiffs(prevState, newState, resolvedSelectors=new NodeSelections(), parent=null) {
-            const rootPatch = new NodeDiff(
-                prevState.id
-            );
-            await this._getDiffs(prevState, newState, rootPatch, parent, resolvedSelectors);
-            return rootPatch;
-        }
-
-        async _getDiffs(prevState, newState, rootDiff, parent, resolvedSelectors) {
-            const node = await this.resolveSelectorsFromState(prevState, parent, resolvedSelectors);
-            console.log(JSON.stringify({prevState, newState}, null, 2));
-            const {additions, updates, removals} = this.getImmediateChildrenDiffs(prevState, newState);
-            rootDiff.children.push(
-                ...additions.map(nodeState => {
-                    return new NodeDiff(
-                        nodeState.id,
+        async getDiffs(node, state, resolvedSelectors=new NodeSelections()) {
+            await this.resolveSelectorsForExistingNodes(node, state, resolvedSelectors);
+            const rootDiff = new NodeDiff(state.id);
+            const children = state.children || [];
+            const currentChildren = await this.core.loadChildren(node);
+            await Promise.all(children.map( async childState => {
+                const idString = childState.id;
+                const childNode = await this.findNode(node, idString, resolvedSelectors);
+                const index = currentChildren.indexOf(childNode);
+                if(index > -1) {
+                    currentChildren.splice(index, 1);
+                }
+                if(childNode) {
+                    rootDiff.children.push(await this.getDiffs(childNode, childState, resolvedSelectors));
+                } else {
+                    rootDiff.children.push(new NodeDiff(
+                        childState.id || '',
                         NODE_PATCH_TYPES.ADD,
-                        [nodeState]
-                    )
-                })
-            );
+                        [{
+                            parentPath: this.core.getPath(node),
+                            state: childState,
+                        }]
+                    ));
+                }
+            }));
+            const current = await this.toJSON(node, new OmittedProperties(['children']));
+            const changes = this._getSortedStateChanges(current, state);
+            if(changes.length) {
+                rootDiff.type = NODE_PATCH_TYPES.UPDATES;
+                const parent = this.core.getParent(node);
+                const parentPath = this.core.getPath(parent);
+                rootDiff.patches = changes.map(change => {
+                    change.parentPath = parentPath;
+                    change.nodeId = state.id || this.core.getPath(node);
+                    return change;
+                });
+            }
 
-            rootDiff.children.push(
-                ...removals.map(nodeState => {
-                    return new NodeDiff(
-                        nodeState.id,
-                        NODE_PATCH_TYPES.REMOVE,
-                        [nodeState]
-                    )
-                })
-            );
+            if(state.children && currentChildren.length) {
+                const deletions = currentChildren.map(child => new NodeDiff(
+                    this.core.getPath(child),
+                    NODE_PATCH_TYPES.REMOVE,
+                    [{
+                        parentPath: this.core.getPath(node),
+                        nodeId: `@path:${this.core.getPath(child)}`
+                    }]
+                ));
 
-            await Promise.all(updates.map(async ([prev, new_]) => {
-                const childPatch = new NodeDiff(prev.id, NODE_PATCH_TYPES.NO_CHANGE);
-                rootDiff.children.push(childPatch);
-                return await this._getDiffs(prev, new_, childPatch, node, resolvedSelectors);
+                rootDiff.children.push(...deletions);
+            }
+
+            return rootDiff;
+        }
+
+        async _patch(diff, resolvedSelectors) {
+            await this._patch[diff.type].call(this, ...arguments);
+            const [childrenWithids, otherChildren] = partition(
+                diff.children, childDiff => (childDiff.id || '').startsWith('@id')
+            ); // Make sure children with @ids are created/updated first
+            await Promise.all(childrenWithids.map(async child => {
+                const args = [child, resolvedSelectors];
+                await this._patch[child.type].call(this, ...args);
             }));
 
-            const sortedChanges = this._getSortedStateChanges(prevState, newState);
-            if(sortedChanges.length) {
-                rootDiff.type = NODE_PATCH_TYPES.UPDATES
-                rootDiff.patches = sortedChanges;
-            }
-
-        }
-
-        getImmediateChildrenDiffs(prevState, newState) {
-            const children = newState.children || [];
-            const prevChildren = prevState.children || [];
-
-            const childrenPairsNewOld = children.map(child => {
-                if(child.id) {
-                    const childSelector = new NodeSelector(child.id);
-                    return [childSelector.findInParentState({children: prevChildren}, this.core, this.rootNode), child];
-                } else {
-                    return [undefined, child];
-                }
-            });
-            let [additions, updates] = partition(childrenPairsNewOld, ([prevChild, _]) => !prevChild);
-            additions = additions.map(add => add.shift());
-
-            const updatedStateIds = updates.map(([prev, _]) => prev).map(prev => prev.id).filter(id => !!id);
-            const wasUpdated = child => {
-                return updatedStateIds.includes(child.id);
-            }
-
-            const removals = prevChildren.filter(child => !wasUpdated(child));
-            return {additions, updates, removals};
-        }
-
-        async patch(node, diff, resolvedSelectors) {
-            await this._patch(node, this.core.getParent(node), diff, resolvedSelectors);
-        }
-
-        async _patch(node, parent, diff, resolvedSelectors) {
-            if(node && !parent) {
-                parent = this.core.getParent(node);
-            }
-
-            node = await this._patch[diff.type].call(this, ...arguments);
-            await(Promise.all(diff.children.map( async child => {
-                const childNode = await this.findNode(parent, child.id, resolvedSelectors);
-                await this._patch(childNode, node, child, resolvedSelectors);
-            })));
+            await Promise.all(otherChildren.map(async child => {
+                const args = [child, resolvedSelectors];
+                await this._patch[child.type].call(this, ...args);
+            }));
         }
 
         _getSortedStateChanges(prevState, newState) {
@@ -344,6 +292,15 @@ define([
             return (state.children || []).map(s => [s, node]);
         }
 
+        async getCreationSubtrees(node, state, resolvedSelectors) {
+            const stateNodePairs = this.getChildStateNodePairs(node, state);
+            const toCreateNodes = (await Promise.all(stateNodePairs
+                .filter(async ([state, parent]) => {
+                    return !(await this.findNode(parent, state.id, resolvedSelectors));
+                })));
+            return toCreateNodes;
+        }
+
         async tryResolveSelectors(stateNodePairs, resolvedSelectors) {
             let tryResolveMore = true;
             while (tryResolveMore) {
@@ -352,33 +309,33 @@ define([
                     const [state, parentNode] = stateNodePairs[i];
                     let child = await this.findNode(parentNode, state.id, resolvedSelectors);
                     //const canCreate = !state.id;
-                    if (!child /*&& canCreate*/) {
-                        let baseNode;
-                        if (state.pointers) {
-                            const {base} = state.pointers;
-                            if (!base) {
-                                const stateID = state.id || JSON.stringify(state);
-                                throw new Error(`No base provided for ${stateID}`);
-                            }
-                            baseNode = await this.findNode(parentNode, base, resolvedSelectors);
-
-
-                        } else {
-                            const fco = await this.core.loadByPath(this.rootNode, '/1');
-                            baseNode = fco;
-                        }
-
-                        if (baseNode) {
-                            child = await this.createNode(parentNode, state, baseNode);
-                        }
-                    }
-
+                    // if (!child /*&& canCreate*/) {
+                    //     let baseNode;
+                    //     if (state.pointers) {
+                    //         const {base} = state.pointers;
+                    //         if (!base) {
+                    //             const stateID = state.id || JSON.stringify(state);
+                    //             throw new Error(`No base provided for ${stateID}`);
+                    //         }
+                    //         baseNode = await this.findNode(parentNode, base, resolvedSelectors);
+                    //
+                    //
+                    //     } else {
+                    //         const fco = await this.core.loadByPath(this.rootNode, '/1');
+                    //         baseNode = fco;
+                    //     }
+                    //
+                    //     if (baseNode) {
+                    //         child = await this.createNode(parentNode, state, baseNode);
+                    //     }
+                    // }
+                    let pairs = [];
                     if (child) {
                         this.resolveSelector(child, state, resolvedSelectors);
-                        const pairs = this.getChildStateNodePairs(child, state);
-                        stateNodePairs.splice(i, 1, ...pairs);
+                        pairs = this.getChildStateNodePairs(child, state);
                         tryResolveMore = true;
                     }
+                    stateNodePairs.splice(i, 1, ...pairs);
                 }
             }
 
@@ -387,7 +344,7 @@ define([
             }
         }
 
-        async resolveSelectors(node, state, resolvedSelectors) {
+        async resolveSelectorsForExistingNodes(node, state, resolvedSelectors) {
             const parent = this.core.getParent(node);
 
             if (state.id && parent) {
@@ -396,16 +353,6 @@ define([
 
             const stateNodePairs = this.getChildStateNodePairs(node, state);
             await this.tryResolveSelectors(stateNodePairs, resolvedSelectors);
-        }
-
-        async resolveSelectorsFromState(state, parent, resolvedSelectors) {
-            const nodeSelector = new NodeSelector(state.id);
-            const node = await nodeSelector.findNode(this.core, this.rootNode, parent, resolvedSelectors);
-            if(!node) {
-                throw new Error(`Can't find node with id: ${state.id}`);
-            }
-            await this.resolveSelectors(node, state, resolvedSelectors);
-            return node;
         }
 
         async findNode(parent, idString, resolvedSelectors=new NodeSelections()) {
@@ -458,6 +405,25 @@ define([
             return node;
         }
 
+        async createStateSubTree(parentPath, state, resolvedSelectors) {
+            const base = state.pointers?.base;
+            const parent = await this.core.loadByPath(this.rootNode, parentPath);
+            const baseNode = await this.findNode(parent, base, resolvedSelectors);
+            const created = await this.createNode(parent, state, baseNode);
+            const nodeSelector = new NodeSelector(this.core.getPath(created));
+            resolvedSelectors.record(parentPath, nodeSelector, created);
+            const nodeState = await this.toJSON(created, new OmittedProperties(['children']));
+            const changes = this._getSortedStateChanges(nodeState, state);
+            await Promise.all(changes.map(async change => {
+                await this._put(created, change, resolvedSelectors);
+            }));
+            await Promise.all((state.children || []).map(async child => {
+                await this.createStateSubTree(this.core.getPath(created), child, resolvedSelectors);
+            }));
+
+            return created;
+        }
+
         async _put (node, change) {
             const [type] = change.key;
             if (type !== 'path' && type !== 'id') {
@@ -491,33 +457,31 @@ define([
         NO_CHANGE: 'noChange'
     };
 
-    Importer.prototype._patch[NODE_PATCH_TYPES.ADD] = async function(node, parent, diff, resolvedSelectors) {
-        const state = diff.patches.pop();
-        const base = state.pointers?.base;
-        const baseNode = await this.findNode(parent, base, resolvedSelectors);
-        const createdNode = await this.createNode(parent, state, baseNode);
-        return createdNode;
+    Importer.prototype._patch[NODE_PATCH_TYPES.ADD] = async function(diff, resolvedSelectors) {
+        const {parentPath, state} = diff.patches.pop();
+        const node = await this.createStateSubTree(parentPath, state, resolvedSelectors);
+        return node;
     }
 
-    Importer.prototype._patch[NODE_PATCH_TYPES.REMOVE] = async function(node, parent, diff, resolvedSelectors) {
+    Importer.prototype._patch[NODE_PATCH_TYPES.REMOVE] = async function(diff, resolvedSelectors) {
+        const {parentPath, nodeId} = diff.patches.pop();
+        const parent = await this.core.loadByPath(this.rootNode, parentPath);
+        const node = await this.findNode(parent, nodeId, resolvedSelectors);
         this.core.deleteNode(node);
-        return node;
     }
 
-    Importer.prototype._patch[NODE_PATCH_TYPES.UPDATES] = async function(node, parent, diff, resolvedSelectors) {
-         const sortedChanges = diff.patches;
-         for (let i = 0; i < sortedChanges.length; i++) {
-            if (sortedChanges[i].type === 'put') {
-                await this._put(node, sortedChanges[i], resolvedSelectors);
-            } else if (sortedChanges[i].type === 'del') {
-                await this._delete(node, sortedChanges[i], resolvedSelectors);
-            }
-         }
-         return node;
+    Importer.prototype._patch[NODE_PATCH_TYPES.UPDATES] = async function(diff, resolvedSelectors) {
+        const changes = diff.patches;
+        return await Promise.all(changes.map(async change => {
+            const parent = await this.core.loadByPath(this.rootNode, change.parentPath);
+            const node = await this.findNode(parent, change.nodeId, resolvedSelectors);
+            if(change.type === 'put') return await this._put(node, change, resolvedSelectors);
+            if(change.type === 'del') return await this._delete(node, change, resolvedSelectors);
+        }));
     }
 
-    Importer.prototype._patch[NODE_PATCH_TYPES.NO_CHANGE] = async function(node, parent, diff, resolvedSelectors) {
-        return node;
+    Importer.prototype._patch[NODE_PATCH_TYPES.NO_CHANGE] = async function(diff, resolvedSelectors) {
+
     }
 
 
@@ -976,31 +940,6 @@ define([
             }
 
             throw new Error(`Unknown tag: ${this.tag}`);
-        }
-
-        findInParentState(state, core, rootNode) { // How to deal with crisscross between @meta and @id tags?
-            if (this.tag === '@path') {
-                return state.children.find(child => child.id === this.value || child.path === this.value.split(':').pop());
-            }
-
-            if (this.tag === '@guid') {
-                return state.children.find(child => child.id === this.value || child.guid === this.value.split(':').pop());
-            }
-
-            if (this.tag === '@attribute') {
-                const [attr, value] = this.value;
-                return state.children.find(child => {
-                    return child.attributes ?  child.attributes[attr] === value : false;
-                });
-            }
-
-            if(this.tag === '@meta') {
-                const metaNode = this.findMetaNodeForTag(core, rootNode);
-                const [guid, path] = [core.getGuid(metaNode), core.getPath(metaNode)];
-                return state.children.find(child => {
-                    return [guid, path].includes(child.guid) || [guid, path].includes(child.path);
-                })
-            }
         }
 
         findMetaNodeForTag(core, rootNode) {
