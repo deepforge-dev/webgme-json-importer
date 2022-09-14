@@ -1,4 +1,4 @@
-import {WebGMEJSONImporter} from './WebGMEJSONImporter';
+import {JSONImporter} from './JSONImporter';
 // Import from Utils
 
-export default WebGMEJSONImporter;
+export default JSONImporter;
