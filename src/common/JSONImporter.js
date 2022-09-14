@@ -203,7 +203,7 @@ define([
                         )
                     ];
                 }
-            }))));
+            }))).flat());
             const current = await this.toJSON(node, new OmittedProperties(['children']));
             const changes = this._getSortedStateChanges(current, state);
             if(changes.length) {
@@ -220,14 +220,14 @@ define([
                 const deletions = currentChildren.map(child => new NodeChangeSet(
                     nodePath,
                     this.core.getPath(child),
-                    'remove_node',
+                    'remove_subtree',
                     this.core.getPath(child),
                     null
                 ));
                 diffs.push(...deletions);
             }
 
-            return diffs.flat();
+            return diffs;
         }
 
         async applyDiffsForNode(node, diffs) {
@@ -238,9 +238,7 @@ define([
         }
 
         async applyDiffs(diffs, resolvedSelectors) {
-            const [additions, remaining] = partition(diffs, diff => diff.type === 'add_subtree' && (diff.nodeId || '').startsWith('@id'));
-
-            await Promise.all([...additions, ...remaining ].map(async diff => {
+            await Promise.all(diffs.map(async diff => {
                 const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
                 const node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
                 return await this.applyDiffs[diff.type].call(this, node, diff, resolvedSelectors);
@@ -456,7 +454,7 @@ define([
         return created;
     };
 
-    Importer.prototype.applyDiffs.remove_node = async function(node, /*change, resolvedSelectors*/) {
+    Importer.prototype.applyDiffs.remove_subtree = async function(node, /*change, resolvedSelectors*/) {
         this.core.deleteNode(node);
     };
 
