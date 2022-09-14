@@ -11,9 +11,7 @@ describe('JSONImporter', function () {
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
-    const fs = require('fs');
     const SEED_DIR = path.join(__dirname, '..', '..', 'src', 'seeds');
-    const ASSETS_DIR = path.join(__dirname, '..', 'assets');
     const Q = testFixture.Q;
     const logger = testFixture.logger.fork('JSONImporter');
     const projectName = 'testProject';
@@ -246,6 +244,7 @@ describe('JSONImporter', function () {
                 original2 = await importer.toJSON(node2);
                 const nodePath = core.getPath(node3);
                 original2.pointers.base = nodePath;
+
                 await importer.apply(node2, original2);
                 assert.equal(core.getPointerPath(node2, 'base'), nodePath);
                 assert(
