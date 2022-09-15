@@ -210,7 +210,7 @@ define([
                 diffs.push(...changes.map(
                     change => NodeChangeSet.fromDiffObj(
                         parentPath,
-                        nodePath,
+                        state.id,
                         change
                     )
                 ));
