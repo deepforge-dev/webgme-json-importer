@@ -302,30 +302,71 @@ describe('JSONImporter', function () {
                 );
             });
 
-            it('should set base correctly during structural inheritance', async function() {
-                // Create nodes: A, B, and A' where 
-                //   - B is contained in A
-                //   - A' inherits from A
-                //
-                // Check that:
-                //   - B' exists (ie, it is created)
-                //   - B' inherits from B
-                const fco = await core.loadByPath(root, '/1');
-                const nodeA = core.createNode({base: fco, parent: root});
-                core.setAttribute(nodeA, 'name', 'A');
+            describe('structural inheritance', function() {
+                it('should set correct base of inherited child', async function() {
+                    // Create nodes: A, B, and A' where
+                    //   - B is contained in A
+                    //   - A' inherits from A
+                    //
+                    // Check that:
+                    //   - B' exists (ie, it is created)
+                    //   - B' inherits from B
+                    const fco = await core.loadByPath(root, '/1');
+                    const nodeA = core.createNode({base: fco, parent: root});
+                    core.setAttribute(nodeA, 'name', 'A');
 
-                const nodeB = core.createNode({base: fco, parent: nodeA});
-                core.setAttribute(nodeB, 'name', 'B');
+                    const nodeB = core.createNode({base: fco, parent: nodeA});
+                    core.setAttribute(nodeB, 'name', 'B');
 
-                const nodeAp = core.createNode({base: nodeA, parent: root});
-                core.setAttribute(nodeAp, 'name', 'A prime');
+                    const nodeAp = core.createNode({base: nodeA, parent: root});
+                    core.setAttribute(nodeAp, 'name', 'A prime');
 
-                const [childPath] = core.getChildrenPaths(nodeAp);
-                const nodeBp = await core.loadByPath(root, childPath);
+                    const [childPath] = core.getChildrenPaths(nodeAp);
+                    const nodeBp = await core.loadByPath(root, childPath);
 
-                const schemaAp = await importer.toJSON(nodeAp);
-                const [schemaBp] = schemaAp.children;
-                assert.equal(schemaBp.pointers.base, core.getGuid(nodeB));
+                    const schemaAp = await importer.toJSON(nodeAp);
+                    const [schemaBp] = schemaAp.children;
+                    assert.equal(schemaBp.pointers.base, core.getGuid(nodeB));
+                });
+
+                it('should resolve @attribute paths to inherited child', async function() {
+                    // Create nodes: A and B
+                    //   - B is contained in A
+                    //   - A' is created from schema and inherits from A
+                    //   - in schema, A' refers to B' using @attribute selector
+                    //
+                    // Check that:
+                    //   - B' is resolved correctly
+                    const fco = await core.loadByPath(root, '/1');
+                    const nodeA = core.createNode({base: fco, parent: root});
+                    core.setAttribute(nodeA, 'name', 'A');
+
+                    const nodeB = core.createNode({base: fco, parent: nodeA});
+                    core.setAttribute(nodeB, 'name', 'B');
+
+                    const selectorA = `@path:${core.getPath(nodeA)}`;
+                    const state = {
+                        pointers: {
+                            base: selectorA
+                        },
+                        children: [
+                            {
+                                id: '@name:B',
+                                attributes: {
+                                    name: 'C'
+                                }
+                            }
+                        ]
+                    };
+
+                    const node = await importer.import(root, state);
+                    const children = await core.loadChildren(node);
+                    assert.equal(children.length, 1);
+                    const [child] = children;
+                    assert.equal(core.getAttribute(child, 'name'), 'C');
+
+                    assert.equal(core.getPath(core.getBase(child)), core.getPath(nodeB));
+                });
             });
         });
 
