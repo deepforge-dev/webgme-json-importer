@@ -168,11 +168,11 @@ define([
         }
 
         async apply(node, state, resolvedSelectors = new NodeSelections()) {
-            const diffs = await this.getDiffs(node, state, resolvedSelectors);
-            await this.applyDiffs(diffs, resolvedSelectors);
+            const diffs = await this.diff(node, state, resolvedSelectors);
+            await this.patchSync(diffs, resolvedSelectors);
         }
 
-        async getDiffs(node, state, resolvedSelectors=new NodeSelections()) {
+        async diff(node, state, resolvedSelectors=new NodeSelections()) {
             await this.resolveSelectorsForExistingNodes(node, state, resolvedSelectors);
 
             const parent = this.core.getParent(node);
@@ -190,7 +190,7 @@ define([
                     currentChildren.splice(index, 1);
                 }
                 if (childNode) {
-                    const childDiffs = await this.getDiffs(childNode, childState, resolvedSelectors);
+                    const childDiffs = await this.diff(childNode, childState, resolvedSelectors);
                     return childDiffs;
                 } else {
                     return [
@@ -230,18 +230,19 @@ define([
             return diffs;
         }
 
-        async applyDiffsForNode(node, diffs) {
-            const resolvedSelectors = new NodeSelections();
-            const currentState = await this.toJSON(node);
-            await this.resolveSelectors(node, currentState, resolvedSelectors);
-            await this.applyDiffs(diffs, resolvedSelectors);
+        async patch(node, diffs, resolvedSelectors=new NodeSelections()) {
+            const diffIds = diffs.map(diff => {
+                return {id: diff.nodeId};
+            });
+            await Promise.all(diffIds.map(async diffId => await this.resolveSelectorsForExistingNodes(node, diffId, resolvedSelectors)));
+            await this.patchSync(diffs, resolvedSelectors);
         }
 
-        async applyDiffs(diffs, resolvedSelectors) {
+        async patchSync(diffs, resolvedSelectors) {
             await Promise.all(diffs.map(async diff => {
-                const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
-                const node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
-                return await this.applyDiffs[diff.type].call(this, node, diff, resolvedSelectors);
+                const selector = new NodeSelector(diff.nodeId);
+                const node = resolvedSelectors.get(diff.parentPath, selector);
+                return await this.patchSync[diff.type].call(this, node, diff, resolvedSelectors);
             }));
         }
 
@@ -274,7 +275,7 @@ define([
             return sortedChanges;
         }
 
-        async resolveSelector(node, state, resolvedSelectors) {
+        resolveSelector(node, state, resolvedSelectors) {
             const parent = this.core.getParent(node);
 
             if (!parent) {
@@ -344,7 +345,9 @@ define([
 
         async resolveSelectors(node, state, resolvedSelectors, create=true) {
             const parent = this.core.getParent(node);
-
+            if(parent) {
+                this.resolveSelector(node, {id: this.core.getPath(node)}, resolvedSelectors);
+            }
             if (state.id && parent) {
                 this.resolveSelector(node, state, resolvedSelectors);
             }
@@ -449,20 +452,20 @@ define([
         }
     }
 
-    Importer.prototype.applyDiffs.add_subtree = async function(node, change, resolvedSelectors) {
+    Importer.prototype.patchSync.add_subtree = async function(node, change, resolvedSelectors) {
         const created = await this.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
         return created;
     };
 
-    Importer.prototype.applyDiffs.remove_subtree = async function(node, /*change, resolvedSelectors*/) {
+    Importer.prototype.patchSync.remove_subtree = async function(node, /*change, resolvedSelectors*/) {
         this.core.deleteNode(node);
     };
 
-    Importer.prototype.applyDiffs.put = async function(node, change, resolvedSelectors) {
+    Importer.prototype.patchSync.put = async function(node, change, resolvedSelectors) {
         return await this._put(node, change, resolvedSelectors);
     };
 
-    Importer.prototype.applyDiffs.del = async function(node, change, resolvedSelectors) {
+    Importer.prototype.patchSync.del = async function(node, change, resolvedSelectors) {
         return await this._delete(node, change, resolvedSelectors);
     };
 
