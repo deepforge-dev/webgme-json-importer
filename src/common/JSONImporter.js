@@ -240,8 +240,11 @@ define([
 
         async patchSync(diffs, resolvedSelectors) {
             await Promise.all(diffs.map(async diff => {
-                const selector = new NodeSelector(diff.nodeId);
-                const node = resolvedSelectors.get(diff.parentPath, selector);
+                let node=null;
+                if(diff.type !== 'add_subtree'){
+                    const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
+                    node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
+                }
                 return await this.patchSync[diff.type].call(this, node, diff, resolvedSelectors);
             }));
         }
@@ -498,7 +501,7 @@ define([
             `Complex attributes not currently supported: ${change.key.join(', ')}`
         );
         const [/*type*/, name] = change.key;
-        this.core.setAttribute(node, name, change.value);
+        this.core.setAttribute(node, name, change.value || '');
     };
 
     Importer.prototype._delete.attributes = function(node, change) {
