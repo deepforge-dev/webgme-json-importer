@@ -239,7 +239,7 @@ define([
         }
 
         async _patch(diffs, resolvedSelectors) {
-            const [firstOrderDiffs, dependentDiffs] = this._partitionDiffs(diffs);
+            const [firstOrderDiffs, dependentDiffs] = this._partitionDiffsByPriority(diffs);
             const apply = diffs => {
                 return diffs.map(async diff => {
                     let node = null;
@@ -255,7 +255,7 @@ define([
             await Promise.all(apply(dependentDiffs));
         }
 
-        _partitionDiffs(diffs) {
+        _partitionDiffsByPriority(diffs) {
             return partition(diffs, diff => diff.type === 'add_subtree' && diff.nodeId.startsWith('@id'));
         }
 
