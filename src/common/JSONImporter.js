@@ -169,7 +169,7 @@ define([
 
         async apply(node, state, resolvedSelectors = new NodeSelections()) {
             const diffs = await this.diff(node, state, resolvedSelectors);
-            await this.patchSync(diffs, resolvedSelectors);
+            await this._patch(diffs, resolvedSelectors);
         }
 
         async diff(node, state, resolvedSelectors=new NodeSelections()) {
@@ -235,18 +235,28 @@ define([
                 return {id: diff.nodeId};
             });
             await Promise.all(diffIds.map(async diffId => await this.resolveSelectorsForExistingNodes(node, diffId, resolvedSelectors)));
-            await this.patchSync(diffs, resolvedSelectors);
+            await this._patch(diffs, resolvedSelectors);
         }
 
-        async patchSync(diffs, resolvedSelectors) {
-            await Promise.all(diffs.map(async diff => {
-                let node=null;
-                if(diff.type !== 'add_subtree'){
-                    const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
-                    node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
-                }
-                return await this.patchSync[diff.type].call(this, node, diff, resolvedSelectors);
-            }));
+        async _patch(diffs, resolvedSelectors) {
+            const [firstOrderDiffs, dependentDiffs] = this._partitionDiffs(diffs);
+            const apply = diffs => {
+                return diffs.map(async diff => {
+                    let node = null;
+                    if (diff.type !== 'add_subtree') {
+                        const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
+                        node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
+                    }
+                    return await this._patch[diff.type].call(this, node, diff, resolvedSelectors);
+                });
+            };
+
+            await Promise.all(apply(firstOrderDiffs));
+            await Promise.all(apply(dependentDiffs));
+        }
+
+        _partitionDiffs(diffs) {
+            return partition(diffs, diff => diff.type === 'add_subtree' && diff.nodeId.startsWith('@id'));
         }
 
         _getSortedStateChanges(prevState, newState) {
@@ -416,6 +426,10 @@ define([
             const created = await this.createNode(parent, state, baseNode);
             const nodeSelector = new NodeSelector(this.core.getPath(created));
             resolvedSelectors.record(parentPath, nodeSelector, created);
+            if(state.id && !state.id.startsWith('@internal')) {
+                const alternateSelector = new NodeSelector(state.id);
+                resolvedSelectors.record(parentPath, alternateSelector, created);
+            }
             const nodeState = await this.toJSON(created, new OmittedProperties(['children']));
             const changes = this._getSortedStateChanges(nodeState, state);
             await Promise.all(changes.map(async change => {
@@ -455,20 +469,20 @@ define([
         }
     }
 
-    Importer.prototype.patchSync.add_subtree = async function(node, change, resolvedSelectors) {
+    Importer.prototype._patch.add_subtree = async function(node, change, resolvedSelectors) {
         const created = await this.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
         return created;
     };
 
-    Importer.prototype.patchSync.remove_subtree = async function(node, /*change, resolvedSelectors*/) {
+    Importer.prototype._patch.remove_subtree = async function(node, /*change, resolvedSelectors*/) {
         this.core.deleteNode(node);
     };
 
-    Importer.prototype.patchSync.put = async function(node, change, resolvedSelectors) {
+    Importer.prototype._patch.put = async function(node, change, resolvedSelectors) {
         return await this._put(node, change, resolvedSelectors);
     };
 
-    Importer.prototype.patchSync.del = async function(node, change, resolvedSelectors) {
+    Importer.prototype._patch.del = async function(node, change, resolvedSelectors) {
         return await this._delete(node, change, resolvedSelectors);
     };
 
