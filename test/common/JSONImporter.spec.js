@@ -1279,7 +1279,7 @@ describe('JSONImporter', function () {
         });
     });
 
-    describe.only('diff', function () {
+    describe('diff', function () {
         let node1;
         beforeEach(async function () {
             node1 = core.createNode({
