@@ -1313,7 +1313,7 @@ describe('JSONImporter', function () {
             };
 
             const diff = (await importer.diff(node1, state)).shift();
-            assert(diff.type === 'put' && diff.key[0] === 'children', 'add_subtree diff not found');
+            assert(diff.type === 'put' && diff.key[0] === 'children', 'put children diff not found');
         });
 
         it('should find del children diff type on children removal', async () => {
