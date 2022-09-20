@@ -303,7 +303,7 @@ describe('JSONImporter', function () {
             });
 
             it('should set base correctly during structural inheritance', async function() {
-                // Create nodes: A, B, and A' where 
+                // Create nodes: A, B, and A' where
                 //   - B is contained in A
                 //   - A' inherits from A
                 //
@@ -1080,7 +1080,7 @@ describe('JSONImporter', function () {
                 ]
             };
             const selectors = new NodeSelections();
-            await importer.resolveSelectors(parent, parentJson, selectors);
+            await importer.resolveSelectorsForExistingNodes(parent, parentJson, selectors);
             assert.equal(selectors.cache.length, 1);
         });
 
@@ -1099,7 +1099,7 @@ describe('JSONImporter', function () {
                 ]
             };
             const selectors = new NodeSelections();
-            await importer.resolveSelectors(parent, parentJson, selectors);
+            await importer.resolveSelectorsForExistingNodes(parent, parentJson, selectors);
             assert.equal(selectors.cache.length, 2);
         });
 
@@ -1278,4 +1278,96 @@ describe('JSONImporter', function () {
             }
         });
     });
+
+    describe('diff', function () {
+        let node1;
+        beforeEach(async function () {
+            node1 = core.createNode({
+                parent: root,
+                base: fco
+            });
+        });
+
+        it('should find a single diff on attribute addition', async () => {
+            core.setAttribute(node1, 'name', 'New Name');
+            const state = await importer.toJSON(node1);
+            core.delAttribute(node1, 'name');
+            const diffs = await importer.diff(node1, state);
+
+            assert.equal(diffs.length, 1, 'more than once diff found');
+            const diff = diffs.shift();
+            const [type, name] = diff.key;
+            assert(diff.type === 'put');
+            assert(type === 'attributes');
+            assert(name === 'name');
+            assert(diff.value === 'New Name');
+        });
+
+        it('should find put children diff type on children addition', async () => {
+            const state = {
+                children: [{
+                    attributes: {
+                        attr1: 'attr1',
+                    }
+                }]
+            };
+
+            const diff = (await importer.diff(node1, state)).shift();
+            assert(diff.type === 'put' && diff.key[0] === 'children', 'put children diff not found');
+        });
+
+        it('should find del children diff type on children removal', async () => {
+
+            range(5).forEach(idx => {
+                const node = core.createNode({
+                    parent: node1,
+                    base: fco
+                });
+                core.setAttribute(node, 'name', `child${idx}`);
+            });
+
+            const state = await importer.toJSON(node1);
+            state.children.splice(0, 2);
+
+            const diffs = await importer.diff(node1, state);
+            assert(diffs.length === 2);
+            assert(diffs.every(diff => diff.type === 'del' && diff.key[0] === 'children'));
+        });
+
+        it('should find pointer changes in diff by path', async () => {
+            range(5).forEach(idx => {
+                const node = core.createNode({
+                    parent: node1,
+                    base: fco
+                });
+                core.setAttribute(node, 'name', `child${idx}`);
+            });
+
+            const node2 = core.createNode({
+                parent: root,
+                base: fco
+            });
+
+            const state = await importer.toJSON(node1);
+            state.children.forEach(child => child.pointers.base = core.getPath(node2));
+
+            const diffs = await importer.diff(node1, state);
+            assert(diffs.length === 5, 'more than 5 diffs found');
+            assert(diffs.every(diff => {
+                const diffType = diff.type;
+                const [type, name] = diff.key;
+                const value = diff.value;
+                return (
+                    diffType === 'put' &&
+                    type === 'pointers' &&
+                    name === 'base' &&
+                    value === core.getPath(node2)
+                );
+            }));
+        });
+    });
 });
+
+function range(size, startAt = 0) {
+    return [...Array(size).keys()].map(i => i + startAt);
+}
