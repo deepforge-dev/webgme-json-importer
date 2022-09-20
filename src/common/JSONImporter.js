@@ -197,8 +197,8 @@ define([
                         new NodeChangeSet(
                             nodePath,
                             childState.id || '',
-                            'add_subtree',
-                            '',
+                            'put',
+                            ['children'],
                             childState
                         )
                     ];
@@ -217,13 +217,16 @@ define([
             }
 
             if(state.children && currentChildren.length) {
-                const deletions = currentChildren.map(child => new NodeChangeSet(
-                    nodePath,
-                    this.core.getPath(child),
-                    'remove_subtree',
-                    this.core.getPath(child),
-                    null
-                ));
+                const deletions = currentChildren.map(child =>{
+                    const childPath = this.core.getPath(child);
+                    return new NodeChangeSet(
+                        nodePath,
+                        childPath,
+                        'del',
+                        ['children'],
+                        childPath
+                    )
+                });
                 diffs.push(...deletions);
             }
 
@@ -243,11 +246,17 @@ define([
             const apply = diffs => {
                 return diffs.map(async diff => {
                     let node = null;
-                    if (diff.type !== 'add_subtree') {
+                    const isNewNode = (diff.type === 'put' && diff.key[0] === 'children');
+                    if (!isNewNode) {
                         const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
                         node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
                     }
-                    return await this._patch[diff.type].call(this, node, diff, resolvedSelectors);
+
+                    if(diff.type === 'put') {
+                        return await this._put(node, diff, resolvedSelectors);
+                    } else if(diff.type === 'del') {
+                        return await this._delete(node, diff, resolvedSelectors);
+                    }
                 });
             };
 
@@ -256,7 +265,14 @@ define([
         }
 
         _partitionDiffsByPriority(diffs) {
-            return partition(diffs, diff => diff.type === 'add_subtree' && diff.nodeId.startsWith('@id'));
+            const isIdBasedCreation = (diff) => {
+                const type = diff.type;
+                const [key,] = diff.key;
+                const nodeSelectorKey = diff.nodeId.slice(0, 2);
+                return type === 'put' && key === 'children' && nodeSelectorKey === '@id';
+            };
+
+            return partition(diffs, isIdBasedCreation);
         }
 
         _getSortedStateChanges(prevState, newState) {
@@ -454,7 +470,7 @@ define([
 
         async _delete (node, change) {
             const [type] = change.key;
-            if (change.key.length > 1) {
+            if (change.key.length > 1 || type === 'children') {
                 if (!this._delete[type]) {
                     throw new Error(`Unrecognized key ${type}`);
                 }
@@ -469,23 +485,14 @@ define([
         }
     }
 
-    Importer.prototype._patch.add_subtree = async function(node, change, resolvedSelectors) {
+    Importer.prototype._put.children = async function(node, change, resolvedSelectors) {
         const created = await this.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
         return created;
     };
 
-    Importer.prototype._patch.remove_subtree = async function(node, /*change, resolvedSelectors*/) {
+    Importer.prototype._delete.children = async function(node, /*change, resolvedSelectors*/) {
         this.core.deleteNode(node);
     };
-
-    Importer.prototype._patch.put = async function(node, change, resolvedSelectors) {
-        return await this._put(node, change, resolvedSelectors);
-    };
-
-    Importer.prototype._patch.del = async function(node, change, resolvedSelectors) {
-        return await this._delete(node, change, resolvedSelectors);
-    };
-
 
     Importer.prototype._put.guid = async function(node, change, resolvedSelectors) {
         const {value} = change;

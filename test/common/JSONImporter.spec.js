@@ -1279,7 +1279,7 @@ describe('JSONImporter', function () {
         });
     });
 
-    describe.only('diff', function () {
+    describe('diff', function () {
         let node1;
         beforeEach(async function () {
             node1 = core.createNode({
@@ -1303,7 +1303,7 @@ describe('JSONImporter', function () {
             assert(diff.value === 'New Name');
         });
 
-        it('should find add_subtree diff type on children addition', async () => {
+        it('should find put children diff type on children addition', async () => {
             const state = {
                 children: [{
                     attributes: {
@@ -1313,10 +1313,10 @@ describe('JSONImporter', function () {
             };
 
             const diff = (await importer.diff(node1, state)).shift();
-            assert(diff.type === 'add_subtree', 'add_subtree diff not found');
+            assert(diff.type === 'put' && diff.key[0] === 'children', 'add_subtree diff not found');
         });
 
-        it('should find delete_subtree children diff for removed children', async () => {
+        it('should find del children diff type on children removal', async () => {
 
             range(5).forEach(idx => {
                 const node = core.createNode({
@@ -1331,7 +1331,7 @@ describe('JSONImporter', function () {
 
             const diffs = await importer.diff(node1, state);
             assert(diffs.length === 2);
-            assert(diffs.every(diff => diff.type === 'remove_subtree'));
+            assert(diffs.every(diff => diff.type === 'del' && diff.key[0] === 'children'));
         });
 
         it('should find pointer changes in diff by path', async () => {
