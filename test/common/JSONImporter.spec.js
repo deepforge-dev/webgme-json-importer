@@ -1368,16 +1368,13 @@ describe('JSONImporter', function () {
     });
 
     describe('patch', function () {
-        let node1;
+        let node1, children;
         beforeEach(async function () {
             node1 = core.createNode({
                 parent: root,
                 base: fco
             });
-        });
-
-        it('should be able to apply patches to appropriate subtree by resolving selectors', async () => {
-            const children = range(5).map(idx => {
+            children = range(5).map(idx => {
                 const node = core.createNode({
                     parent: node1,
                     base: fco
@@ -1386,6 +1383,9 @@ describe('JSONImporter', function () {
                 return node;
             });
 
+        });
+
+        it('should patch attribute change set to appropriate node in the subtree with path selector', async () => {
             const changeSets = [
                 new NodeChangeSet(
                     core.getPath(node1),
@@ -1402,9 +1402,50 @@ describe('JSONImporter', function () {
                     'changedNameChild3'
                 ),
             ];
+            await importer.patch(node1, changeSets);
+            assert(core.getAttribute(children[0], 'name') === 'changedNameChild0');
+        });
+
+        it('should patch attribute change set to appropriate node in the subtree with guid selector', async () => {
+            const changeSets = [
+                new NodeChangeSet(
+                    core.getPath(node1),
+                    core.getGuid(children[0]),
+                    'put',
+                    ['attributes', 'name'],
+                    'changedNameChild0'
+                ),
+                new NodeChangeSet(
+                    core.getPath(node1),
+                    core.getGuid(children[3]),
+                    'put',
+                    ['attributes', 'name'],
+                    'changedNameChild3'
+                ),
+            ];
 
             await importer.patch(node1, changeSets);
-            assert(core.getAttribute(children[0], 'name') === 'changedNameChild0',);
+            assert(core.getAttribute(children[0], 'name') === 'changedNameChild0');
+        });
+
+        it('should patch base pointer change set to appropriate node in the subtree with guid selector', async () => {
+            const node2 = core.createNode({
+                parent: node1,
+                base: fco
+            });
+
+            core.setAttribute(node2, 'name', 'newName');
+
+            const changeSets = [new NodeChangeSet(
+                core.getPath(node1),
+                core.getGuid(children[3]),
+                'put',
+                ['pointers', 'base'],
+                core.getGuid(node2)
+            )];
+
+            await importer.patch(node1, changeSets);
+            assert(core.getPointerPath(children[3], 'base') === core.getPath(node2));
         });
     });
 });
