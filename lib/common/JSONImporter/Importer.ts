@@ -29,7 +29,6 @@ export class Importer extends Exporter {
         const diffs = [];
         const children = state.children || [];
         const currentChildren = await this.core.loadChildren(node);
-
         diffs.push(...(await Promise.all(children.map(async childState => {
             const idString = childState.id;
             const childNode = await this.findNode(node, idString, resolvedSelectors);
@@ -455,7 +454,6 @@ Importer.prototype._put.pointer_meta = async function(node, change, resolvedSele
 
 Importer.prototype._delete.pointer_meta = async function(node, change, resolvedSelectors) {
     const [/*type*/, name, targetId] = change.key;
-    console.log(change)
     const removePointer = targetId === undefined;
     if (removePointer) {
         this.core.delPointerMeta(node, name);

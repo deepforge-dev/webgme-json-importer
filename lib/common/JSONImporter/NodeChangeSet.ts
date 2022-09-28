@@ -24,6 +24,4 @@ export class NodeChangeSet implements DiffObj{
             diffObj.value
         );
     }
-
-
 }

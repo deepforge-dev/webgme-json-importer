@@ -101,42 +101,41 @@ export class Exporter {
     }
 
     sets(node: Core.Node, json: Pick<GMEJSONNodeType, ['sets', 'member_attributes', 'member_registry']>) {
-        this.promiseQueue
-            .push(...this.core.getOwnSetNames(node)
-                .filter(name => name !== '_mixins')
-                .map(async name => {
-                    const paths = this.core.getMemberPaths(node, name);
-                    const members = await Promise.all(paths.map(path => this.core.loadByPath(this.rootNode, path)));
-                    const memberGuids = members.map(member => this.core.getGuid(member));
-                    json.sets[name] = memberGuids;
+        this.promiseQueue.push(...this.core.getOwnSetNames(node)
+            .filter(name => name !== '_mixins')
+            .map(async name => {
+                const paths = this.core.getMemberPaths(node, name);
+                const members = await Promise.all(paths.map(path => this.core.loadByPath(this.rootNode, path)));
+                const memberGuids = members.map(member => this.core.getGuid(member));
+                json.sets[name] = memberGuids;
 
-                    if (!this.omitted.has('member_attributes')) { // Alternatives to this closure variable?
-                        members.forEach(member => {
-                            let guid = this.core.getGuid(member);
-                            let memberPath = this.core.getPath(member);
+                if (!this.omitted.has('member_attributes')) { // Alternatives to this closure variable?
+                    members.forEach(member => {
+                        let guid = this.core.getGuid(member);
+                        let memberPath = this.core.getPath(member);
 
-                            json.member_attributes[name] = {};
-                            json.member_attributes[name][guid] = {};
-                            this.core.getMemberAttributeNames(node, name, memberPath).forEach(attrName => {
-                                const value = this.core.getMemberAttribute(node, name, memberPath, attrName);
-                                json.member_attributes[name][guid][attrName] = value;
-                            });
+                        json.member_attributes[name] = {};
+                        json.member_attributes[name][guid] = {};
+                        this.core.getMemberAttributeNames(node, name, memberPath).forEach(attrName => {
+                            const value = this.core.getMemberAttribute(node, name, memberPath, attrName);
+                            json.member_attributes[name][guid][attrName] = value;
                         });
-                    }
-                    if (!this.omitted.has('member_registry')) {
-                        members.forEach(member => {
-                            let guid = this.core.getGuid(member);
-                            let memberPath = this.core.getPath(member);
+                    });
+                }
+                if (!this.omitted.has('member_registry')) {
+                    members.forEach(member => {
+                        let guid = this.core.getGuid(member);
+                        let memberPath = this.core.getPath(member);
 
-                            json.member_registry[name] = {};
-                            json.member_registry[name][guid] = {};
-                            this.core.getMemberRegistryNames(node, name, memberPath).forEach(regName => {
-                                const value = this.core.getMemberRegistry(node, name, memberPath, regName);
-                                json.member_registry[name][guid][regName] = value;
-                            });
+                        json.member_registry[name] = {};
+                        json.member_registry[name][guid] = {};
+                        this.core.getMemberRegistryNames(node, name, memberPath).forEach(regName => {
+                            const value = this.core.getMemberRegistry(node, name, memberPath, regName);
+                            json.member_registry[name][guid][regName] = value;
                         });
-                    }
-                }));
+                    });
+                }
+            }));
     }
 
     pointers(node: Core.Node, json: Pick<GMEJSONNodeType, 'pointers'>) {
@@ -159,7 +158,7 @@ export class Exporter {
         });
     }
 
-    children(node, json,) {
+    children(node: Core.Node, json: Pick<GMEJSONNodeType, 'children'>) {
         this.promiseQueue.push((async () => {
             const children = await this.core.loadChildren(node);
             json.children = await Promise.all(
@@ -168,12 +167,22 @@ export class Exporter {
         })());
     }
 
-    children_meta(node, json: Pick<GMEJSONNodeType, 'children_meta'>) {
+    children_meta(node: Core.Node, json: Pick<GMEJSONNodeType, 'children_meta'>) {
         this.promiseQueue.push(
             this._metaDictToGuids(this.core.getChildrenMeta(node))
-                .then(children_meta => children_meta ? json.children_meta = children_meta : () => {
-                })
+                .then(children_meta => json.children_meta = children_meta)
         );
+    }
+
+    pointer_meta(node: Core.Node, json: Pick<GMEJSONNodeType, 'pointer_meta'>) {
+        this.promiseQueue.push(...this.core.getOwnValidPointerNames(node).map(async name => {
+            const ptr_meta = this.core.getPointerMeta(node, name);
+            json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
+        }));
+    }
+
+    mixins(node: Core.Node, json: Pick<GMEJSONNodeType, 'mixins'>) {
+        json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
     }
 }
 
