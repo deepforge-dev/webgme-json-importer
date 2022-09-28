@@ -1,10 +1,11 @@
 import {Exporter} from './Exporter';
 import {NodeSelections, NodeSelector} from './NodeSelectors';
-import {assert, compare, partition, setNested} from './Utils';
-import {DiffObj, DiffTypes, GMEJSONNodeType} from './Models';
+import {assert, partition, setNested} from './Utils';
 import {NodeChangeSet} from './NodeChangeSet';
 import {OmittedProperties} from './OmittedProperties';
-import {apply} from './changeset.js';
+import {gmeDiff} from './SortedChanges';
+import {apply} from './Changeset';
+import {DiffTypes} from "./Models";
 
 export class Importer extends Exporter {
 
@@ -14,16 +15,16 @@ export class Importer extends Exporter {
         super(core, rootNode);
     }
 
-    async apply(node: Core.Node, state: Partial<GMEJSONNodeType>, resolvedSelectors = new NodeSelections()) {
+    async apply(node, state, resolvedSelectors = new NodeSelections()) {
         const diffs = await this.diff(node, state, resolvedSelectors);
         await this._patch(diffs, resolvedSelectors);
     }
 
-    async diff(node: Core.Node, state: Partial<GMEJSONNodeType>, resolvedSelectors = new NodeSelections()) {
+    async diff(node, state, resolvedSelectors=new NodeSelections()) {
         await this.resolveSelectorsForExistingNodes(node, state, resolvedSelectors);
 
         const parent = this.core.getParent(node);
-        const parentPath = parent ? this.core.getPath(parent) : '';
+        const parentPath = this.core.getPath(parent) || '';
         const nodePath = this.core.getPath(node);
         const diffs = [];
         const children = state.children || [];
@@ -52,8 +53,8 @@ export class Importer extends Exporter {
             }
         }))).flat());
         const current = await this.toJSON(node, new OmittedProperties(['children']));
-        const changes = this._getSortedStateChanges(current, state);
-        if (changes.length) {
+        const changes = gmeDiff(current, state);
+        if(changes.length) {
             diffs.push(...changes.map(
                 change => NodeChangeSet.fromDiffObj(
                     parentPath,
@@ -63,8 +64,8 @@ export class Importer extends Exporter {
             ));
         }
 
-        if (state.children && currentChildren.length) {
-            const deletions = currentChildren.map(child => {
+        if(state.children && currentChildren.length) {
+            const deletions = currentChildren.map(child =>{
                 const childPath = this.core.getPath(child);
                 return new NodeChangeSet(
                     nodePath,
@@ -80,11 +81,8 @@ export class Importer extends Exporter {
         return diffs;
     }
 
-    async patch(node, diffs, resolvedSelectors = new NodeSelections()) {
-        const diffIds = diffs.map(diff => {
-            return {id: diff.nodeId};
-        });
-        await Promise.all(diffIds.map(async diffId => await this.resolveSelectorsForExistingNodes(node, diffId, resolvedSelectors)));
+    async patch(node, diffs, resolvedSelectors=new NodeSelections()) {
+        await this.resolveSelectorsFromDiffs(node, diffs, resolvedSelectors);
         await this._patch(diffs, resolvedSelectors);
     }
 
@@ -99,9 +97,9 @@ export class Importer extends Exporter {
                     node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
                 }
 
-                if (diff.type === 'put') {
+                if(diff.type === 'put') {
                     return await this._put(node, diff, resolvedSelectors);
-                } else if (diff.type === 'del') {
+                } else if(diff.type === 'del') {
                     return await this._delete(node, diff, resolvedSelectors);
                 }
             });
@@ -122,37 +120,9 @@ export class Importer extends Exporter {
         return partition(diffs, isIdBasedCreation);
     }
 
-    _getSortedStateChanges(prevState: Partial<GMEJSONNodeType>, newState: Partial<GMEJSONNodeType>): DiffObj[] {
-        const keyOrder = [
-            'children_meta',
-            'pointer_meta',
-            'pointers',
-            'mixins',
-            'sets',
-            'member_attributes',
-            'member_registry',
-        ];
 
-        const changes = compare(prevState, newState);
-        const singleKeyFields = ['children_meta', 'guid'];
-        const sortedChanges = changes.filter(
-            change => change.key.length > 1 ||
-                (singleKeyFields.includes(change.key[0]) && change.type === 'put')
-        )
-            .map((change, index) => {
-                let order = 2 * keyOrder.indexOf(change.key[0]);
-                if (change.type === 'put') {
-                    order += 1;
-                }
-                return [order, index];
-            })
-            .sort((p1, p2) => p1[0] - p2[0])
-            .map(pair => changes?.[pair[1]])
-            .filter(pair => !!pair) as DiffObj[];
-        return sortedChanges;
-    }
 
-    resolveSelector(node: Core.Node, state: Partial<GMEJSONNodeType>, resolvedSelectors: NodeSelections) {
+    resolveSelector(node, state, resolvedSelectors) {
         const parent = this.core.getParent(node);
 
         if (!parent) {
@@ -216,13 +186,24 @@ export class Importer extends Exporter {
         }
     }
 
-    async resolveSelectorsForExistingNodes(node: Core.Node, state: Partial<GMEJSONNodeType>, resolvedSelectors: NodeSelections) {
+    async resolveSelectorsForExistingNodes(node, state, resolvedSelectors) {
         await this.resolveSelectors(node, state, resolvedSelectors, false);
     }
 
-    async resolveSelectors(node: Core.Node, state: Partial<GMEJSONNodeType>, resolvedSelectors: NodeSelections, create = true) {
+    async resolveSelectorsFromDiffs(node, diffs, resolvedSelectors) {
+        await Promise.all(diffs.map(async diff => {
+            const selector = new NodeSelector(diff.nodeId);
+            const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
+            const node = await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors);
+            if(node) {
+                resolvedSelectors.record(diff.parentPath, selector, node);
+            }
+        }));
+    }
+
+    async resolveSelectors(node, state, resolvedSelectors, create=true) {
         const parent = this.core.getParent(node);
-        if (parent) {
+        if(parent) {
             this.resolveSelector(node, {id: this.core.getPath(node)}, resolvedSelectors);
         }
         if (state.id && parent) {
@@ -233,7 +214,7 @@ export class Importer extends Exporter {
         await this.tryResolveSelectors(stateNodePairs, resolvedSelectors, create);
     }
 
-    async findNode(parent, idString, resolvedSelectors = new NodeSelections()) {
+    async findNode(parent, idString, resolvedSelectors=new NodeSelections()) {
         if (idString === undefined) {
             return;
         }
@@ -262,7 +243,7 @@ export class Importer extends Exporter {
         return this.core.getPath(node);
     }
 
-    async createNode(parent: Core.Node, state: Partial<GMEJSONNodeType> = {}, base = null) {
+    async createNode(parent, state={}, base) {
         if (!state.id) {
             state.id = `@internal:${this._nodeIDCounter++}`;
         }
@@ -270,15 +251,15 @@ export class Importer extends Exporter {
         const fco = await this.core.loadByPath(this.rootNode, '/1');
         const selector = new NodeSelector(idString);
         const params = selector.prepareCreateParams({
-            base: base || fco,
-            parent,
-            relid: state.path?.split('/').pop()
-        });
+                base: base || fco,
+                parent,
+                relid: state.path?.split('/').pop()
+            });
 
         if (state.guid) {
             params.guid = state.guid;
         }
-        const node = this.core.createNode(params) as Core.Node;
+        const node = this.core.createNode(params);
         await selector.prepare(this.core, this.rootNode, node);
         return node;
     }
@@ -290,12 +271,12 @@ export class Importer extends Exporter {
         const created = await this.createNode(parent, state, baseNode);
         const nodeSelector = new NodeSelector(this.core.getPath(created));
         resolvedSelectors.record(parentPath, nodeSelector, created);
-        if (state.id && !state.id.startsWith('@internal')) {
+        if(state.id && !state.id.startsWith('@internal')) {
             const alternateSelector = new NodeSelector(state.id);
             resolvedSelectors.record(parentPath, alternateSelector, created);
         }
         const nodeState = await this.toJSON(created, new OmittedProperties(['children']));
-        const changes = this._getSortedStateChanges(nodeState, state);
+        const changes = gmeDiff(nodeState, state);
         await Promise.all(changes.map(async change => {
             await this._put(created, change, resolvedSelectors);
         }));
@@ -306,7 +287,7 @@ export class Importer extends Exporter {
         return created;
     }
 
-    async _put(node, change) {
+    async _put (node, change) {
         const [type] = change.key;
         if (type !== 'path' && type !== 'id') {
             if (!this._put[type]) {
@@ -316,7 +297,7 @@ export class Importer extends Exporter {
         }
     }
 
-    async _delete(node, change) {
+    async _delete (node, change) {
         const [type] = change.key;
         if (change.key.length > 1 || type === 'children') {
             if (!this._delete[type]) {
@@ -326,29 +307,28 @@ export class Importer extends Exporter {
         }
     }
 
-    async import(parent: Core.Node, state: Partial<GMEJSONNodeType>) {
+    async import(parent, state) {
         const node = await this.createNode(parent, state);
         await this.apply(node, state);
         return node;
     }
 }
 
-
-Importer.prototype._put.children = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.children = async function(node, change, resolvedSelectors) {
     const created = await this.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
     return created;
 };
 
-Importer.prototype._delete.children = async function (node, /*change, resolvedSelectors*/) {
+Importer.prototype._delete.children = async function(node, /*change, resolvedSelectors*/) {
     this.core.deleteNode(node);
 };
 
-Importer.prototype._put.guid = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.guid = async function(node, change, resolvedSelectors) {
     const {value} = change;
     this.core.setGuid(node, value);
 };
 
-Importer.prototype._put.mixins = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.mixins = async function(node, change, resolvedSelectors) {
     const [, index] = change.key;
     const oldMixinPath = this.core.getMixinPaths(node)[index];
     if (oldMixinPath) {
@@ -365,7 +345,7 @@ Importer.prototype._put.mixins = async function (node, change, resolvedSelectors
     }
 };
 
-Importer.prototype._put.attributes = function (node, change) {
+Importer.prototype._put.attributes = function(node, change) {
     assert(
         change.key.length === 2,
         `Complex attributes not currently supported: ${change.key.join(', ')}`
@@ -374,7 +354,7 @@ Importer.prototype._put.attributes = function (node, change) {
     this.core.setAttribute(node, name, change.value || '');
 };
 
-Importer.prototype._delete.attributes = function (node, change) {
+Importer.prototype._delete.attributes = function(node, change) {
     assert(
         change.key.length === 2,
         `Complex attributes not currently supported: ${change.key.join(', ')}`
@@ -383,7 +363,7 @@ Importer.prototype._delete.attributes = function (node, change) {
     this.core.delAttribute(node, name);
 };
 
-Importer.prototype._put.attribute_meta = function (node, change) {
+Importer.prototype._put.attribute_meta = function(node, change) {
     const [/*type*/, name] = change.key;
     const keys = change.key.slice(2);
     if (keys.length) {
@@ -395,7 +375,7 @@ Importer.prototype._put.attribute_meta = function (node, change) {
     }
 };
 
-Importer.prototype._delete.attribute_meta = function (node, change) {
+Importer.prototype._delete.attribute_meta = function(node, change) {
     const isAttrDeletion = change.key.length === 2;
     const [/*type*/, name] = change.key;
     if (isAttrDeletion) {
@@ -408,7 +388,7 @@ Importer.prototype._delete.attribute_meta = function (node, change) {
     }
 };
 
-Importer.prototype._put.pointers = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.pointers = async function(node, change, resolvedSelectors) {
     assert(
         change.key.length === 2,
         `Invalid key for pointer: ${change.key.slice(1).join(', ')}`
@@ -428,7 +408,7 @@ Importer.prototype._put.pointers = async function (node, change, resolvedSelecto
     }
 };
 
-Importer.prototype._delete.pointers = function (node, change) {
+Importer.prototype._delete.pointers = function(node, change) {
     assert(
         change.key.length === 2,
         `Invalid key for pointer: ${change.key.slice(1).join(', ')}`
@@ -437,7 +417,7 @@ Importer.prototype._delete.pointers = function (node, change) {
     this.core.delPointer(node, name);
 };
 
-Importer.prototype._put.pointer_meta = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.pointer_meta = async function(node, change, resolvedSelectors) {
     const [/*"pointer_meta"*/, name, idOrMinMax] = change.key;
     const isNewPointer = change.key.length === 2;
 
@@ -473,8 +453,9 @@ Importer.prototype._put.pointer_meta = async function (node, change, resolvedSel
     }
 };
 
-Importer.prototype._delete.pointer_meta = async function (node, change, resolvedSelectors) {
+Importer.prototype._delete.pointer_meta = async function(node, change, resolvedSelectors) {
     const [/*type*/, name, targetId] = change.key;
+    console.log(change)
     const removePointer = targetId === undefined;
     if (removePointer) {
         this.core.delPointerMeta(node, name);
@@ -484,13 +465,13 @@ Importer.prototype._delete.pointer_meta = async function (node, change, resolved
     }
 };
 
-Importer.prototype._delete.mixins = async function (node, change, resolvedSelectors) {
+Importer.prototype._delete.mixins = async function(node, change, resolvedSelectors) {
     const [, index] = change.key;
     const mixinPath = this.core.getMixinPaths(node)[index];
     this.core.delMixin(node, mixinPath);
 };
 
-Importer.prototype._put.children_meta = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.children_meta = async function(node, change, resolvedSelectors) {
     const [/*"children_meta"*/, idOrUndef] = change.key;
     const isAddingContainment = !idOrUndef;
     const isNewChildDefinition = typeof idOrUndef === 'string';
@@ -511,7 +492,7 @@ Importer.prototype._put.children_meta = async function (node, change, resolvedSe
     }
 };
 
-Importer.prototype._delete.children_meta = async function (node, change, resolvedSelectors) {
+Importer.prototype._delete.children_meta = async function(node, change, resolvedSelectors) {
     const [/*"children_meta"*/, idOrMinMax] = change.key;
     const isNodeId = !['min', 'max'].includes(idOrMinMax);
     if (isNodeId) {
@@ -520,7 +501,7 @@ Importer.prototype._delete.children_meta = async function (node, change, resolve
     }
 };
 
-Importer.prototype._put.sets = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.sets = async function(node, change, resolvedSelectors) {
     const [/*type*/, name] = change.key;
     const isNewSet = change.key.length === 2;
     if (isNewSet) {
@@ -537,7 +518,7 @@ Importer.prototype._put.sets = async function (node, change, resolvedSelectors) 
     }
 };
 
-Importer.prototype._delete.sets = async function (node, change) {
+Importer.prototype._delete.sets = async function(node, change) {
     const [/*type*/, name, index] = change.key;
     const removeSet = index === undefined;
     if (removeSet) {
@@ -548,7 +529,7 @@ Importer.prototype._delete.sets = async function (node, change) {
     }
 };
 
-Importer.prototype._put.member_attributes = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.member_attributes = async function(node, change, resolvedSelectors) {
     const [/*type*/, set, nodeId, name] = change.key;
     const isNewSet = nodeId === undefined;
     const isNewMember = name === undefined;
@@ -569,7 +550,7 @@ Importer.prototype._put.member_attributes = async function (node, change, resolv
     }
 };
 
-Importer.prototype._delete.member_attributes = async function (node, change, resolvedSelectors) {
+Importer.prototype._delete.member_attributes = async function(node, change, resolvedSelectors) {
     const [/*type*/, set, nodeId, name] = change.key;
     const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
     const deleteAllAttributes = name === undefined;
@@ -594,7 +575,7 @@ Importer.prototype._delete.member_attributes = async function (node, change, res
 
 };
 
-Importer.prototype._put.member_registry = async function (node, change, resolvedSelectors) {
+Importer.prototype._put.member_registry = async function(node, change, resolvedSelectors) {
     const [/*type*/, set, nodeId, name] = change.key;
     const isNewSet = nodeId === undefined;
     const isNewMember = name === undefined;
@@ -622,7 +603,7 @@ Importer.prototype._put.member_registry = async function (node, change, resolved
     }
 };
 
-Importer.prototype._delete.member_registry = async function (node, change, resolvedSelectors) {
+Importer.prototype._delete.member_registry = async function(node, change, resolvedSelectors) {
     const [/*type*/, set, nodeId, name] = change.key;
     const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
     const deleteAllRegistryValues = name === undefined;
@@ -647,7 +628,7 @@ Importer.prototype._delete.member_registry = async function (node, change, resol
 
 };
 
-Importer.prototype._put.registry = function (node, change) {
+Importer.prototype._put.registry = function(node, change) {
     const [/*type*/, name] = change.key;
     const keys = change.key.slice(2);
     if (keys.length) {
@@ -659,7 +640,7 @@ Importer.prototype._put.registry = function (node, change) {
     }
 };
 
-Importer.prototype._delete.registry = function (node, change) {
+Importer.prototype._delete.registry = function(node, change) {
     assert(
         change.key.length === 2,
         `Complex registry values not currently supported: ${change.key.join(', ')}`

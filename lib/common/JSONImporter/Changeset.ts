@@ -1,13 +1,29 @@
-import * as _ from 'underscore';
+import _ from 'underscore';
+
+function deepCopy<T>(source: T): T {
+    return Array.isArray(source)
+        ? source.map(item => deepCopy(item))
+        : source instanceof Date
+            ? new Date(source.getTime())
+            : source && typeof source === 'object'
+                ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
+                    Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop)!);
+                    o[prop] = deepCopy((source as { [key: string]: any })[prop]);
+                    return o;
+                }, Object.create(Object.getPrototypeOf(source)))
+                : source as T;
+}
+
 
 export function diff(old, new_) {
-  var changes = [];
+    let changes = [];
 
-  changes = changes.concat(compare([], old, new_));
+    changes = changes.concat(compare([], old, new_));
 
-  comparing = [];
-  return changes;
+    comparing = [];
+    return changes;
 }
+
 
 function delCheck(op) {
   if (op.type === 'put' && op.value === undefined) {
@@ -17,9 +33,9 @@ function delCheck(op) {
   return op;
 }
 
-var comparing = [];
+let comparing = [];
 function compare(path, old, new_) {
-  var changes = [];
+  let changes = [];
   if (old !== null && new_ !== null &&
       typeof old === 'object' && typeof new_ === 'object' &&
       !_.contains(comparing, old)) {
@@ -52,13 +68,12 @@ function compare(path, old, new_) {
   return changes;
 }
 
-
-export function apply(changes, target, modify=false) {
+export function apply(changes, target, modify) {
   var obj, clone;
   if (modify) {
     obj = target;
   } else {
-    const clone = require('udc');
+    clone = deepCopy;
     obj = clone(target);
   }
   changes.forEach(function (ch) {
@@ -113,5 +128,3 @@ export function apply(changes, target, modify=false) {
   });
   return obj;
 }
-
-

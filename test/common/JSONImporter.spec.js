@@ -6,8 +6,9 @@ describe('JSONImporter', function () {
     const testFixture = require('../globals');
     const _ = testFixture.requirejs('underscore');
     const Core = testFixture.requirejs('common/core/coreQ');
-    const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
-    const {OmittedProperties, NodeSelections, NodeChangeSet} = Importer;
+    const ImporterLib = testFixture.requirejs('webgme-json-importer/JSONImporter');
+    const Importer = ImporterLib.default;
+    const {OmittedProperties, NodeSelections, NodeChangeSet, NodeSelector} = ImporterLib;
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
@@ -1167,7 +1168,7 @@ describe('JSONImporter', function () {
 
         describe('prepare', function() {
             it('should add @meta node to META', async function() {
-                const selector = new Importer.NodeSelector('@meta:TestMeta');
+                const selector = new NodeSelector('@meta:TestMeta');
                 const fco = await core.loadByPath(root, '/1');
                 const node = core.createNode({base: fco, parent: root});
                 await selector.prepare(core, root, node);
@@ -1177,7 +1178,7 @@ describe('JSONImporter', function () {
             });
 
             it('should add @meta node to META sheet', async function() {
-                const selector = new Importer.NodeSelector('@meta:TestMetaSheet');
+                const selector = new NodeSelector('@meta:TestMetaSheet');
                 const fco = await core.loadByPath(root, '/1');
                 const node = core.createNode({base: fco, parent: root});
                 await selector.prepare(core, root, node);

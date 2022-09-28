@@ -1,5 +1,5 @@
-import {diff} from './changeset';
 import {DiffObj, GMEJSONNodeType} from './Models';
+import {diff} from './Changeset';
 
 export const Constants = {
     META_ASPECT_SET_NAME: 'MetaAspectSet',
