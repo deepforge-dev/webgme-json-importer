@@ -35,3 +35,6 @@ blob-local-storage/
 test-tmp/
 
 build
+
+src/common/JSONImporter
+src/common/JSONImporter.js*

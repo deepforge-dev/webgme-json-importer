@@ -1,5 +1,3 @@
-import {GMEJSONNodeType} from "./models";
-
 const RELATED_PROPERTIES: {[key: string]: string[]} = {
     sets: ['member_attributes', 'member_registry'],
     children: ['children_meta'],
@@ -8,7 +6,6 @@ const RELATED_PROPERTIES: {[key: string]: string[]} = {
 };
 
 const INVALID_PROPS = ['id', 'guid', 'path'];
-
 
 export class OmittedProperties extends Set<string> {
     constructor(args: string[]|null|undefined = undefined) {

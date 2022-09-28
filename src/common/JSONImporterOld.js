@@ -167,25 +167,115 @@ define([
             return json;
         }
 
-        async apply (node, state, resolvedSelectors=new NodeSelections()) {
-            await this.resolveSelectors(node, state, resolvedSelectors);
+        async apply(node, state, resolvedSelectors = new NodeSelections()) {
+            const diffs = await this.diff(node, state, resolvedSelectors);
+            await this._patch(diffs, resolvedSelectors);
+        }
 
+        async diff(node, state, resolvedSelectors=new NodeSelections()) {
+            await this.resolveSelectorsForExistingNodes(node, state, resolvedSelectors);
+
+            const parent = this.core.getParent(node);
+            const parentPath = this.core.getPath(parent) || '';
+            const nodePath = this.core.getPath(node);
+            const diffs = [];
             const children = state.children || [];
             const currentChildren = await this.core.loadChildren(node);
 
-            for (let i = 0; i < children.length; i++) {
-                const idString = children[i].id;
-                const child = await this.findNode(node, idString, resolvedSelectors);
-                const index = currentChildren.indexOf(child);
+            diffs.push(...(await Promise.all(children.map(async childState => {
+                const idString = childState.id;
+                const childNode = await this.findNode(node, idString, resolvedSelectors);
+                const index = currentChildren.indexOf(childNode);
                 if (index > -1) {
                     currentChildren.splice(index, 1);
                 }
-
-                await this.apply(child, children[i], resolvedSelectors);
+                if (childNode) {
+                    const childDiffs = await this.diff(childNode, childState, resolvedSelectors);
+                    return childDiffs;
+                } else {
+                    return [
+                        new NodeChangeSet(
+                            nodePath,
+                            childState.id || '',
+                            'put',
+                            ['children'],
+                            childState
+                        )
+                    ];
+                }
+            }))).flat());
+            const current = await this.toJSON(node, new OmittedProperties(['children']));
+            const changes = this._getSortedStateChanges(current, state);
+            if(changes.length) {
+                diffs.push(...changes.map(
+                    change => NodeChangeSet.fromDiffObj(
+                        parentPath,
+                        state.id || nodePath,
+                        change
+                    )
+                ));
             }
 
-            const current = await this.toJSON(node);
-            const changes = compare(current, state);
+            if(state.children && currentChildren.length) {
+                const deletions = currentChildren.map(child =>{
+                    const childPath = this.core.getPath(child);
+                    return new NodeChangeSet(
+                        nodePath,
+                        childPath,
+                        'del',
+                        ['children'],
+                        childPath
+                    )
+                });
+                diffs.push(...deletions);
+            }
+
+            return diffs;
+        }
+
+        async patch(node, diffs, resolvedSelectors=new NodeSelections()) {
+            const diffIds = diffs.map(diff => {
+                return {id: diff.nodeId};
+            });
+            await Promise.all(diffIds.map(async diffId => await this.resolveSelectorsForExistingNodes(node, diffId, resolvedSelectors)));
+            await this._patch(diffs, resolvedSelectors);
+        }
+
+        async _patch(diffs, resolvedSelectors) {
+            const [firstOrderDiffs, dependentDiffs] = this._partitionDiffsByPriority(diffs);
+            const apply = diffs => {
+                return diffs.map(async diff => {
+                    let node = null;
+                    const isNewNode = (diff.type === 'put' && diff.key[0] === 'children');
+                    if (!isNewNode) {
+                        const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
+                        node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
+                    }
+
+                    if(diff.type === 'put') {
+                        return await this._put(node, diff, resolvedSelectors);
+                    } else if(diff.type === 'del') {
+                        return await this._delete(node, diff, resolvedSelectors);
+                    }
+                });
+            };
+
+            await Promise.all(apply(firstOrderDiffs));
+            await Promise.all(apply(dependentDiffs));
+        }
+
+        _partitionDiffsByPriority(diffs) {
+            const isIdBasedCreation = (diff) => {
+                const type = diff.type;
+                const [key,] = diff.key;
+                const nodeSelectorKey = diff.nodeId.slice(0, 2);
+                return type === 'put' && key === 'children' && nodeSelectorKey === '@id';
+            };
+
+            return partition(diffs, isIdBasedCreation);
+        }
+
+        _getSortedStateChanges(prevState, newState) {
             const keyOrder = [
                 'children_meta',
                 'pointer_meta',
@@ -195,12 +285,13 @@ define([
                 'member_attributes',
                 'member_registry',
             ];
+
+            const changes = compare(prevState, newState);
             const singleKeyFields = ['children_meta', 'guid'];
-            const sortedChanges = changes
-                .filter(
-                    change => change.key.length > 1 ||
-                        (singleKeyFields.includes(change.key[0]) && change.type === 'put')
-                )
+            const sortedChanges = changes.filter(
+                change => change.key.length > 1 ||
+                    (singleKeyFields.includes(change.key[0]) && change.type === 'put')
+            )
                 .map((change, index) => {
                     let order = 2 * keyOrder.indexOf(change.key[0]);
                     if (change.type === 'put') {
@@ -210,23 +301,10 @@ define([
                 })
                 .sort((p1, p2) => p1[0] - p2[0])
                 .map(pair => changes[pair[1]]);
-
-            for (let i = 0; i < sortedChanges.length; i++) {
-                if (sortedChanges[i].type === 'put') {
-                    await this._put(node, sortedChanges[i], resolvedSelectors);
-                } else if (sortedChanges[i].type === 'del') {
-                    await this._delete(node, sortedChanges[i], resolvedSelectors);
-                }
-            }
-
-            if (state.children) {
-                for (let i = currentChildren.length; i--;) {
-                    this.core.deleteNode(currentChildren[i]);
-                }
-            }
+            return sortedChanges;
         }
 
-        async resolveSelector(node, state, resolvedSelectors) {
+        resolveSelector(node, state, resolvedSelectors) {
             const parent = this.core.getParent(node);
 
             if (!parent) {
@@ -247,7 +325,7 @@ define([
             return (state.children || []).map(s => [s, node]);
         }
 
-        async tryResolveSelectors(stateNodePairs, resolvedSelectors) {
+        async tryResolveSelectors(stateNodePairs, resolvedSelectors, create) {
             let tryResolveMore = true;
             while (tryResolveMore) {
                 tryResolveMore = false;
@@ -255,7 +333,7 @@ define([
                     const [state, parentNode] = stateNodePairs[i];
                     let child = await this.findNode(parentNode, state.id, resolvedSelectors);
                     //const canCreate = !state.id;
-                    if (!child /*&& canCreate*/) {
+                    if (!child && create) {
                         let baseNode;
                         if (state.pointers) {
                             const {base} = state.pointers;
@@ -275,13 +353,13 @@ define([
                             child = await this.createNode(parentNode, state, baseNode);
                         }
                     }
-
+                    let pairs = [];
                     if (child) {
-                        this.resolveSelector(child, state, resolvedSelectors);
-                        const pairs = this.getChildStateNodePairs(child, state);
-                        stateNodePairs.splice(i, 1, ...pairs);
+                        this.resolveSelector(child, state, resolvedSelectors, create);
+                        pairs = this.getChildStateNodePairs(child, state);
                         tryResolveMore = true;
                     }
+                    stateNodePairs.splice(i, 1, ...pairs);
                 }
             }
 
@@ -290,15 +368,21 @@ define([
             }
         }
 
-        async resolveSelectors(node, state, resolvedSelectors) {
-            const parent = this.core.getParent(node);
+        async resolveSelectorsForExistingNodes(node, state, resolvedSelectors) {
+            await this.resolveSelectors(node, state, resolvedSelectors, false);
+        }
 
+        async resolveSelectors(node, state, resolvedSelectors, create=true) {
+            const parent = this.core.getParent(node);
+            if(parent) {
+                this.resolveSelector(node, {id: this.core.getPath(node)}, resolvedSelectors);
+            }
             if (state.id && parent) {
                 this.resolveSelector(node, state, resolvedSelectors);
             }
 
             const stateNodePairs = this.getChildStateNodePairs(node, state);
-            await this.tryResolveSelectors(stateNodePairs, resolvedSelectors);
+            await this.tryResolveSelectors(stateNodePairs, resolvedSelectors, create);
         }
 
         async findNode(parent, idString, resolvedSelectors=new NodeSelections()) {
@@ -351,6 +435,29 @@ define([
             return node;
         }
 
+        async createStateSubTree(parentPath, state, resolvedSelectors) {
+            const base = state.pointers?.base;
+            const parent = await this.core.loadByPath(this.rootNode, parentPath);
+            const baseNode = await this.findNode(parent, base, resolvedSelectors);
+            const created = await this.createNode(parent, state, baseNode);
+            const nodeSelector = new NodeSelector(this.core.getPath(created));
+            resolvedSelectors.record(parentPath, nodeSelector, created);
+            if(state.id && !state.id.startsWith('@internal')) {
+                const alternateSelector = new NodeSelector(state.id);
+                resolvedSelectors.record(parentPath, alternateSelector, created);
+            }
+            const nodeState = await this.toJSON(created, new OmittedProperties(['children']));
+            const changes = this._getSortedStateChanges(nodeState, state);
+            await Promise.all(changes.map(async change => {
+                await this._put(created, change, resolvedSelectors);
+            }));
+            await Promise.all((state.children || []).map(async child => {
+                await this.createStateSubTree(this.core.getPath(created), child, resolvedSelectors);
+            }));
+
+            return created;
+        }
+
         async _put (node, change) {
             const [type] = change.key;
             if (type !== 'path' && type !== 'id') {
@@ -363,7 +470,7 @@ define([
 
         async _delete (node, change) {
             const [type] = change.key;
-            if (change.key.length > 1) {
+            if (change.key.length > 1 || type === 'children') {
                 if (!this._delete[type]) {
                     throw new Error(`Unrecognized key ${type}`);
                 }
@@ -377,6 +484,15 @@ define([
             return node;
         }
     }
+
+    Importer.prototype._put.children = async function(node, change, resolvedSelectors) {
+        const created = await this.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
+        return created;
+    };
+
+    Importer.prototype._delete.children = async function(node, /*change, resolvedSelectors*/) {
+        this.core.deleteNode(node);
+    };
 
     Importer.prototype._put.guid = async function(node, change, resolvedSelectors) {
         const {value} = change;
@@ -405,9 +521,8 @@ define([
             change.key.length === 2,
             `Complex attributes not currently supported: ${change.key.join(', ')}`
         );
-
         const [/*type*/, name] = change.key;
-        this.core.setAttribute(node, name, change.value);
+        this.core.setAttribute(node, name, change.value || '');
     };
 
     Importer.prototype._delete.attributes = function(node, change) {
@@ -732,6 +847,13 @@ define([
         return object;
     }
 
+    function partition(array, fn) {
+        return array.reduce((arr, next, index, records) => {
+            arr[fn(next, index, records) ? 0 : 1].push(next);
+            return arr;
+        }, [[], []]);
+    }
+
     class NodeSelector {
         constructor(idString='') {
             if (idString.startsWith('/')) {
@@ -792,33 +914,13 @@ define([
             }
 
             if (this.tag === '@meta') {
-                const metanodes = Object.values(core.getAllMetaNodes(rootNode));
-                const libraries = core.getLibraryNames(rootNode)
-                    .map(name => [
-                        core.getPath(core.getLibraryRoot(rootNode, name)),
-                        name,
-                    ]);
-
-                function getFullyQualifiedName(node) {
-                    const name = core.getAttribute(node, 'name');
-                    const path = core.getPath(node);
-                    const libraryPair = libraries.find(([rootPath,]) => path.startsWith(rootPath));
-                    if (libraryPair) {
-                        const [,libraryName] = libraryPair;
-                        return libraryName + '.' + name;
-                    }
-                    return name;
-                }
-
-                return metanodes
-                    .find(child => {
-                        const name = core.getAttribute(child, 'name');
-                        const fullName = getFullyQualifiedName(child);
-                        return name === this.value || fullName === this.value;
-                    });
+                return this.findMetaNodeForTag(core, rootNode);
             }
 
             if (this.tag === '@attribute') {
+                if(!parent) {
+                    throw new Error(`cannot resolve tag ${this.tag} without a parent`);
+                }
                 const [attr, value] = this.value;
                 const children = await core.loadChildren(parent);
                 return children
@@ -847,6 +949,33 @@ define([
             }
 
             throw new Error(`Unknown tag: ${this.tag}`);
+        }
+
+        findMetaNodeForTag(core, rootNode) {
+            const metanodes = Object.values(core.getAllMetaNodes(rootNode));
+            const libraries = core.getLibraryNames(rootNode)
+                .map(name => [
+                    core.getPath(core.getLibraryRoot(rootNode, name)),
+                    name,
+                ]);
+
+            function getFullyQualifiedName(node) {
+                const name = core.getAttribute(node, 'name');
+                const path = core.getPath(node);
+                const libraryPair = libraries.find(([rootPath,]) => path.startsWith(rootPath));
+                if (libraryPair) {
+                    const [, libraryName] = libraryPair;
+                    return libraryName + '.' + name;
+                }
+                return name;
+            }
+
+            return metanodes
+                .find(child => {
+                    const name = core.getAttribute(child, 'name');
+                    const fullName = getFullyQualifiedName(child);
+                    return name === this.value || fullName === this.value;
+                });
         }
 
         async nodeSearch(core, node, fn, searchOpts = new NodeSearchOpts()) {
@@ -1006,6 +1135,26 @@ define([
         }
     }
 
+    class NodeChangeSet {
+        constructor(parentPath, nodeId, type, key, value) {
+            this.parentPath = parentPath;
+            this.nodeId = nodeId;
+            this.type = type;
+            this.key = key;
+            this.value = value;
+        }
+
+        static fromDiffObj(parentPath, nodeId, diffObj) {
+            return new NodeChangeSet(
+                parentPath,
+                nodeId,
+                diffObj.type,
+                diffObj.key,
+                diffObj.value
+            );
+        }
+    }
+
     const RELATED_PROPERTIES = {
         sets: ['member_attributes', 'member_registry'],
         children: ['children_meta'],
@@ -1036,5 +1185,7 @@ define([
     Importer.NodeSelector = NodeSelector;
     Importer.NodeSelections = NodeSelections;
     Importer.OmittedProperties = OmittedProperties;
+    Importer.NodeChangeSet = NodeChangeSet;
+    Importer.diff = compare;
     return Importer;
 });
