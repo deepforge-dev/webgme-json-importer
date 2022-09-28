@@ -234,10 +234,7 @@ define([
         }
 
         async patch(node, diffs, resolvedSelectors=new NodeSelections()) {
-            const diffIds = diffs.map(diff => {
-                return {id: diff.nodeId};
-            });
-            await Promise.all(diffIds.map(async diffId => await this.resolveSelectorsForExistingNodes(node, diffId, resolvedSelectors)));
+            await this.resolveSelectorsFromDiffs(node, diffs, resolvedSelectors);
             await this._patch(diffs, resolvedSelectors);
         }
 
@@ -370,6 +367,17 @@ define([
 
         async resolveSelectorsForExistingNodes(node, state, resolvedSelectors) {
             await this.resolveSelectors(node, state, resolvedSelectors, false);
+        }
+
+        async resolveSelectorsFromDiffs(node, diffs, resolvedSelectors) {
+            await Promise.all(diffs.map(async diff => {
+                const selector = new NodeSelector(diff.nodeId);
+                const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
+                const node = await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors);
+                if(node) {
+                    resolvedSelectors.record(diff.parentPath, selector, node);
+                }
+            }));
         }
 
         async resolveSelectors(node, state, resolvedSelectors, create=true) {
