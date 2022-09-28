@@ -185,5 +185,3 @@ export class Exporter {
         json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
     }
 }
-
-

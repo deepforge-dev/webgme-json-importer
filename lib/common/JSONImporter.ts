@@ -8,4 +8,3 @@ import {diff, apply} from './JSONImporter/Changeset';
 
 export default Importer;
 export {OmittedProperties, NodeSelections, diff, apply, NodeChangeSet, NodeSelector};
-

@@ -46,4 +46,4 @@ export interface DiffObj {
     type: DiffTypes,
     key: string[],
     value: any
-};
+}
