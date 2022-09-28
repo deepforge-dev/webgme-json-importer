@@ -1385,7 +1385,7 @@ describe('JSONImporter', function () {
 
         });
 
-        it('should patch attribute change set to appropriate node in the subtree with path selector', async () => {
+        it('should apply attribute changeset to appropriate node in the subtree (@path)', async () => {
             const changeSets = [
                 new NodeChangeSet(
                     core.getPath(node1),
@@ -1403,10 +1403,11 @@ describe('JSONImporter', function () {
                 ),
             ];
             await importer.patch(node1, changeSets);
-            assert(core.getAttribute(children[0], 'name') === 'changedNameChild0');
+            assert.equal(core.getAttribute(children[0], 'name'), 'changedNameChild0');
+            assert.equal(core.getAttribute(children[3], 'name'), 'changedNameChild3');
         });
 
-        it('should patch attribute change set to appropriate node in the subtree with guid selector', async () => {
+        it('should apply attribute changeset to appropriate node in the subtree (@guid)', async () => {
             const changeSets = [
                 new NodeChangeSet(
                     core.getPath(node1),
@@ -1425,10 +1426,11 @@ describe('JSONImporter', function () {
             ];
 
             await importer.patch(node1, changeSets);
-            assert(core.getAttribute(children[0], 'name') === 'changedNameChild0');
+            assert.equal(core.getAttribute(children[0], 'name'), 'changedNameChild0');
+            assert.equal(core.getAttribute(children[3], 'name'), 'changedNameChild3');
         });
 
-        it('should patch base pointer change set to appropriate node in the subtree with guid selector', async () => {
+        it('should apply base pointer changeset to appropriate node in the subtree (@guid)', async () => {
             const node2 = core.createNode({
                 parent: node1,
                 base: fco
