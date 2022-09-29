@@ -14,9 +14,9 @@ export class NodeSelector {
             if (tag === '@name') {
                 data.splice(0, 1, '@attribute', 'name');
             }
-            this.tag = data.shift();
+            this.tag = data.shift() as string;
             if (data.length === 1) {
-                this.value = data.shift();
+                this.value = data.shift() as string;
             } else {
                 this.value = [data[0], data.slice(1).join(':')];
             }
@@ -131,18 +131,19 @@ export class NodeSelector {
                 if (checkNode(node)) {
                     return true;
                 } else {
-                    const key = cacheKey(node);
+                    const key = cacheKey?.(node);
                     const parent = core.getParent(node);
-                    if (parent) {
+                    if (parent && key) {
                         if (cache) {
                             cache.record(core.getPath(parent), key, node);
                         }
                     }
+                    return false;
                 }
             };
         }
 
-        let skipNodes = [];
+        let skipNodes: Core.Node[] = [];
         if (searchOpts.startHint) {
             let startNode: Core.Node | null = searchOpts.startHint;
             let match = null;
@@ -272,7 +273,7 @@ class NodeCache extends NodeSelections {
 
 class NodeSearchOpts {
     startHint: Core.Node | null;
-    cacheKey: (node: Core.Node) => any;
+    cacheKey: ((node: Core.Node) => any) | null;
     cache: NodeCache | null;
 
 

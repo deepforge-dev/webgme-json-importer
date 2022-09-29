@@ -1,33 +1,24 @@
-export type GMEAttributesType = { [key: string]: GmeCommon.OutAttr };
-export type GMEAttributeMetaType = { [key: string]: GmeCommon.DefObject };
-export type GMEPointerMetaType = { [key: string]: GMERelationRuleType };
-export type GMEPointersType = { [key: string]: Core.GUID | GmeCommon.OutPath };
 export type GMERelationRuleType = { [key: Core.GUID]: Core.RelationRuleDetail } | null;
+export type GMEOutAttrDictionary = GmeCommon.Dictionary<GmeCommon.OutAttr>;
+export type GMEDefObjectDictionary = GmeCommon.Dictionary<GmeCommon.DefObject>;
+export type GMEPointersDictionary = GmeCommon.Dictionary<Core.GUID | GmeCommon.OutPath>;
+export type GMERelationRuleDictionary = GmeCommon.Dictionary<GMERelationRuleType>;
 
-export type GMEGuidToOutAttrType = { [key: Core.GUID]: GmeCommon.OutAttr };
-export type GMESetsType = { [key: string]: Core.GUID[] };
-export type MemberAttributeType = {
-    [key: string]: GMEGuidToOutAttrType
-}
-
-export type MemberRegistryType = {
-    [key: string]: GMEGuidToOutAttrType
-}
 
 export interface GMEJson {
     id: string;
     path: GmeCommon.Path;
     guid: Core.GUID;
     alias: string;
-    attributes: GMEAttributesType,
-    attribute_meta: GMEAttributeMetaType,
-    pointers: GMEPointersType,
-    pointer_meta: GMEPointerMetaType,
-    mixins: Core.GUID[],
-    registry: GMEGuidToOutAttrType,
-    sets: GMESetsType,
-    member_registry: MemberRegistryType,
-    member_attributes: MemberAttributeType,
-    children: GMEJson[] | Partial<GMEJson>[]
-    children_meta: GMERelationRuleType | null,
+    attributes: GMEOutAttrDictionary;
+    attribute_meta: GMEDefObjectDictionary;
+    pointers: GMEPointersDictionary;
+    pointer_meta: GMERelationRuleDictionary;
+    mixins: Core.GUID[];
+    registry: GMEOutAttrDictionary;
+    sets: GmeCommon.Dictionary<Core.GUID[]>;
+    member_registry: GmeCommon.Dictionary<{[key: Core.GUID]: GMEOutAttrDictionary}>;
+    member_attributes: GmeCommon.Dictionary<{[key: Core.GUID]: GMEOutAttrDictionary}>;
+    children: GMEJson[] | Partial<GMEJson>[];
+    children_meta: GMERelationRuleType;
 }

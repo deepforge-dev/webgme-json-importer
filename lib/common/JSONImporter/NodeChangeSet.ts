@@ -15,7 +15,7 @@ export class NodeChangeSet implements ChangeSet {
         this.value = value;
     }
 
-    static fromChangeSet(parentPath, nodeId, diffObj: ChangeSet) {
+    static fromChangeSet(parentPath: string, nodeId: string, diffObj: ChangeSet) {
         return new NodeChangeSet(
             parentPath,
             nodeId,

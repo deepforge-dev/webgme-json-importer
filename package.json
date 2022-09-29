@@ -6,6 +6,7 @@
     "postinstall": "npm run build",
     "build": "npm run build:lib",
     "build:lib": "vite build",
+    "typecheck": "tsc --noEmit",
     "apply": "node ./node_modules/webgme-engine/src/bin/apply.js",
     "diff": "node ./node_modules/webgme-engine/src/bin/diff.js",
     "export": "node ./node_modules/webgme-engine/src/bin/export.js",
