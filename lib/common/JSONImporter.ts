@@ -4,7 +4,7 @@ import {NodeSelections} from './JSONImporter/NodeSelectors';
 import {NodeChangeSet} from './JSONImporter/NodeChangeSet';
 import {NodeSelector} from './JSONImporter/NodeSelectors';
 
-import {diff, apply} from './JSONImporter/Changeset';
+import diff from 'changeset';
 
 export default Importer;
-export {OmittedProperties, NodeSelections, diff, apply, NodeChangeSet, NodeSelector};
+export {OmittedProperties, NodeSelections, diff, NodeChangeSet, NodeSelector};

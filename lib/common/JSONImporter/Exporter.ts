@@ -1,15 +1,10 @@
 /// <reference path="./webgme/webgme.d.ts" />
 import type {
-    Diff,
-    GMEAttributeMetaType,
-    GMEAttributesType, GMEGuidToOutAttrType,
-    GMEJSONNodeType,
-    GMEPointersType,
-    GMERelationRuleType, GMESetsType, MemberRegistryType
+    GMEJson,
+    GMERelationRuleType
 } from './Models';
 
 import {OmittedProperties} from './OmittedProperties';
-import {Constants} from './Utils';
 
 
 type Core = GmeClasses.Core;
@@ -46,7 +41,7 @@ export class Exporter {
         this.omitted = omitted;
     }
 
-    async toJSON(node: Core.Node, omit: OmittedProperties | boolean = new OmittedProperties()): Promise<Partial<GMEJSONNodeType>> {
+    async toJSON(node: Core.Node, omit: OmittedProperties | boolean = new OmittedProperties()): Promise<Partial<GMEJson>> {
         if (typeof omit === 'boolean') {
             const omitList = omit ? ['children'] : [];
             omit = new OmittedProperties(omitList);
@@ -56,7 +51,7 @@ export class Exporter {
         return await this._toJSON(node);
     }
 
-    async _toJSON(node: Core.Node): Promise<Partial<GMEJSONNodeType>> {
+    async _toJSON(node: Core.Node): Promise<Partial<GMEJson>> {
         const json = {
             id: this.core.getGuid(node),
             path: this.core.getPath(node),
@@ -88,19 +83,19 @@ export class Exporter {
         return json;
     }
 
-    attributes(node: Core.Node, json: Pick<GMEJSONNodeType, 'attributes'>) {
+    attributes(node: Core.Node, json: Pick<GMEJson, 'attributes'>) {
         this.core.getOwnAttributeNames(node).forEach(name => {
             json.attributes[name] = this.core.getAttribute(node, name);
         });
     }
 
-    attribute_meta(node: Core.Node, json: Pick<GMEJSONNodeType, 'attribute_meta'>) {
+    attribute_meta(node: Core.Node, json: Pick<GMEJson, 'attribute_meta'>) {
         this.core.getOwnValidAttributeNames(node).forEach(name => {
             json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
         });
     }
 
-    sets(node: Core.Node, json: Pick<GMEJSONNodeType, ['sets', 'member_attributes', 'member_registry']>) {
+    sets(node: Core.Node, json: Pick<GMEJson, 'sets' | 'member_attributes' | 'member_registry'>) {
         this.promiseQueue.push(...this.core.getOwnSetNames(node)
             .filter(name => name !== '_mixins')
             .map(async name => {
@@ -138,7 +133,7 @@ export class Exporter {
             }));
     }
 
-    pointers(node: Core.Node, json: Pick<GMEJSONNodeType, 'pointers'>) {
+    pointers(node: Core.Node, json: Pick<GMEJson, 'pointers'>) {
         this.promiseQueue.push(...this.core.getOwnPointerNames(node).map(async name => {
             const path = this.core.getPointerPath(node, name);
             if (path) {
@@ -152,13 +147,13 @@ export class Exporter {
         json.pointers.base = baseNode && this.core.getGuid(baseNode);
     }
 
-    registry(node: Core.Node, json: Pick<GMEJSONNodeType, 'registry'>) {
+    registry(node: Core.Node, json: Pick<GMEJson, 'registry'>) {
         this.core.getOwnRegistryNames(node).forEach(name => {
             json.registry[name] = this.core.getRegistry(node, name);
         });
     }
 
-    children(node: Core.Node, json: Pick<GMEJSONNodeType, 'children'>) {
+    children(node: Core.Node, json: Pick<GMEJson, 'children'>) {
         this.promiseQueue.push((async () => {
             const children = await this.core.loadChildren(node);
             json.children = await Promise.all(
@@ -167,21 +162,21 @@ export class Exporter {
         })());
     }
 
-    children_meta(node: Core.Node, json: Pick<GMEJSONNodeType, 'children_meta'>) {
+    children_meta(node: Core.Node, json: Pick<GMEJson, 'children_meta'>) {
         this.promiseQueue.push(
             this._metaDictToGuids(this.core.getChildrenMeta(node))
-                .then(children_meta => json.children_meta = children_meta)
+                .then((children_meta) => json.children_meta = children_meta)
         );
     }
 
-    pointer_meta(node: Core.Node, json: Pick<GMEJSONNodeType, 'pointer_meta'>) {
+    pointer_meta(node: Core.Node, json: Pick<GMEJson, 'pointer_meta'>) {
         this.promiseQueue.push(...this.core.getOwnValidPointerNames(node).map(async name => {
             const ptr_meta = this.core.getPointerMeta(node, name);
             json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
         }));
     }
 
-    mixins(node: Core.Node, json: Pick<GMEJSONNodeType, 'mixins'>) {
+    mixins(node: Core.Node, json: Pick<GMEJson, 'mixins'>) {
         json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
     }
 }

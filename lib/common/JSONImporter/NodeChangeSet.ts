@@ -1,13 +1,13 @@
-import {DiffObj, DiffTypes} from './Models';
+import {ChangeSet, ChangeType} from 'changeset';
 
-export class NodeChangeSet implements DiffObj{
+export class NodeChangeSet implements ChangeSet {
     parentPath: string;
     nodeId: string;
     key: string[];
-    type: DiffTypes;
+    type: ChangeType;
     value: any;
 
-    constructor(parentPath: string, nodeId: string, type: DiffTypes, key: string[], value: any) {
+    constructor(parentPath: string, nodeId: string, type: ChangeType, key: string[], value: any) {
         this.parentPath = parentPath;
         this.nodeId = nodeId;
         this.type = type;
@@ -15,7 +15,7 @@ export class NodeChangeSet implements DiffObj{
         this.value = value;
     }
 
-    static fromDiffObj(parentPath, nodeId, diffObj: DiffObj) {
+    static fromChangeSet(parentPath, nodeId, diffObj: ChangeSet) {
         return new NodeChangeSet(
             parentPath,
             nodeId,

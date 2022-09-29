@@ -1,6 +1,6 @@
 This file contains documentation about the contained shared modules.
 
-## JSONImporter (uses changeset.js)
+## JSONImporter (uses [changeset.js](https://github.com/deepforge-dev/changeset))
 Given a GME node and JSON, this utility will update the GME node to be equivalent to the JSON. This will also recursively update all child nodes (removing those not present in the JSON).
 
 An example JSON is as follows:

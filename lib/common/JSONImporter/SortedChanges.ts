@@ -1,4 +1,4 @@
-import {GMEJSONNodeType} from './Models';
+import {GMEJson} from './Models';
 import {compare} from "./Utils";
 
 export function gmeDiff(prevState, newState) {

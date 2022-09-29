@@ -1,5 +1,6 @@
-import {DiffObj, GMEJSONNodeType} from './Models';
-import {diff} from './Changeset';
+import {GMEJson} from './Models';
+import diff from 'changeset';
+import {ChangeSet} from 'changeset';
 
 export const Constants = {
     META_ASPECT_SET_NAME: 'MetaAspectSet',
@@ -17,7 +18,7 @@ export function omit<T>(obj: T, keys: (keyof T)[]): Partial<T> {
     return result;
 }
 
-export function compare(obj: Partial<GMEJSONNodeType>, obj2: Partial<GMEJSONNodeType>, ignore: (keyof GMEJSONNodeType)[] = ['id', 'children']): DiffObj[] {
+export function compare(obj: Partial<GMEJson>, obj2: Partial<GMEJson>, ignore: (keyof GMEJson)[] = ['id', 'children']): ChangeSet[] {
     return diff(
         omit(obj, ignore),
         omit(obj2, ignore),

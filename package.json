@@ -5,7 +5,7 @@
     "test": "node ./node_modules/mocha/bin/mocha --recursive test",
     "postinstall": "npm run build",
     "build": "npm run build:lib",
-    "build:lib": "tsc",
+    "build:lib": "vite build",
     "apply": "node ./node_modules/webgme-engine/src/bin/apply.js",
     "diff": "node ./node_modules/webgme-engine/src/bin/diff.js",
     "export": "node ./node_modules/webgme-engine/src/bin/export.js",
@@ -28,6 +28,11 @@
     "commander": "^9.4.0",
     "mocha": "^5.2.0",
     "typescript": "^4.8.3",
+    "vite": "^3.1.4",
+    "vite-plugin-dts": "^1.6.1",
     "webgme": "^2.42.1"
+  },
+  "dependencies": {
+    "changeset": "github:deepforge-dev/changeset"
   }
 }

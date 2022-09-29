@@ -4,8 +4,8 @@ import {assert, partition, setNested} from './Utils';
 import {NodeChangeSet} from './NodeChangeSet';
 import {OmittedProperties} from './OmittedProperties';
 import {gmeDiff} from './SortedChanges';
-import {apply} from './Changeset';
-import {DiffTypes} from "./Models";
+import diff from 'changeset';
+import {ChangeType} from 'changeset';
 
 export class Importer extends Exporter {
 
@@ -44,7 +44,7 @@ export class Importer extends Exporter {
                     new NodeChangeSet(
                         nodePath,
                         childState.id || '',
-                        DiffTypes.PUT,
+                        ChangeType.PUT,
                         ['children'],
                         childState
                     )
@@ -55,7 +55,7 @@ export class Importer extends Exporter {
         const changes = gmeDiff(current, state);
         if(changes.length) {
             diffs.push(...changes.map(
-                change => NodeChangeSet.fromDiffObj(
+                change => NodeChangeSet.fromChangeSet(
                     parentPath,
                     state.id || nodePath,
                     change
@@ -69,7 +69,7 @@ export class Importer extends Exporter {
                 return new NodeChangeSet(
                     nodePath,
                     childPath,
-                    DiffTypes.DEL,
+                    ChangeType.DEL,
                     ['children'],
                     childPath
                 )
@@ -382,7 +382,7 @@ Importer.prototype._delete.attribute_meta = function(node, change) {
     } else {
         const meta = this.core.getAttributeMeta(node, name);
         const metaChange = {type: 'del', key: change.key.slice(2)};
-        const newMeta = apply([metaChange], meta);
+        const newMeta = diff.apply([metaChange], meta);
         this.core.setAttributeMeta(node, name, newMeta);
     }
 };
