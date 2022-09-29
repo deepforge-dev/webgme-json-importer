@@ -7,7 +7,7 @@ describe('JSONImporter', function () {
     const _ = testFixture.requirejs('underscore');
     const Core = testFixture.requirejs('common/core/coreQ');
     const Importer = testFixture.requirejs('webgme-json-importer/JSONImporter');
-    const {OmittedProperties, NodeSelections} = Importer;
+    const {OmittedProperties, NodeSelections, NodeChangeSet} = Importer;
     const assert = require('assert');
     const gmeConfig = testFixture.getGmeConfig();
     const path = testFixture.path;
@@ -1364,6 +1364,90 @@ describe('JSONImporter', function () {
                     value === core.getPath(node2)
                 );
             }));
+        });
+    });
+
+    describe('patch', function () {
+        let node1, children;
+        beforeEach(async function () {
+            node1 = core.createNode({
+                parent: root,
+                base: fco
+            });
+            children = range(5).map(idx => {
+                const node = core.createNode({
+                    parent: node1,
+                    base: fco
+                });
+                core.setAttribute(node, 'name', `child${idx}`);
+                return node;
+            });
+
+        });
+
+        it('should apply attribute changeset to appropriate node in the subtree (@path)', async () => {
+            const changeSets = [
+                new NodeChangeSet(
+                    core.getPath(node1),
+                    core.getPath(children[0]),
+                    'put',
+                    ['attributes', 'name'],
+                    'changedNameChild0'
+                ),
+                new NodeChangeSet(
+                    core.getPath(node1),
+                    core.getPath(children[3]),
+                    'put',
+                    ['attributes', 'name'],
+                    'changedNameChild3'
+                ),
+            ];
+            await importer.patch(node1, changeSets);
+            assert.equal(core.getAttribute(children[0], 'name'), 'changedNameChild0');
+            assert.equal(core.getAttribute(children[3], 'name'), 'changedNameChild3');
+        });
+
+        it('should apply attribute changeset to appropriate node in the subtree (@guid)', async () => {
+            const changeSets = [
+                new NodeChangeSet(
+                    core.getPath(node1),
+                    core.getGuid(children[0]),
+                    'put',
+                    ['attributes', 'name'],
+                    'changedNameChild0'
+                ),
+                new NodeChangeSet(
+                    core.getPath(node1),
+                    core.getGuid(children[3]),
+                    'put',
+                    ['attributes', 'name'],
+                    'changedNameChild3'
+                ),
+            ];
+
+            await importer.patch(node1, changeSets);
+            assert.equal(core.getAttribute(children[0], 'name'), 'changedNameChild0');
+            assert.equal(core.getAttribute(children[3], 'name'), 'changedNameChild3');
+        });
+
+        it('should apply base pointer changeset to appropriate node in the subtree (@guid)', async () => {
+            const node2 = core.createNode({
+                parent: node1,
+                base: fco
+            });
+
+            core.setAttribute(node2, 'name', 'newName');
+
+            const changeSets = [new NodeChangeSet(
+                core.getPath(node1),
+                core.getGuid(children[3]),
+                'put',
+                ['pointers', 'base'],
+                core.getGuid(node2)
+            )];
+
+            await importer.patch(node1, changeSets);
+            assert(core.getPointerPath(children[3], 'base') === core.getPath(node2));
         });
     });
 });
