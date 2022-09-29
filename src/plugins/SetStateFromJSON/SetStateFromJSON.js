@@ -6,15 +6,13 @@ define([
     'text!./metadata.json',
     'plugin/PluginBase'
 ], function (
-    ImporterLib,
+    JSONImporter,
     pluginMetadata,
     PluginBase
 ) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
-
-    const JSONImporter = ImporterLib.default;
 
     class SetStateFromJSON extends PluginBase {
         constructor() {
