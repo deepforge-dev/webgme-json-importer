@@ -4,9 +4,8 @@
 define([
     './build/JSONImporter.umd'
 ], function (ImporterLib) {
-    const {default: JSONImporter,  diff, NodeSelections, NodeChangeSet, NodeSelector, OmittedProperties, gmeDiff} = ImporterLib;
+    const {default: JSONImporter, NodeSelections, NodeChangeSet, NodeSelector, OmittedProperties, gmeDiff} = ImporterLib;
 
-    JSONImporter.diff = diff;
     JSONImporter.NodeChangeSet = NodeChangeSet;
     JSONImporter.NodeSelections = NodeSelections;
     JSONImporter.NodeSelector = NodeSelector;

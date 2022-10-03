@@ -5,7 +5,5 @@ import {NodeChangeSet} from './JSONImporter/NodeChangeSet';
 import {NodeSelector} from './JSONImporter/NodeSelectors';
 import {gmeDiff} from './JSONImporter/SortedChanges';
 
-import diff from 'changeset';
-
 export default Importer;
-export {OmittedProperties, NodeSelections, diff, NodeChangeSet, NodeSelector, gmeDiff};
+export {OmittedProperties, NodeSelections, NodeChangeSet, NodeSelector, gmeDiff};

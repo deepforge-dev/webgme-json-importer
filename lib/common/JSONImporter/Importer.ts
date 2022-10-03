@@ -124,7 +124,6 @@ export class Importer {
             const nodeSelectorKey = diff.nodeId.slice(0, 2);
             return type === 'put' && key === 'children' && nodeSelectorKey === '@id';
         };
-
         return partition(diffs, isIdBasedCreation);
     }
 
