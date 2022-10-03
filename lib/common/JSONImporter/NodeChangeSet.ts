@@ -1,5 +1,6 @@
 import {ChangeSet, ChangeType} from 'changeset';
 
+export type NodeChangeSetType = ChangeType;
 export class NodeChangeSet implements ChangeSet {
     parentPath: string;
     nodeId: string;
