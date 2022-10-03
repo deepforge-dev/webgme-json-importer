@@ -12,14 +12,10 @@ type Core = GmeClasses.Core;
 export class Exporter {
     core: Core;
     rootNode: Core.Node;
-    omitted: OmittedProperties;
-    promiseQueue: Promise<any>[];
 
     constructor(core: Core, rootNode: Core.Node) {
         this.core = core
         this.rootNode = rootNode;
-        this.omitted = new OmittedProperties();
-        this.promiseQueue = [];
     }
 
     async _metaDictToGuids(meta_dict: Core.RelationRule | null): Promise<GMERelationRuleType> {
@@ -33,12 +29,8 @@ export class Exporter {
         );
     }
 
-    clearPromiseQueue(): void {
-        this.promiseQueue = [];
-    }
-
-    setOmittedProperties(omitted: OmittedProperties): void {
-        this.omitted = omitted;
+    getNewPromiseQueue(): Array<Promise<any>>  {
+        return [] as Promise<any>[];
     }
 
     async toJSON(node: Core.Node, omit: OmittedProperties | boolean = new OmittedProperties()): Promise<Partial<GMEJson>> {
@@ -47,11 +39,10 @@ export class Exporter {
             omit = new OmittedProperties(omitList);
         } // Backwards compatible with shallow
 
-        this.setOmittedProperties(omit);
-        return await this._toJSON(node);
+        return await this._toJSON(node, omit);
     }
 
-    async _toJSON(node: Core.Node): Promise<Partial<GMEJson>> {
+    async _toJSON(node: Core.Node, omitted: Set<string>): Promise<Partial<GMEJson>> {
         const json = {
             id: this.core.getGuid(node),
             path: this.core.getPath(node),
@@ -67,36 +58,34 @@ export class Exporter {
             member_attributes: {},
             children: [],
             children_meta: {},
-        }
+        };
 
-        this.omitted.forEach(toOmit => delete json[toOmit]);
+        omitted.forEach(toOmit => delete json[toOmit]);
 
-        this.clearPromiseQueue();
+        const promiseQueue = this.getNewPromiseQueue();
         Object.keys(json).forEach(key => {
-            if (this[key]) {
-                this[key](node, json);
+            if (this[key]) {  // ToDo: Fix this not to use dynamic typings
+                this[key](node, json, promiseQueue, omitted);
             }
         });
-        await Promise.all(this.promiseQueue);
-
-        this.clearPromiseQueue();
+        await Promise.all(promiseQueue);
         return json;
     }
 
-    attributes(node: Core.Node, json: Pick<GMEJson, 'attributes'>) {
+    attributes(node: Core.Node, json: Pick<GMEJson, 'attributes'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
         this.core.getOwnAttributeNames(node).forEach(name => {
             json.attributes[name] = this.core.getAttribute(node, name);
         });
     }
 
-    attribute_meta(node: Core.Node, json: Pick<GMEJson, 'attribute_meta'>) {
+    attribute_meta(node: Core.Node, json: Pick<GMEJson, 'attribute_meta'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
         this.core.getOwnValidAttributeNames(node).forEach(name => {
             json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
         });
     }
 
-    sets(node: Core.Node, json: Pick<GMEJson, 'sets' | 'member_attributes' | 'member_registry'>) {
-        this.promiseQueue.push(...this.core.getOwnSetNames(node)
+    sets(node: Core.Node, json: Pick<GMEJson, 'sets' | 'member_attributes' | 'member_registry'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+        promiseQueue.push(...this.core.getOwnSetNames(node)
             .filter(name => name !== '_mixins')
             .map(async name => {
                 const paths = this.core.getMemberPaths(node, name);
@@ -104,7 +93,7 @@ export class Exporter {
                 const memberGuids = members.map(member => this.core.getGuid(member));
                 json.sets[name] = memberGuids;
 
-                if (!this.omitted.has('member_attributes')) { // Alternatives to this closure variable?
+                if (!omitted.has('member_attributes')) { // Alternatives to this closure variable?
                     members.forEach(member => {
                         let guid = this.core.getGuid(member);
                         let memberPath = this.core.getPath(member);
@@ -117,7 +106,7 @@ export class Exporter {
                         });
                     });
                 }
-                if (!this.omitted.has('member_registry')) {
+                if (!omitted.has('member_registry')) {
                     members.forEach(member => {
                         let guid = this.core.getGuid(member);
                         let memberPath = this.core.getPath(member);
@@ -133,8 +122,8 @@ export class Exporter {
             }));
     }
 
-    pointers(node: Core.Node, json: Pick<GMEJson, 'pointers'>) {
-        this.promiseQueue.push(...this.core.getOwnPointerNames(node).map(async name => {
+    pointers(node: Core.Node, json: Pick<GMEJson, 'pointers'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+        promiseQueue.push(...this.core.getOwnPointerNames(node).map(async name => {
             const path = this.core.getPointerPath(node, name);
             if (path) {
                 const target = await this.core.loadByPath(this.rootNode, path);
@@ -147,36 +136,36 @@ export class Exporter {
         json.pointers.base = baseNode && this.core.getGuid(baseNode);
     }
 
-    registry(node: Core.Node, json: Pick<GMEJson, 'registry'>) {
+    registry(node: Core.Node, json: Pick<GMEJson, 'registry'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
         this.core.getOwnRegistryNames(node).forEach(name => {
             json.registry[name] = this.core.getRegistry(node, name);
         });
     }
 
-    children(node: Core.Node, json: Pick<GMEJson, 'children'>) {
-        this.promiseQueue.push((async () => {
+    children(node: Core.Node, json: Pick<GMEJson, 'children'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+        promiseQueue.push((async () => {
             const children = await this.core.loadChildren(node);
             json.children = await Promise.all(
-                children.map(child => this._toJSON(child))
+                children.map(child => this._toJSON(child, omitted))
             );
         })());
     }
 
-    children_meta(node: Core.Node, json: Pick<GMEJson, 'children_meta'>) {
-        this.promiseQueue.push(
+    children_meta(node: Core.Node, json: Pick<GMEJson, 'children_meta'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+        promiseQueue.push(
             this._metaDictToGuids(this.core.getChildrenMeta(node))
                 .then((children_meta) => json.children_meta = children_meta)
         );
     }
 
-    pointer_meta(node: Core.Node, json: Pick<GMEJson, 'pointer_meta'>) {
-        this.promiseQueue.push(...this.core.getOwnValidPointerNames(node).map(async name => {
+    pointer_meta(node: Core.Node, json: Pick<GMEJson, 'pointer_meta'>,  promiseQueue: Promise<any>[], omitted: Set<string>) {
+        promiseQueue.push(...this.core.getOwnValidPointerNames(node).map(async name => {
             const ptr_meta = this.core.getPointerMeta(node, name);
             json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
         }));
     }
 
-    mixins(node: Core.Node, json: Pick<GMEJson, 'mixins'>) {
+    mixins(node: Core.Node, json: Pick<GMEJson, 'mixins'>, promiseQueue: Promise<any>, omitted: Set<string>) {
         json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
     }
 }

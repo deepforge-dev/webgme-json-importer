@@ -7,12 +7,21 @@ import {gmeDiff} from './SortedChanges';
 import diff from 'changeset';
 import {ChangeType} from 'changeset';
 
-export class Importer extends Exporter {
+export class Importer {
 
     _nodeIDCounter: number = 1;
+    core: GmeClasses.Core;
+    rootNode: Core.Node;
+    exporter: Exporter;
 
     constructor(core: GmeClasses.Core, rootNode: Core.Node) {
-        super(core, rootNode);
+        this.core = core;
+        this.rootNode = rootNode;
+        this.exporter = new Exporter(this.core, this.rootNode);
+    }
+
+    async toJSON(node: Core.Node, omittedProperties: OmittedProperties | boolean = new OmittedProperties()) {
+        return await this.exporter.toJSON(node, omittedProperties);
     }
 
     async apply(node, state, resolvedSelectors = new NodeSelections()) {
