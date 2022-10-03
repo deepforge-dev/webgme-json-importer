@@ -1,4 +1,4 @@
-import {GMEJson} from './Models';
+import {JSONNode} from './Models';
 import diff from 'changeset';
 import {ChangeSet} from 'changeset';
 
@@ -18,7 +18,7 @@ export function omit<T>(obj: T, keys: (keyof T)[]): Partial<T> {
     return result;
 }
 
-export function compare(obj: Partial<GMEJson>, obj2: Partial<GMEJson>, ignore: (keyof GMEJson)[] = ['id', 'children']): ChangeSet[] {
+export function compare(obj: Partial<JSONNode>, obj2: Partial<JSONNode>, ignore: (keyof JSONNode)[] = ['id', 'children']): ChangeSet[] {
     return diff(
         omit(obj, ignore),
         omit(obj2, ignore),

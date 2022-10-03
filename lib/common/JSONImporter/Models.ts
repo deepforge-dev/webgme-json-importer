@@ -5,7 +5,7 @@ export type GMEPointersDictionary = GmeCommon.Dictionary<Core.GUID | GmeCommon.O
 export type GMERelationRuleDictionary = GmeCommon.Dictionary<GMERelationRuleType>;
 
 
-export interface GMEJson {
+export interface JSONNode {
     id: string;
     path: GmeCommon.Path;
     guid: Core.GUID;
@@ -19,6 +19,6 @@ export interface GMEJson {
     sets: GmeCommon.Dictionary<Core.GUID[]>;
     member_registry: GmeCommon.Dictionary<{[key: Core.GUID]: GMEOutAttrDictionary}>;
     member_attributes: GmeCommon.Dictionary<{[key: Core.GUID]: GMEOutAttrDictionary}>;
-    children: GMEJson[] | Partial<GMEJson>[];
+    children: JSONNode[] | Partial<JSONNode>[];
     children_meta: GMERelationRuleType;
 }
