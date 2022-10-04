@@ -29,10 +29,6 @@ export class Exporter {
         );
     }
 
-    getNewPromiseQueue(): Array<Promise<any>>  {
-        return [] as Promise<any>[];
-    }
-
     async toJSON(node: Core.Node, omit: OmittedProperties | boolean = new OmittedProperties()): Promise<Partial<NodeState>> {
         if (typeof omit === 'boolean') {
             const omitList = omit ? ['children'] : [];
@@ -62,7 +58,7 @@ export class Exporter {
 
         omitted.forEach(toOmit => delete json[toOmit]);
 
-        const promiseQueue = this.getNewPromiseQueue();
+        const promiseQueue: Promise<void>[] = [];
         Object.keys(json).forEach(key => {
             if (this[key]) {  // ToDo: Fix this not to use dynamic typings
                 this[key](node, json, promiseQueue, omitted);
