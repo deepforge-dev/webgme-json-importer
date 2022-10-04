@@ -9,20 +9,20 @@ const INVALID_PROPS = ['id', 'guid', 'path'];
 
 export class OmittedProperties extends Set<string> {
     constructor(args: string[]|null|undefined = undefined) {
-            super(args);
-            const invalidProperties = INVALID_PROPS.filter(prop => this.has(prop));
+        super(args);
+        const invalidProperties = INVALID_PROPS.filter(prop => this.has(prop));
 
-            if(invalidProperties.length) {
-                throw new Error(`Invalid properties to omit: ${invalidProperties.join(', ')}`);
-            }
+        if(invalidProperties.length) {
+            throw new Error(`Invalid properties to omit: ${invalidProperties.join(', ')}`);
         }
+    }
 
-        withRelatedProperties(): OmittedProperties {
-            const relatedProps = Object.keys(RELATED_PROPERTIES)
-                .filter(key => this.has(key))
-                .flatMap(key => RELATED_PROPERTIES[key]);
+    withRelatedProperties(): OmittedProperties {
+        const relatedProps = Object.keys(RELATED_PROPERTIES)
+            .filter(key => this.has(key))
+            .flatMap(key => RELATED_PROPERTIES[key]);
 
-            relatedProps.forEach(dep => this.add(dep));
-            return this;
-        }
+        relatedProps.forEach(dep => this.add(dep));
+        return this;
+    }
 }
