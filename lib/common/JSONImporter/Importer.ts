@@ -5,6 +5,7 @@ import {NodeChangeSet} from './NodeChangeSet';
 import {OmittedProperties} from './OmittedProperties';
 import {gmeDiff} from './SortedChanges';
 import diff from 'changeset';
+import NodeState from './NodeState';
 import {ChangeType} from 'changeset';
 
 export class Importer {
@@ -24,12 +25,12 @@ export class Importer {
         return await this.exporter.toJSON(node, omittedProperties);
     }
 
-    async apply(node, state, resolvedSelectors = new NodeSelections()) {
+    async apply(node: Core.Node, state: NodeState, resolvedSelectors = new NodeSelections()) {
         const diffs = await this.diff(node, state, resolvedSelectors);
         await this._patch(diffs, resolvedSelectors);
     }
 
-    async diff(node, state, resolvedSelectors=new NodeSelections()) {
+    async diff(node: Core.Node, state: NodeState, resolvedSelectors=new NodeSelections()) {
         await this.resolveSelectorsForExistingNodes(node, state, resolvedSelectors);
 
         const parent = this.core.getParent(node);

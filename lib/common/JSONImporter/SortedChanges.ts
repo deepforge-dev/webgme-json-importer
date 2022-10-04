@@ -1,7 +1,7 @@
-import {JSONNode} from './Models';
+import NodeState from './NodeState';
 import {compare} from "./Utils";
 
-export function gmeDiff(prevState, newState) {
+export function gmeDiff(prevState: NodeState, newState: NodeState) {
     const keyOrder = [
         'children_meta',
         'pointer_meta',

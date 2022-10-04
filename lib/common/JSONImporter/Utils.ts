@@ -1,4 +1,4 @@
-import {JSONNode} from './Models';
+import NodeState from './NodeState';
 import diff from 'changeset';
 import {ChangeSet} from 'changeset';
 
@@ -18,7 +18,7 @@ export function omit<T>(obj: T, keys: (keyof T)[]): Partial<T> {
     return result;
 }
 
-export function compare(obj: Partial<JSONNode>, obj2: Partial<JSONNode>, ignore: (keyof JSONNode)[] = ['id', 'children']): ChangeSet[] {
+export function compare(obj: Partial<NodeState>, obj2: Partial<NodeState>, ignore: (keyof NodeState)[] = ['id', 'children']): ChangeSet[] {
     return diff(
         omit(obj, ignore),
         omit(obj2, ignore),
