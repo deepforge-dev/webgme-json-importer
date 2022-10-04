@@ -68,19 +68,19 @@ export class Exporter {
         return json;
     }
 
-    attributes(node: Core.Node, json: Pick<NodeState, 'attributes'>, _promiseQueue: Promise<any>[], _omitted: Set<string>) {
+    attributes(node: Core.Node, json: Pick<NodeState, 'attributes'>, _promiseQueue: Promise<void>[], _omitted: Set<string>) {
         this.core.getOwnAttributeNames(node).forEach(name => {
             json.attributes[name] = this.core.getAttribute(node, name);
         });
     }
 
-    attribute_meta(node: Core.Node, json: Pick<NodeState, 'attribute_meta'>, _promiseQueue: Promise<any>[], _omitted: Set<string>) {
+    attribute_meta(node: Core.Node, json: Pick<NodeState, 'attribute_meta'>, _promiseQueue: Promise<void>[], _omitted: Set<string>) {
         this.core.getOwnValidAttributeNames(node).forEach(name => {
             json.attribute_meta[name] = this.core.getAttributeMeta(node, name);
         });
     }
 
-    sets(node: Core.Node, json: Pick<NodeState, 'sets' | 'member_attributes' | 'member_registry'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+    sets(node: Core.Node, json: Pick<NodeState, 'sets' | 'member_attributes' | 'member_registry'>, promiseQueue: Promise<void>[], omitted: Set<string>) {
         promiseQueue.push(...this.core.getOwnSetNames(node)
             .filter(name => name !== '_mixins')
             .map(async name => {
@@ -118,7 +118,7 @@ export class Exporter {
             }));
     }
 
-    pointers(node: Core.Node, json: Pick<NodeState, 'pointers'>, promiseQueue: Promise<any>[], _omitted: Set<string>) {
+    pointers(node: Core.Node, json: Pick<NodeState, 'pointers'>, promiseQueue: Promise<void>[], _omitted: Set<string>) {
         promiseQueue.push(...this.core.getOwnPointerNames(node).map(async name => {
             const path = this.core.getPointerPath(node, name);
             if (path) {
@@ -132,13 +132,13 @@ export class Exporter {
         json.pointers.base = baseNode && this.core.getGuid(baseNode);
     }
 
-    registry(node: Core.Node, json: Pick<NodeState, 'registry'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+    registry(node: Core.Node, json: Pick<NodeState, 'registry'>, promiseQueue: Promise<void>[], _omitted: Set<string>) {
         this.core.getOwnRegistryNames(node).forEach(name => {
             json.registry[name] = this.core.getRegistry(node, name);
         });
     }
 
-    children(node: Core.Node, json: Pick<NodeState, 'children'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+    children(node: Core.Node, json: Pick<NodeState, 'children'>, promiseQueue: Promise<void>[], omitted: Set<string>) {
         promiseQueue.push((async () => {
             const children = await this.core.loadChildren(node);
             json.children = await Promise.all(
@@ -147,21 +147,23 @@ export class Exporter {
         })());
     }
 
-    children_meta(node: Core.Node, json: Pick<NodeState, 'children_meta'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+    children_meta(node: Core.Node, json: Pick<NodeState, 'children_meta'>, promiseQueue: Promise<void>[], _omitted: Set<string>) {
         promiseQueue.push(
             this._metaDictToGuids(this.core.getChildrenMeta(node))
-                .then((children_meta) => json.children_meta = children_meta)
+                .then((children_meta) => {
+                    json.children_meta = children_meta;
+                })
         );
     }
 
-    pointer_meta(node: Core.Node, json: Pick<NodeState, 'pointer_meta'>, promiseQueue: Promise<any>[], omitted: Set<string>) {
+    pointer_meta(node: Core.Node, json: Pick<NodeState, 'pointer_meta'>, promiseQueue: Promise<void>[], _omitted: Set<string>) {
         promiseQueue.push(...this.core.getOwnValidPointerNames(node).map(async name => {
             const ptr_meta = this.core.getPointerMeta(node, name);
             json.pointer_meta[name] = await this._metaDictToGuids(ptr_meta);
         }));
     }
 
-    mixins(node: Core.Node, json: Pick<NodeState, 'mixins'>, promiseQueue: Promise<any>, omitted: Set<string>) {
+    mixins(node: Core.Node, json: Pick<NodeState, 'mixins'>, _promiseQueue: Promise<void>[], _omitted: Set<string>) {
         json.mixins = Object.values(this.core.getMixinNodes(node)).map(node => this.core.getGuid(node));
     }
 }
