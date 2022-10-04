@@ -3,6 +3,10 @@
   "scripts": {
     "start": "node app.js",
     "test": "node ./node_modules/mocha/bin/mocha --recursive test",
+    "postinstall": "npm run build",
+    "build": "npm run build:lib",
+    "build:lib": "vite build",
+    "typecheck": "tsc --noEmit",
     "apply": "node ./node_modules/webgme-engine/src/bin/apply.js",
     "diff": "node ./node_modules/webgme-engine/src/bin/diff.js",
     "export": "node ./node_modules/webgme-engine/src/bin/export.js",
@@ -18,10 +22,16 @@
     "webgme": "^2.23.0"
   },
   "devDependencies": {
+    "@types/node": "^18.7.18",
+    "@types/underscore": "^1.11.4",
     "benchmark": "^2.1.4",
     "chai": "^4.3.4",
     "commander": "^9.4.0",
     "mocha": "^5.2.0",
-    "webgme": "^2.42.1"
+    "typescript": "^4.8.3",
+    "vite": "^3.1.4",
+    "vite-plugin-dts": "^1.6.1",
+    "webgme": "^2.42.1",
+    "changeset": "github:deepforge-dev/changeset"
   }
 }
