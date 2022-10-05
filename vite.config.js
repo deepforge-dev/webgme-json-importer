@@ -10,6 +10,7 @@ export default defineConfig({
             fileName: 'JSONImporter',
             name: 'JSONImporter',
         },
+        sourcemap: true,
         outDir: 'src/common/build',
     },
     plugins: [dts()]
