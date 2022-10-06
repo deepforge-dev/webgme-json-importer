@@ -327,6 +327,50 @@ describe('JSONImporter', function () {
                 const [schemaBp] = schemaAp.children;
                 assert.equal(schemaBp.pointers.base, core.getGuid(nodeB));
             });
+
+            it('should recreate deleted nodes on setting pointers and assign proper guid', async function() {
+                const fco = await core.loadByPath(root, '/1');
+                const parent = core.createNode({
+                    parent: root,
+                    base: fco
+                });
+
+                const child1 = core.createNode({
+                    parent: parent,
+                    base: fco
+                });
+                core.setAttribute(child1, 'name', 'child1');
+
+                const child2 = core.createNode({
+                    parent: parent,
+                    base: fco
+                });
+                core.setAttribute(child2, 'name', 'child2');
+
+
+                const child3 = core.createNode({
+                    parent: parent,
+                    base: fco
+                });
+                core.setAttribute(child3, 'name', 'child3');
+
+                core.setPointer(child1, 'sibling', child2);
+
+                const state = await importer.toJSON(parent);
+
+                const deletedPointerGuid = core.getGuid(child3);
+
+                const child1State = state.children.find(child => child.attributes.name === 'child1')
+                child1State.pointers.sibling = deletedPointerGuid;
+
+                core.deleteNode(child3);
+
+                await importer.apply(parent, state);
+                const pointer = await core.loadPointer(child1, 'sibling');
+
+                assert(core.getGuid(pointer) === deletedPointerGuid, core.getGuid(pointer) + '/' + deletedPointerGuid);
+            });
+
         });
 
         describe('pointer meta', function() {
