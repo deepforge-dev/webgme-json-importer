@@ -14,8 +14,15 @@ import {
     AttributeMetaPatch,
     PointersPatch,
     GuidPatch,
-    MixinsPatch, PointerMetaPatch, SetsPatch, MemberAttributesPatch, MemberRegistryPatch, RegistryPatch
-} from './NodePatch';
+    MixinsPatch,
+    PointerMetaPatch,
+    SetsPatch,
+    MemberAttributesPatch,
+    MemberRegistryPatch,
+    RegistryPatch,
+    ChildrenPatch,
+    ChildrenMetaPatch
+} from './NodeStatePatch';
 
 export class Importer {
 
@@ -71,6 +78,15 @@ export class Importer {
             registry: new RegistryPatch(
                 this.core,
                 this.searchUtils
+            ),
+            children: new ChildrenPatch(
+                this.core,
+                this.searchUtils,
+                this
+            ),
+            children_meta: new ChildrenMetaPatch(
+                this.core,
+                this.searchUtils,
             )
         };
     }

@@ -3,6 +3,7 @@ import {NodeChangeSet} from './NodeChangeSet';
 import {assert, Maybe, NodeSearchUtils, Result, setNested} from './Utils';
 import diff from 'changeset';
 import Core = GmeClasses.Core;
+import JSONImporter from "../JSONImporter";
 
 type PatchFunction = (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections) => Promise<Result<PatchResult, PatchError>>;
 type PatchResultPromise = Promise<Result<PatchResult, PatchError>>;
@@ -251,12 +252,20 @@ export class PointerMetaPatch extends NodeStatePatch {
 }
 
 export class ChildrenPatch extends NodeStatePatch {
-    put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
+    importer: JSONImporter;
+    constructor(core: GmeClasses.Core, nodeSearchUtils: NodeSearchUtils, importer: JSONImporter) {
+        super(core, nodeSearchUtils);
+        this.importer = importer;
+    }
 
+    put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
+        await this.importer.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
+        return new Result<PatchResult, PatchError>(Maybe.fromValue(PatchResult.Ok()), Maybe.none());
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-
+        this.core.deleteNode(node);
+        return new Result<PatchResult, PatchError>(Maybe.fromValue(PatchResult.Ok()), Maybe.none());
     };
 }
 
@@ -434,8 +443,15 @@ export class RegistryPatch extends NodeStatePatch {
 
 
 export class ChildrenMetaPatch extends NodeStatePatch {
-    delete = (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
+    delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
+        const [/*"children_meta"*/, idOrMinMax] = change.key;
+        const isNodeId = !['min', 'max'].includes(idOrMinMax);
+        if (isNodeId) {
+            const gmeId = await this.nodeSearchUtils.getNodeId(node, idOrMinMax, resolvedSelectors);
+            this.core.delChildMeta(node, gmeId);
+        }
 
+        return new Result<PatchResult, PatchError>(Maybe.some(PatchResult.Ok()), Maybe.none());
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -458,6 +474,7 @@ export class ChildrenMetaPatch extends NodeStatePatch {
             const childNode = await this.nodeSearchUtils.getNode(node, nodeId, resolvedSelectors);
             this.core.setChildMeta(node, childNode, min, max);
         }
-    }
 
+        return new Result<PatchResult, PatchError>(Maybe.some(PatchResult.Ok()), Maybe.none());
+    }
 }
