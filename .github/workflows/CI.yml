@@ -30,7 +30,7 @@ jobs:
           mongodb-version: "5.0"
 
       - name: "Install Dependencies"
-        run: npm install -g npm && npm install
+        run: npm install -g npm && npm install && npm run build
         continue-on-error: true
 
       - name: "Run Tests"
