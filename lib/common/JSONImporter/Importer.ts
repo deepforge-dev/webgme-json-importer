@@ -1,6 +1,6 @@
 import {Exporter} from './Exporter';
 import {NodeSelections, NodeSelector} from './NodeSelectors';
-import {assert, partition, setNested} from './Utils';
+import {assert, partition, setNested, NodeSearchUtils} from './Utils';
 import {NodeChangeSet} from './NodeChangeSet';
 import {OmittedProperties} from './OmittedProperties';
 import {gmeDiff} from './SortedChanges';
@@ -14,11 +14,13 @@ export class Importer {
     core: GmeClasses.Core;
     rootNode: Core.Node;
     exporter: Exporter;
+    searchUtils: NodeSearchUtils;
 
     constructor(core: GmeClasses.Core, rootNode: Core.Node) {
         this.core = core;
         this.rootNode = rootNode;
         this.exporter = new Exporter(this.core, this.rootNode);
+        this.searchUtils = new NodeSearchUtils(this.core, this.rootNode);
     }
 
     async toJSON(node: Core.Node, omittedProperties: OmittedProperties | boolean = new OmittedProperties()) {
@@ -41,7 +43,7 @@ export class Importer {
         const currentChildren = await this.core.loadChildren(node);
         diffs.push(...(await Promise.all(children.map(async childState => {
             const idString = childState.id;
-            const childNode = await this.findNode(node, idString, resolvedSelectors);
+            const childNode = await this.searchUtils.findNode(node, idString, resolvedSelectors);
             const index = currentChildren.indexOf(childNode);
             if (index > -1) {
                 currentChildren.splice(index, 1);
@@ -103,7 +105,7 @@ export class Importer {
                 const isNewNode = (diff.type === 'put' && diff.key[0] === 'children');
                 if (!isNewNode) {
                     const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
-                    node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
+                    node = await this.searchUtils.findNode(parent, diff.nodeId, resolvedSelectors);
                 }
 
                 if(diff.type === 'put') {
@@ -157,7 +159,7 @@ export class Importer {
             tryResolveMore = false;
             for (let i = stateNodePairs.length; i--;) {
                 const [state, parentNode] = stateNodePairs[i];
-                let child = await this.findNode(parentNode, state.id, resolvedSelectors);
+                let child = await this.searchUtils.findNode(parentNode, state.id, resolvedSelectors);
                 //const canCreate = !state.id;
                 if (!child && create) {
                     let baseNode;
@@ -167,7 +169,7 @@ export class Importer {
                             const stateID = state.id || JSON.stringify(state);
                             throw new Error(`No base provided for ${stateID}`);
                         }
-                        baseNode = await this.findNode(parentNode, base, resolvedSelectors);
+                        baseNode = await this.searchUtils.findNode(parentNode, base, resolvedSelectors);
 
 
                     } else {
@@ -222,35 +224,6 @@ export class Importer {
         await this.tryResolveSelectors(stateNodePairs, resolvedSelectors, create);
     }
 
-    async findNode(parent, idString, resolvedSelectors=new NodeSelections()) {
-        if (idString === undefined) {
-            return;
-        }
-        assert(typeof idString === 'string', `Expected ID to be a string but found ${JSON.stringify(idString)}`);
-
-        const parentId = this.core.getPath(parent);
-        const selector = new NodeSelector(idString);
-        const resolved = resolvedSelectors.get(parentId, selector);
-        if (resolved) {
-            return resolved;
-        }
-
-        return await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors.cache);
-    }
-
-    async getNode(parent, idString, resolvedSelectors) {
-        const node = await this.findNode(parent, idString, resolvedSelectors);
-        if (!node) {
-            throw new Error(`Could not resolve ${idString} to an existing node.`);
-        }
-        return node;
-    }
-
-    async getNodeId(parent, id, resolvedSelectors) {
-        const node = await this.getNode(parent, id, resolvedSelectors);
-        return this.core.getPath(node);
-    }
-
     async createNode(parent, state={}, base) {
         if (!state.id) {
             state.id = `@internal:${this._nodeIDCounter++}`;
@@ -275,7 +248,7 @@ export class Importer {
     async createStateSubTree(parentPath, state, resolvedSelectors) {
         const base = state.pointers?.base;
         const parent = await this.core.loadByPath(this.rootNode, parentPath);
-        const baseNode = await this.findNode(parent, base, resolvedSelectors);
+        const baseNode = await this.searchUtils.findNode(parent, base, resolvedSelectors);
         const created = await this.createNode(parent, state, baseNode);
         const nodeSelector = new NodeSelector(this.core.getPath(created));
         resolvedSelectors.record(parentPath, nodeSelector, created);
@@ -344,7 +317,7 @@ Importer.prototype._put.mixins = async function(node, change, resolvedSelectors)
     }
 
     const mixinId = change.value;
-    const mixinPath = await this.getNodeId(node, mixinId, resolvedSelectors);
+    const mixinPath = await this.searchUtils.getNodeId(node, mixinId, resolvedSelectors);
     const canSet = this.core.canSetAsMixin(node, mixinPath);
     if (canSet.isOk) {
         this.core.addMixin(node, mixinPath);
@@ -406,7 +379,7 @@ Importer.prototype._put.pointers = async function(node, change, resolvedSelector
     let targetPath = null;
     if (change.value !== null) {
         target = change.value !== null ?
-            await this.getNode(node, change.value, resolvedSelectors)
+            await this.searchUtils.getNode(node, change.value, resolvedSelectors)
             : null;
         targetPath = this.core.getPath(target);
     }
@@ -441,7 +414,7 @@ Importer.prototype._put.pointer_meta = async function(node, change, resolvedSele
 
         for (let i = targets.length; i--;) {
             const [nodeId, meta] = targets[i];
-            const target = await this.getNode(node, nodeId, resolvedSelectors);
+            const target = await this.searchUtils.getNode(node, nodeId, resolvedSelectors);
             this.core.setPointerMetaTarget(node, name, target, meta.min, meta.max);
         }
     } else if (['min', 'max'].includes(idOrMinMax)) {
@@ -450,7 +423,7 @@ Importer.prototype._put.pointer_meta = async function(node, change, resolvedSele
         this.core.setPointerMetaLimits(node, name, meta.min, meta.max);
     } else {
         const meta = this.core.getPointerMeta(node, name);
-        const target = await this.getNode(node, idOrMinMax, resolvedSelectors);
+        const target = await this.searchUtils.getNode(node, idOrMinMax, resolvedSelectors);
         const gmeId = await this.core.getPath(target);
         const keys = change.key.slice(2);
         keys[0] = gmeId;
@@ -467,7 +440,7 @@ Importer.prototype._delete.pointer_meta = async function(node, change, resolvedS
     if (removePointer) {
         this.core.delPointerMeta(node, name);
     } else {
-        const gmeId = await this.getNodeId(node, targetId, resolvedSelectors);
+        const gmeId = await this.searchUtils.getNodeId(node, targetId, resolvedSelectors);
         this.core.delPointerMetaTarget(node, name, gmeId);
     }
 };
@@ -488,13 +461,13 @@ Importer.prototype._put.children_meta = async function(node, change, resolvedSel
         const childEntries = Object.entries(change.value).filter(pair => !['min', 'max'].includes(pair[0]));
         for (let i = 0; i < childEntries.length; i++) {
             const [nodeId, {min, max}] = childEntries[i];
-            const childNode = await this.getNode(node, nodeId, resolvedSelectors);
+            const childNode = await this.searchUtils.getNode(node, nodeId, resolvedSelectors);
             this.core.setChildMeta(node, childNode, min, max);
         }
     } else if (isNewChildDefinition) {
         const nodeId = idOrUndef;
         const {min, max} = change.value;
-        const childNode = await this.getNode(node, nodeId, resolvedSelectors);
+        const childNode = await this.searchUtils.getNode(node, nodeId, resolvedSelectors);
         this.core.setChildMeta(node, childNode, min, max);
     }
 };
@@ -503,7 +476,7 @@ Importer.prototype._delete.children_meta = async function(node, change, resolved
     const [/*"children_meta"*/, idOrMinMax] = change.key;
     const isNodeId = !['min', 'max'].includes(idOrMinMax);
     if (isNodeId) {
-        const gmeId = await this.getNodeId(node, idOrMinMax, resolvedSelectors);
+        const gmeId = await this.searchUtils.getNodeId(node, idOrMinMax, resolvedSelectors);
         this.core.delChildMeta(node, gmeId);
     }
 };
@@ -516,11 +489,11 @@ Importer.prototype._put.sets = async function(node, change, resolvedSelectors) {
         const memberPaths = change.value;
 
         for (let i = 0; i < memberPaths.length; i++) {
-            const member = await this.getNode(node, memberPaths[i], resolvedSelectors);
+            const member = await this.searchUtils.getNode(node, memberPaths[i], resolvedSelectors);
             this.core.addMember(node, name, member);
         }
     } else {
-        const member = await this.getNode(node, change.value, resolvedSelectors);
+        const member = await this.searchUtils.getNode(node, change.value, resolvedSelectors);
         this.core.addMember(node, name, member);
     }
 };
@@ -552,14 +525,14 @@ Importer.prototype._put.member_attributes = async function(node, change, resolve
             await this._put(node, changesets[i], resolvedSelectors);
         }
     } else {
-        const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
+        const gmeId = await this.searchUtils.getNodeId(node, nodeId, resolvedSelectors);
         this.core.setMemberAttribute(node, set, gmeId, name, change.value);
     }
 };
 
 Importer.prototype._delete.member_attributes = async function(node, change, resolvedSelectors) {
     const [/*type*/, set, nodeId, name] = change.key;
-    const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
+    const gmeId = await this.searchUtils.getNodeId(node, nodeId, resolvedSelectors);
     const deleteAllAttributes = name === undefined;
     const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
 
@@ -598,7 +571,7 @@ Importer.prototype._put.member_registry = async function(node, change, resolvedS
             await this._put(node, changesets[i], resolvedSelectors);
         }
     } else {
-        const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
+        const gmeId = await this.searchUtils.getNodeId(node, nodeId, resolvedSelectors);
         const isNested = change.key.length > 4;
         if (isNested) {
             const value = this.core.getMemberRegistry(node, set, gmeId, name);
@@ -612,7 +585,7 @@ Importer.prototype._put.member_registry = async function(node, change, resolvedS
 
 Importer.prototype._delete.member_registry = async function(node, change, resolvedSelectors) {
     const [/*type*/, set, nodeId, name] = change.key;
-    const gmeId = await this.getNodeId(node, nodeId, resolvedSelectors);
+    const gmeId = await this.searchUtils.getNodeId(node, nodeId, resolvedSelectors);
     const deleteAllRegistryValues = name === undefined;
     const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
 

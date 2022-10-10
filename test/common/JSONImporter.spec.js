@@ -931,17 +931,17 @@ describe('JSONImporter', function () {
 
     describe('findNode', function() {
         it('should find nodes using @meta', async function() {
-            const fco = await importer.findNode(node, '@meta:FCO');
+            const fco = await importer.searchUtils.findNode(node, '@meta:FCO');
             assert.equal(fco, node);
         });
 
         it('should find nodes using @name', async function() {
-            const fco = await importer.findNode(root, '@name:FCO');
+            const fco = await importer.searchUtils.findNode(root, '@name:FCO');
             assert.equal(fco, node);
         });
 
         it('should not find nodes outside parent', async function() {
-            const fco = await importer.findNode(node, '@name:FCO');
+            const fco = await importer.searchUtils.findNode(node, '@name:FCO');
             assert.equal(fco, undefined);
         });
     });
