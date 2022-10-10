@@ -141,7 +141,11 @@ export class NodeSearchUtils {
         this.rootNode = rootNode;
     }
 
-    async getNodeId(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections) {
+    getRoot(): Core.Node {
+        return this.rootNode;
+    }
+
+    async getNodeId(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections): Promise<GmeCommon.Path>{
         const node = await this.getNode(parent, idString, resolvedSelectors);
         return this.core.getPath(node);
     }
@@ -167,6 +171,6 @@ export class NodeSearchUtils {
             return resolved;
         }
 
-        return await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors.cache);
+        return await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors.cache as NodeSelections);
     }
 }
