@@ -3,7 +3,6 @@ import diff from 'changeset';
 import {ChangeSet} from 'changeset';
 import Core = GmeClasses.Core;
 import {NodeSelections, NodeSelector} from "./NodeSelectors";
-import exp from "constants";
 
 export const Constants = {
     META_ASPECT_SET_NAME: 'MetaAspectSet',
@@ -48,103 +47,6 @@ export function partition<T>(
     });
     return partitioned;
 }
-
-
-export class Maybe<T> {
-    private constructor(private value: T | null) {
-        this.value = value;
-    }
-
-    static some<T>(value: T) {
-        if (!value) {
-            throw Error("Provided value must not be empty");
-        }
-        return new Maybe(value);
-    }
-
-    static none<T>() {
-        return new Maybe<T>(null)
-    }
-
-    static fromValue<T>(value: T | null): Maybe<T>{
-        return value ? Maybe.some(value) : Maybe.none<T>();
-    }
-
-    getOrElse(defaultValue: T) {
-        return this.value === null ? defaultValue : this.value;
-    }
-
-    flatMap<R>(f: (wrapped: T) => Maybe<R>): Maybe<R> {
-        if (this.value === null) {
-            return Maybe.none();
-        } else {
-            return f(this.value);
-        }
-    }
-
-    public isSome(): boolean {
-        return !this.isNone()
-    }
-
-    public isNone(): boolean {
-        return this.value === null || this.value === undefined
-    }
-
-    unwrap(): T | null {
-        return this.value;
-    }
-}
-
-export class Result<V, E> {
-    _value: Maybe<V>;
-    _error: Maybe<E>;
-
-    constructor(value: Maybe<V>, error: Maybe<E>) {
-        this._value = value;
-        this._error = error;
-    }
-
-    map<V2>(fn: (item: V) => Maybe<V2>): Result<V2, E> {
-        if(this._value.isSome()) {
-            const result = this._value.flatMap(fn);
-            return new Result<V2, E>(result, Maybe.none());
-        } else {
-            return new Result<V2, E>(Maybe.none(), this._error);
-        }
-    }
-
-    mapError<E2>(errFn: (err: E) => Maybe<E2>): Result<V, E2> {
-        if (this._error.isSome()) {
-            const result = this._error.flatMap<E2>(errFn);
-            return new Result(Maybe.none<V>(), result);
-        } else {
-            return new Result(this._value, Maybe.none());
-        }
-    }
-
-    unwrap() {
-        if(this._error.isSome()) {
-            throw this._error.unwrap();
-        } else {
-            return this._value.unwrap();
-        }
-    }
-
-    static Ok<V, E>(value: V) : Result<NonNullable<V>, E> {
-        return new Result(
-            Maybe.some<V>(value),
-            Maybe.none<E>()
-        )
-    }
-
-    static Error<V, E>(err: E) : Result<V, NonNullable<E>> {
-        return new Result(
-            Maybe.none<V>(),
-            Maybe.some<E>(err),
-        )
-    }
-}
-
 
 export class NodeSearchUtils {
     core: GmeClasses.Core;

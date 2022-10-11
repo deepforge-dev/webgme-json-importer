@@ -1,6 +1,7 @@
 import {NodeSelections} from './NodeSelectors';
 import {NodeChangeSet} from './NodeChangeSet';
-import {assert, Maybe, NodeSearchUtils, Result, setNested} from './Utils';
+import {assert, NodeSearchUtils, setNested} from './Utils';
+import {Maybe, Result} from 'ts-monads';
 import diff from 'changeset';
 import Core = GmeClasses.Core;
 import JSONImporter from "../JSONImporter";
@@ -13,10 +14,6 @@ class PatchResult {
 
     constructor(patch) {
         this.patch = patch;
-    }
-
-    static Ok(patch: NodeChangeSet) {
-        return new PatchResult(patch);
     }
 }
 
@@ -126,7 +123,7 @@ export class PointersPatch extends NodeStatePatch {
         }
         const [/*type*/, name] = change.key;
         this.core.delPointer(node, name);
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -149,19 +146,19 @@ export class PointersPatch extends NodeStatePatch {
             this.core.setPointer(node, name, target);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 }
 
 export class GuidPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const {value} = change;
         this.core.setGuid(node, value);
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 }
 
@@ -170,7 +167,7 @@ export class MixinsPatch extends NodeStatePatch {
         const [, index] = change.key;
         const mixinPath = this.core.getMixinPaths(node)[index];
         this.core.delMixin(node, mixinPath);
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -186,7 +183,7 @@ export class MixinsPatch extends NodeStatePatch {
         const canSet = this.core.canSetAsMixin(node, mixinPath);
         if (canSet.isOk) {
             this.core.addMixin(node, mixinPath);
-            return Result.Ok(PatchResult.Ok(change));
+            return Result.Ok(new PatchResult(change));
         } else {
             const err = new PatchError(
                 `Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}: ${canSet.reason}`
@@ -233,7 +230,7 @@ export class PointerMetaPatch extends NodeStatePatch {
             this.core.setPointerMetaTarget(node, name, target, targetMeta.min, targetMeta.max);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -246,7 +243,7 @@ export class PointerMetaPatch extends NodeStatePatch {
             this.core.delPointerMetaTarget(node, name, gmeId);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 }
 
@@ -261,7 +258,7 @@ export class ChildrenPatch extends NodeStatePatch {
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         try {
             await this.importer.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
-            return Result.Ok(PatchResult.Ok(change));
+            return Result.Ok(new PatchResult(change));
         } catch (err) {
             return Result.Error(new PatchError((err as Error).message));
         }
@@ -269,7 +266,7 @@ export class ChildrenPatch extends NodeStatePatch {
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         this.core.deleteNode(node);
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 }
 
@@ -290,7 +287,7 @@ export class SetsPatch extends NodeStatePatch {
             this.core.addMember(node, name, member);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -302,7 +299,7 @@ export class SetsPatch extends NodeStatePatch {
             const member = this.core.getMemberPaths(node, name)[index];
             this.core.delMember(node, name, member);
         }
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
 }
@@ -328,7 +325,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
             this.core.setMemberAttribute(node, set, gmeId, name, change.value);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -336,7 +333,6 @@ export class MemberAttributesPatch extends NodeStatePatch {
         const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllAttributes = name === undefined;
         const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
-        let error: Maybe<PatchError> = Maybe.none();
         if (isMember) {
             const attributeNames = deleteAllAttributes ?
                 this.core.getMemberAttributeNames(node, set, gmeId) : [name];
@@ -354,7 +350,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
             }
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
 }
@@ -388,7 +384,7 @@ export class MemberRegistryPatch extends NodeStatePatch {
             }
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -414,7 +410,7 @@ export class MemberRegistryPatch extends NodeStatePatch {
                 return Result.Error(err);
             }
         }
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 }
 
@@ -430,7 +426,7 @@ export class RegistryPatch extends NodeStatePatch {
             this.core.setRegistry(node, name, change.value);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -441,7 +437,7 @@ export class RegistryPatch extends NodeStatePatch {
         }
         const [/*type*/, name] = change.key;
         this.core.delRegistry(node, name);
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     };
 }
 
@@ -455,7 +451,7 @@ export class ChildrenMetaPatch extends NodeStatePatch {
             this.core.delChildMeta(node, gmeId);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -479,6 +475,6 @@ export class ChildrenMetaPatch extends NodeStatePatch {
             this.core.setChildMeta(node, childNode, min, max);
         }
 
-        return Result.Ok(PatchResult.Ok(change));
+        return Result.Ok(new PatchResult(change));
     }
 }

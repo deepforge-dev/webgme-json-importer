@@ -25,12 +25,13 @@
     "@types/underscore": "^1.11.4",
     "benchmark": "^2.1.4",
     "chai": "^4.3.4",
+    "changeset": "github:deepforge-dev/changeset",
     "commander": "^9.4.0",
     "mocha": "^5.2.0",
+    "ts-monads": "github:umesh-timalsina/ts-monads",
     "typescript": "^4.8.3",
     "vite": "^3.1.4",
     "vite-plugin-dts": "^1.6.1",
-    "webgme": "^2.42.1",
-    "changeset": "github:deepforge-dev/changeset"
+    "webgme": "^2.42.1"
   }
 }
