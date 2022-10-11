@@ -9,8 +9,14 @@ type PatchFunction = (node: Core.Node, change: NodeChangeSet, resolvedSelectors:
 type PatchResultPromise = Promise<Result<PatchResult, PatchError>>;
 
 class PatchResult {
-    static Ok() {
-        return new PatchResult();
+    patch: NodeChangeSet;
+
+    constructor(patch) {
+        this.patch = patch;
+    }
+
+    static Ok(patch: NodeChangeSet) {
+        return new PatchResult(patch);
     }
 }
 
@@ -38,41 +44,40 @@ export abstract class NodeStatePatch implements PatchOperation {
     abstract delete: PatchFunction;
     abstract put: PatchFunction;
 
-    getKeyLengthErrorObject(change: NodeChangeSet, msg: string | null = null): Maybe<PatchError> {
-        let err = null;
-        if (change.key.length === 2) {
-            new PatchError(
+    getKeyLengthErrorObject(change: NodeChangeSet, msg: string | null = null): PatchError | null {
+        let err: PatchError | null = null;
+        if (change.key.length !== 2) {
+            err = new PatchError(
                 msg === null ? `Complex attributes not currently supported: ${change.key.join(', ')}` : msg
             );
         }
-        return Maybe.fromValue<PatchError>(err);
+        return err;
     }
-
 }
 
 export class AttributesPatch extends NodeStatePatch {
-
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): PatchResultPromise => {
         const err = this.getKeyLengthErrorObject(change);
-        let success = Maybe.none<PatchResult>();
-        if (err.isNone()) {
-            const [/*type*/, name] = change.key;
-            this.core.setAttribute(node, name, change.value || '');
-            success = Maybe.some<PatchResult>(new PatchResult());
+
+        if (err) {
+            return Result.Error(err);
         }
 
-        return new Result(success, err);
+        const [/*type*/, name] = change.key;
+        this.core.setAttribute(node, name, change.value || '');
+
+        return Result.Ok(new PatchResult(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const err = this.getKeyLengthErrorObject(change);
-        let success = Maybe.none<PatchResult>();
-        if (err.isNone()) {
-            const [/*type*/, name] = change.key;
-            this.core.delAttribute(node, name);
-            success = Maybe.some<PatchResult>(new PatchResult());
+        if (err) {
+            return Result.Error(err);
         }
-        return new Result(success, err);
+
+        const [/*type*/, name] = change.key;
+        this.core.delAttribute(node, name);
+        return Result.Ok(new PatchResult(change));
     };
 }
 
@@ -89,7 +94,7 @@ export class AttributeMetaPatch extends NodeStatePatch {
             this.core.setAttributeMeta(node, name, newMeta);
         }
 
-        return new Result(Maybe.fromValue<PatchResult>(new PatchResult()), Maybe.none<PatchError>());
+        return Result.Ok(new PatchResult(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -103,8 +108,9 @@ export class AttributeMetaPatch extends NodeStatePatch {
             this.core.setAttributeMeta(node, name, change.value);
         }
 
-        const result = new Result(Maybe.fromValue<PatchResult>(new PatchResult()), Maybe.none<PatchError>());
-        return Promise.resolve(result);
+        // const result = new Result(Maybe.fromValue<PatchResult>(new PatchResult()), Maybe.none<PatchError>());
+        // return Promise.resolve(result);
+        return Result.Ok(new PatchResult(change));
     }
 
 }
@@ -113,67 +119,62 @@ export class PointersPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const errMsg = `Invalid key for pointer: ${change.key.slice(1).join(', ')}`;
         const err = this.getKeyLengthErrorObject(change, errMsg);
-        let success: Maybe<PatchResult> = Maybe.none();
-        if (err.isNone()) {
-            const [/*type*/, name] = change.key;
-            this.core.delPointer(node, name);
-            success = Maybe.fromValue(PatchResult.Ok());
+        if (err) {
+            return Result.Error(
+                err
+            )
         }
-        return new Result(success, err);
+        const [/*type*/, name] = change.key;
+        this.core.delPointer(node, name);
+        return Result.Ok(PatchResult.Ok(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const errMsg = `Invalid key for pointer: ${change.key.slice(1).join(', ')}`;
         const err = this.getKeyLengthErrorObject(change, errMsg);
-        let success: Maybe<PatchResult> = Maybe.none();
-        if (err.isNone()) {
-            const [/*type*/, name] = change.key;
-            let target = null;
-            let targetPath = null;
-            if (change.value !== null) {
-                target = change.value !== null ?
-                    await this.nodeSearchUtils.getNode(node, change.value, resolvedSelectors)
-                    : null;
-                targetPath = this.core.getPath(target);
-            }
-            const hasChanged = targetPath !== this.core.getPointerPath(node, name);
-            if (hasChanged) {
-                this.core.setPointer(node, name, target);
-            }
-            success = Maybe.fromValue<PatchResult>(PatchResult.Ok());
+        if (err) {
+            return Result.Error(err);
+        }
+        const [/*type*/, name] = change.key;
+        let target = null;
+        let targetPath = null;
+        if (change.value !== null) {
+            target = change.value !== null ?
+                await this.nodeSearchUtils.getNode(node, change.value, resolvedSelectors)
+                : null;
+            targetPath = this.core.getPath(target);
+        }
+        const hasChanged = targetPath !== this.core.getPointerPath(node, name);
+        if (hasChanged) {
+            this.core.setPointer(node, name, target);
         }
 
-        return new Result(success, err);
+        return Result.Ok(PatchResult.Ok(change));
     }
 }
 
 export class GuidPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        return new Result(Maybe.none<PatchResult>(), Maybe.none<PatchError>());
+        return Result.Ok(PatchResult.Ok(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const {value} = change;
         this.core.setGuid(node, value);
-        return new Result(Maybe.fromValue<PatchResult>(new PatchResult()), Maybe.none<PatchError>());
+        return Result.Ok(PatchResult.Ok(change));
     }
 }
 
 export class MixinsPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        let error = Maybe.none<PatchError>();
         const [, index] = change.key;
         const mixinPath = this.core.getMixinPaths(node)[index];
         this.core.delMixin(node, mixinPath);
-        let success = Maybe.fromValue<PatchResult>(PatchResult.Ok());
-        const result = new Result(success, error);
-        return Promise.resolve(result);
+        return Result.Ok(PatchResult.Ok(change));
     };
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const [, index] = change.key;
-        let success = Maybe.none<PatchResult>();
-        let error = Maybe.none<PatchError>();
         const oldMixinPath = this.core.getMixinPaths(node)[index];
         if (oldMixinPath) {
             this.core.delMixin(node, oldMixinPath);
@@ -185,15 +186,13 @@ export class MixinsPatch extends NodeStatePatch {
         const canSet = this.core.canSetAsMixin(node, mixinPath);
         if (canSet.isOk) {
             this.core.addMixin(node, mixinPath);
-            success = Maybe.fromValue(PatchResult.Ok());
+            return Result.Ok(PatchResult.Ok(change));
         } else {
             const err = new PatchError(
                 `Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}: ${canSet.reason}`
             );
-            error = Maybe.fromValue<PatchError>(err);
+            return Result.Error(err);
         }
-
-        return new Result(success, error);
     };
 
 }
@@ -234,7 +233,7 @@ export class PointerMetaPatch extends NodeStatePatch {
             this.core.setPointerMetaTarget(node, name, target, targetMeta.min, targetMeta.max);
         }
 
-        return new Result(Maybe.fromValue(PatchResult.Ok()), Maybe.none<PatchError>());
+        return Result.Ok(PatchResult.Ok(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -247,25 +246,30 @@ export class PointerMetaPatch extends NodeStatePatch {
             this.core.delPointerMetaTarget(node, name, gmeId);
         }
 
-        return new Result(Maybe.fromValue(PatchResult.Ok()), Maybe.none<PatchError>());
+        return Result.Ok(PatchResult.Ok(change));
     };
 }
 
 export class ChildrenPatch extends NodeStatePatch {
     importer: JSONImporter;
+
     constructor(core: GmeClasses.Core, nodeSearchUtils: NodeSearchUtils, importer: JSONImporter) {
         super(core, nodeSearchUtils);
         this.importer = importer;
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        await this.importer.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
-        return new Result<PatchResult, PatchError>(Maybe.fromValue(PatchResult.Ok()), Maybe.none());
+        try {
+            await this.importer.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
+            return Result.Ok(PatchResult.Ok(change));
+        } catch (err) {
+            return Result.Error(new PatchError((err as Error).message));
+        }
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         this.core.deleteNode(node);
-        return new Result<PatchResult, PatchError>(Maybe.fromValue(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     };
 }
 
@@ -286,7 +290,7 @@ export class SetsPatch extends NodeStatePatch {
             this.core.addMember(node, name, member);
         }
 
-        return new Result(Maybe.some(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -298,7 +302,7 @@ export class SetsPatch extends NodeStatePatch {
             const member = this.core.getMemberPaths(node, name)[index];
             this.core.delMember(node, name, member);
         }
-        return new Result(Maybe.some(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     };
 
 }
@@ -324,7 +328,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
             this.core.setMemberAttribute(node, set, gmeId, name, change.value);
         }
 
-        return new Result(Maybe.some(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -350,7 +354,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
             }
         }
 
-        return new Result(Maybe.some(PatchResult.Ok()), error);
+        return Result.Ok(PatchResult.Ok(change));
     };
 
 }
@@ -384,7 +388,7 @@ export class MemberRegistryPatch extends NodeStatePatch {
             }
         }
 
-        return new Result(Maybe.some<PatchResult>(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     }
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -407,10 +411,10 @@ export class MemberRegistryPatch extends NodeStatePatch {
                 const memberDisplay = `${memberName} (${gmeId})`;
 
                 const err = new PatchError(`Cannot delete partial member registry values for ${memberDisplay}`);
-                error = Maybe.fromValue(err);
+                return Result.Error(err);
             }
         }
-        return new Result(Maybe.some<PatchResult>(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     }
 }
 
@@ -426,18 +430,18 @@ export class RegistryPatch extends NodeStatePatch {
             this.core.setRegistry(node, name, change.value);
         }
 
-        return new Result(Maybe.some<PatchResult>(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const err = this.getKeyLengthErrorObject(change);
         let success = Maybe.none<PatchResult>();
-        if (err.isNone()) {
-            const [/*type*/, name] = change.key;
-            this.core.delRegistry(node, name);
-            success = Maybe.fromValue(PatchResult.Ok());
+        if (err) {
+            return Result.Error(err);
         }
-        return new Result(success, err);
+        const [/*type*/, name] = change.key;
+        this.core.delRegistry(node, name);
+        return Result.Ok(PatchResult.Ok(change));
     };
 }
 
@@ -451,7 +455,7 @@ export class ChildrenMetaPatch extends NodeStatePatch {
             this.core.delChildMeta(node, gmeId);
         }
 
-        return new Result<PatchResult, PatchError>(Maybe.some(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
@@ -475,6 +479,6 @@ export class ChildrenMetaPatch extends NodeStatePatch {
             this.core.setChildMeta(node, childNode, min, max);
         }
 
-        return new Result<PatchResult, PatchError>(Maybe.some(PatchResult.Ok()), Maybe.none());
+        return Result.Ok(PatchResult.Ok(change));
     }
 }

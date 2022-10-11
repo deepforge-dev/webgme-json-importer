@@ -129,6 +129,20 @@ export class Result<V, E> {
             return this._value.unwrap();
         }
     }
+
+    static Ok<V, E>(value: V) : Result<NonNullable<V>, E> {
+        return new Result(
+            Maybe.some<V>(value),
+            Maybe.none<E>()
+        )
+    }
+
+    static Error<V, E>(err: E) : Result<V, NonNullable<E>> {
+        return new Result(
+            Maybe.none<V>(),
+            Maybe.some<E>(err),
+        )
+    }
 }
 
 
