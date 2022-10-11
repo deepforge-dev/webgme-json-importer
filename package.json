@@ -3,7 +3,6 @@
   "scripts": {
     "start": "node app.js",
     "test": "node ./node_modules/mocha/bin/mocha --recursive test",
-    "postinstall": "npm run build",
     "build": "npm run build:lib",
     "build:lib": "vite build",
     "typecheck": "tsc --noEmit",
