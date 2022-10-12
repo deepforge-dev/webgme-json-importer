@@ -1,10 +1,10 @@
 import {NodeSelections} from './NodeSelectors';
 import {NodeChangeSet} from './NodeChangeSet';
-import {assert, NodeSearchUtils, setNested} from './Utils';
+import {NodeSearchUtils, setNested} from './Utils';
 import {Maybe, Result} from 'ts-monads';
 import diff from 'changeset';
-import Core = GmeClasses.Core;
 import JSONImporter from "../JSONImporter";
+import Core = GmeClasses.Core;
 
 type PatchFunction = (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections) => Promise<Result<PatchResult, PatchError>>;
 type PatchResultPromise = Promise<Result<PatchResult, PatchError>>;
@@ -17,7 +17,7 @@ class PatchResult {
     }
 }
 
-class PatchError extends Error {
+export class PatchError extends Error {
     constructor(msg: string) {
         super(msg);
     }
@@ -38,76 +38,78 @@ export abstract class NodeStatePatch implements PatchOperation {
         this.nodeSearchUtils = nodeSearchUtils;
     }
 
+    keyLengthValidator(change) {
+        return change.key.length === 2;
+    }
+
     abstract delete: PatchFunction;
     abstract put: PatchFunction;
-
-    getKeyLengthErrorObject(change: NodeChangeSet, msg: string | null = null): PatchError | null {
-        let err: PatchError | null = null;
-        if (change.key.length !== 2) {
-            err = new PatchError(
-                msg === null ? `Complex attributes not currently supported: ${change.key.join(', ')}` : msg
-            );
-        }
-        return err;
-    }
 }
 
 export class AttributesPatch extends NodeStatePatch {
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): PatchResultPromise => {
-        const err = this.getKeyLengthErrorObject(change);
+        const errMsg = `Complex attributes not currently supported: ${change.key.join(', ')}`;
+        return change
+            .validated(this.keyLengthValidator, errMsg)
+            .map(chg => {
+                const [/*type*/, name] = chg.key;
+                this.core.setAttribute(node, name, chg.value || '');
+                return Maybe.fromValue(new PatchResult(chg));
+            }).mapError(err => {
+                return Maybe.fromValue(new PatchError(err.message));
+            });
 
-        if (err) {
-            return Result.Error(err);
-        }
-
-        const [/*type*/, name] = change.key;
-        this.core.setAttribute(node, name, change.value || '');
-
-        return Result.Ok(new PatchResult(change));
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const err = this.getKeyLengthErrorObject(change);
-        if (err) {
-            return Result.Error(err);
-        }
+        const errMsg = `Complex attributes not currently supported: ${change.key.join(', ')}`;
 
-        const [/*type*/, name] = change.key;
-        this.core.delAttribute(node, name);
-        return Result.Ok(new PatchResult(change));
+        return change
+            .validated(this.keyLengthValidator, errMsg)
+            .map(chg => {
+                const [/*type*/, name] = change.key;
+                this.core.delAttribute(node, name);
+                return Maybe.fromValue(new PatchResult(chg))
+            }).mapError(err => {
+                return Maybe.fromValue(new PatchError(err.message));
+            });
     };
 }
 
 export class AttributeMetaPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const isAttrDeletion = change.key.length === 2;
-        const [/*type*/, name] = change.key;
-        if (isAttrDeletion) {
-            this.core.delAttributeMeta(node, name);
-        } else {
-            const meta = this.core.getAttributeMeta(node, name);
-            const metaChange = {type: 'del', key: change.key.slice(2)};
-            const newMeta = diff.apply([metaChange], meta);
-            this.core.setAttributeMeta(node, name, newMeta);
-        }
-
-        return Result.Ok(new PatchResult(change));
+        return change.asResult()
+            .map(chg => {
+                const isAttrDeletion = chg.key.length === 2;
+                const [/*type*/, name] = chg.key;
+                if (isAttrDeletion) {
+                    this.core.delAttributeMeta(node, name);
+                } else {
+                    const meta = this.core.getAttributeMeta(node, name);
+                    const metaChange = {type: 'del', key: change.key.slice(2)};
+                    const newMeta = diff.apply([metaChange], meta);
+                    this.core.setAttributeMeta(node, name, newMeta);
+                }
+                return Maybe.some(new PatchResult(chg));
+            });
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*type*/, name] = change.key;
-        const keys = change.key.slice(2);
-        if (keys.length) {
-            const value = this.core.getAttributeMeta(node, name);
-            setNested(value, keys, change.value);
-            this.core.setAttributeMeta(node, name, value);
-        } else {
-            this.core.setAttributeMeta(node, name, change.value);
-        }
+        return change.asResult()
+            .map(chg => {
+                const [/*type*/, name] = chg.key;
+                const keys = chg.key.slice(2);
 
-        // const result = new Result(Maybe.fromValue<PatchResult>(new PatchResult()), Maybe.none<PatchError>());
-        // return Promise.resolve(result);
-        return Result.Ok(new PatchResult(change));
+                if (keys.length) {
+                    const value = this.core.getAttributeMeta(node, name);
+                    setNested(value, keys, change.value);
+                    this.core.setAttributeMeta(node, name, value);
+                } else {
+                    this.core.setAttributeMeta(node, name, change.value);
+                }
+
+                return Maybe.some(new PatchResult(chg));
+            });
     }
 
 }
@@ -115,38 +117,32 @@ export class AttributeMetaPatch extends NodeStatePatch {
 export class PointersPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const errMsg = `Invalid key for pointer: ${change.key.slice(1).join(', ')}`;
-        const err = this.getKeyLengthErrorObject(change, errMsg);
-        if (err) {
-            return Result.Error(
-                err
-            )
-        }
-        const [/*type*/, name] = change.key;
-        this.core.delPointer(node, name);
-        return Result.Ok(new PatchResult(change));
+        return change.validated(this.keyLengthValidator, errMsg).map(chg => {
+            const [/*type*/, name] = change.key;
+            this.core.delPointer(node, name);
+            return Maybe.some(new PatchResult(chg));
+        });
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const errMsg = `Invalid key for pointer: ${change.key.slice(1).join(', ')}`;
-        const err = this.getKeyLengthErrorObject(change, errMsg);
-        if (err) {
-            return Result.Error(err);
-        }
-        const [/*type*/, name] = change.key;
-        let target = null;
-        let targetPath = null;
-        if (change.value !== null) {
-            target = change.value !== null ?
-                await this.nodeSearchUtils.getNode(node, change.value, resolvedSelectors)
-                : null;
-            targetPath = this.core.getPath(target);
-        }
-        const hasChanged = targetPath !== this.core.getPointerPath(node, name);
-        if (hasChanged) {
-            this.core.setPointer(node, name, target);
-        }
+        return await (change.validated(this.keyLengthValidator, errMsg).mapAsync(async chg => {
+            const [/*type*/, name] = chg.key;
+            let target = null;
+            let targetPath = null;
+            if (chg.value !== null) {
+                target = chg.value !== null ?
+                    await this.nodeSearchUtils.getNode(node, chg.value, resolvedSelectors)
+                    : null;
+                targetPath = this.core.getPath(target);
+            }
+            const hasChanged = targetPath !== this.core.getPointerPath(node, name);
+            if (hasChanged) {
+                this.core.setPointer(node, name, target);
+            }
 
-        return Result.Ok(new PatchResult(change));
+            return Maybe.some(new PatchResult(change));
+        }));
     }
 }
 
@@ -196,54 +192,61 @@ export class MixinsPatch extends NodeStatePatch {
 
 export class PointerMetaPatch extends NodeStatePatch {
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*"pointer_meta"*/, name, idOrMinMax] = change.key;
-        const isNewPointer = change.key.length === 2;
+        return (await change.asResult()
+            .mapAsync(async chg => {
+                const [/*"pointer_meta"*/, name, idOrMinMax] = chg.key;
+                const isNewPointer = chg.key.length === 2;
 
-        if (isNewPointer) {
-            const meta = change.value;
-            this.core.setPointerMetaLimits(node, name, meta.min, meta.max);
+                if (isNewPointer) {
+                    const meta = chg.value;
+                    this.core.setPointerMetaLimits(node, name, meta.min, meta.max);
 
-            const targets = Object.entries(change.value)
-                .filter(pair => {
-                    const [key, /*value*/] = pair;
-                    return !['min', 'max'].includes(key);
-                });
+                    const targets = Object.entries(chg.value)
+                        .filter(pair => {
+                            const [key, /*value*/] = pair;
+                            return !['min', 'max'].includes(key);
+                        });
 
-            for (let i = targets.length; i--;) {
-                const [nodeId, meta] = targets[i];
-                const target = await this.nodeSearchUtils.getNode(node, nodeId, resolvedSelectors);
-                this.core.setPointerMetaTarget(node, name, target, meta.min, meta.max);
-            }
-        } else if (['min', 'max'].includes(idOrMinMax)) {
-            const meta = this.core.getPointerMeta(node, name);
-            meta[idOrMinMax] = change.value;
-            this.core.setPointerMetaLimits(node, name, meta.min, meta.max);
-        } else {
-            const meta = this.core.getPointerMeta(node, name);
-            const target = await this.nodeSearchUtils.getNode(node, idOrMinMax, resolvedSelectors);
-            const gmeId = await this.core.getPath(target);
-            const keys = change.key.slice(2);
-            keys[0] = gmeId;
-            setNested(meta, keys, change.value);
+                    for (let i = targets.length; i--;) {
+                        const [nodeId, meta] = targets[i];
+                        const target = await this.nodeSearchUtils.getNode(node, nodeId, resolvedSelectors);
+                        this.core.setPointerMetaTarget(node, name, target, meta.min, meta.max);
+                    }
+                } else if (['min', 'max'].includes(idOrMinMax)) {
+                    const meta = this.core.getPointerMeta(node, name);
+                    meta[idOrMinMax] = chg.value;
+                    this.core.setPointerMetaLimits(node, name, meta.min, meta.max);
+                } else {
+                    const meta = this.core.getPointerMeta(node, name);
+                    const target = await this.nodeSearchUtils.getNode(node, idOrMinMax, resolvedSelectors);
+                    const gmeId = await this.core.getPath(target);
+                    const keys = chg.key.slice(2);
+                    keys[0] = gmeId;
+                    setNested(meta, keys, chg.value);
 
-            const targetMeta = meta[gmeId];
-            this.core.setPointerMetaTarget(node, name, target, targetMeta.min, targetMeta.max);
-        }
+                    const targetMeta = meta[gmeId];
+                    this.core.setPointerMetaTarget(node, name, target, targetMeta.min, targetMeta.max);
+                }
 
-        return Result.Ok(new PatchResult(change));
+                return Maybe.some(new PatchResult(chg));
+            }));
+
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*type*/, name, targetId] = change.key;
-        const removePointer = targetId === undefined;
-        if (removePointer) {
-            this.core.delPointerMeta(node, name);
-        } else {
-            const gmeId = await this.nodeSearchUtils.getNodeId(node, targetId, resolvedSelectors);
-            this.core.delPointerMetaTarget(node, name, gmeId);
-        }
+        return await change.asResult().mapAsync(async chg => {
+            const [/*type*/, name, targetId] = chg.key;
+            const removePointer = targetId === undefined;
+            if (removePointer) {
+                this.core.delPointerMeta(node, name);
+            } else {
+                const gmeId = await this.nodeSearchUtils.getNodeId(node, targetId, resolvedSelectors);
+                this.core.delPointerMetaTarget(node, name, gmeId);
+            }
 
-        return Result.Ok(new PatchResult(change));
+            return Maybe.some(new PatchResult(chg));
+        });
+
     };
 }
 
@@ -256,50 +259,57 @@ export class ChildrenPatch extends NodeStatePatch {
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        try {
+        return (await change.asResult().mapAsync(async chg => {
             await this.importer.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
-            return Result.Ok(new PatchResult(change));
-        } catch (err) {
-            return Result.Error(new PatchError((err as Error).message));
-        }
+            return Maybe.some(new PatchResult(change));
+        })).mapError(err => {
+            return Maybe.some(err);
+        });
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        this.core.deleteNode(node);
-        return Result.Ok(new PatchResult(change));
+        return change.asResult().map(chg => {
+            this.core.deleteNode(node);
+            return Maybe.some(new PatchResult(chg));
+        });
     };
 }
 
 export class SetsPatch extends NodeStatePatch {
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*type*/, name] = change.key;
-        const isNewSet = change.key.length === 2;
-        if (isNewSet) {
-            this.core.createSet(node, name);
-            const memberPaths = change.value;
+        return await change.asResult().mapAsync(async change => {
+            const [/*type*/, name] = change.key;
+            const isNewSet = change.key.length === 2;
+            if (isNewSet) {
+                this.core.createSet(node, name);
+                const memberPaths = change.value;
 
-            for (let i = 0; i < memberPaths.length; i++) {
-                const member = await this.nodeSearchUtils.getNode(node, memberPaths[i], resolvedSelectors);
+                for (let i = 0; i < memberPaths.length; i++) {
+                    const member = await this.nodeSearchUtils.getNode(node, memberPaths[i], resolvedSelectors);
+                    this.core.addMember(node, name, member);
+                }
+            } else {
+                const member = await this.nodeSearchUtils.getNode(node, change.value, resolvedSelectors);
                 this.core.addMember(node, name, member);
             }
-        } else {
-            const member = await this.nodeSearchUtils.getNode(node, change.value, resolvedSelectors);
-            this.core.addMember(node, name, member);
-        }
 
-        return Result.Ok(new PatchResult(change));
+            return Maybe.some(new PatchResult(change));
+        })
+
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*type*/, name, index] = change.key;
-        const removeSet = index === undefined;
-        if (removeSet) {
-            this.core.delSet(node, name);
-        } else {
-            const member = this.core.getMemberPaths(node, name)[index];
-            this.core.delMember(node, name, member);
-        }
-        return Result.Ok(new PatchResult(change));
+        return change.asResult().map(chg => {
+            const [/*type*/, name, index] = change.key;
+            const removeSet = index === undefined;
+            if (removeSet) {
+                this.core.delSet(node, name);
+            } else {
+                const member = this.core.getMemberPaths(node, name)[index];
+                this.core.delMember(node, name, member);
+            }
+            return Maybe.some(new PatchResult(change));
+        });
     };
 
 }
@@ -329,29 +339,33 @@ export class MemberAttributesPatch extends NodeStatePatch {
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
+
         const [/*type*/, set, nodeId, name] = change.key;
         const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllAttributes = name === undefined;
         const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
-        if (isMember) {
-            const attributeNames = deleteAllAttributes ?
-                this.core.getMemberAttributeNames(node, set, gmeId) : [name];
+        const validator = chg => isMember;
+        return await (change
+            .validated(validator, 'Empty')
+            .map(chg => {
+                const attributeNames = deleteAllAttributes ?
+                    this.core.getMemberAttributeNames(node, set, gmeId) : [name];
 
-            attributeNames.forEach(name => {
-                this.core.delMemberAttribute(node, set, gmeId, name);
-            });
-        } else {
-            if (!deleteAllAttributes) {
+                attributeNames.forEach(name => {
+                    this.core.delMemberAttribute(node, set, gmeId, name);
+                });
+                return Maybe.some(new PatchResult(chg));
+            }))
+            .mapErrorAsync(async err => {
+                if (deleteAllAttributes) return Maybe.none();
                 const member = await this.core.loadByPath(this.nodeSearchUtils.getRoot(), gmeId);
                 const memberName = this.core.getAttribute(member, 'name');
                 const memberDisplay = `${memberName} (${gmeId})`;
 
-                throw new Error(`Cannot delete partial member attributes for ${memberDisplay}`);
-            }
-        }
-
-        return Result.Ok(new PatchResult(change));
-    };
+                const newErr = new PatchError(`Cannot delete partial member attributes for ${memberDisplay}`);
+                return Maybe.some(newErr);
+            });
+    }
 
 }
 
@@ -388,93 +402,99 @@ export class MemberRegistryPatch extends NodeStatePatch {
     }
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*type*/, set, nodeId, name] = change.key;
-        const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
-        const deleteAllRegistryValues = name === undefined;
-        const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
-        let error = Maybe.none<PatchError>();
-        if (isMember) {
-            const attributeNames = deleteAllRegistryValues ?
-                this.core.getMemberRegistryNames(node, set, gmeId) : [name];
+        return await change.asResult().mapAsync(async chg => {
+            const [/*type*/, set, nodeId, name] = chg.key;
+            const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
+            const deleteAllRegistryValues = name === undefined;
+            const isMember = this.core.getMemberPaths(node, set).includes(gmeId);
+            if (isMember) {
+                const attributeNames = deleteAllRegistryValues ?
+                    this.core.getMemberRegistryNames(node, set, gmeId) : [name];
 
-            attributeNames.forEach(name => {
-                this.core.delMemberRegistry(node, set, gmeId, name);
-            });
-        } else {
-            if (!deleteAllRegistryValues) {
-                const member = await this.core.loadByPath(this.nodeSearchUtils.getRoot(), gmeId);
-                const memberName = this.core.getAttribute(member, 'name');
-                const memberDisplay = `${memberName} (${gmeId})`;
+                attributeNames.forEach(name => {
+                    this.core.delMemberRegistry(node, set, gmeId, name);
+                });
+            } else {
+                if (!deleteAllRegistryValues) {
+                    const member = await this.core.loadByPath(this.nodeSearchUtils.getRoot(), gmeId);
+                    const memberName = this.core.getAttribute(member, 'name');
+                    const memberDisplay = `${memberName} (${gmeId})`;
 
-                const err = new PatchError(`Cannot delete partial member registry values for ${memberDisplay}`);
-                return Result.Error(err);
+                    throw new PatchError(`Cannot delete partial member registry values for ${memberDisplay}`);
+                }
             }
-        }
-        return Result.Ok(new PatchResult(change));
+            return Maybe.some(new PatchResult(chg));
+        });
     }
 }
 
 export class RegistryPatch extends NodeStatePatch {
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*type*/, name] = change.key;
-        const keys = change.key.slice(2);
-        if (keys.length) {
-            const value = this.core.getRegistry(node, name);
-            setNested(value, keys, change.value);
-            this.core.setRegistry(node, name, value);
-        } else {
-            this.core.setRegistry(node, name, change.value);
-        }
-
-        return Result.Ok(new PatchResult(change));
+        return change.asResult().map(chg => {
+            const [/*type*/, name] = change.key;
+            const keys = change.key.slice(2);
+            if (keys.length) {
+                const value = this.core.getRegistry(node, name);
+                setNested(value, keys, change.value);
+                this.core.setRegistry(node, name, value);
+            } else {
+                this.core.setRegistry(node, name, change.value);
+            }
+            return Maybe.some(new PatchResult(chg));
+        });
     };
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const err = this.getKeyLengthErrorObject(change);
-        let success = Maybe.none<PatchResult>();
-        if (err) {
-            return Result.Error(err);
-        }
-        const [/*type*/, name] = change.key;
-        this.core.delRegistry(node, name);
-        return Result.Ok(new PatchResult(change));
+        const errMsg = `Complex registry values not currently supported: ${change.key.join(', ')}`;
+        return change.validated(this.keyLengthValidator, errMsg).map(chg => {
+            const [/*type*/, name] = change.key;
+            this.core.delRegistry(node, name);
+            return Maybe.some(new PatchResult(change));
+        }).mapError(err => {
+            return Maybe.some(new PatchError(err.message));
+        });
     };
 }
 
 
 export class ChildrenMetaPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*"children_meta"*/, idOrMinMax] = change.key;
-        const isNodeId = !['min', 'max'].includes(idOrMinMax);
-        if (isNodeId) {
-            const gmeId = await this.nodeSearchUtils.getNodeId(node, idOrMinMax, resolvedSelectors);
-            this.core.delChildMeta(node, gmeId);
-        }
+        return change.asResult().mapAsync(async chg => {
+            const [/*"children_meta"*/, idOrMinMax] = chg.key;
+            const isNodeId = !['min', 'max'].includes(idOrMinMax);
+            if (isNodeId) {
+                const gmeId = await this.nodeSearchUtils.getNodeId(node, idOrMinMax, resolvedSelectors);
+                this.core.delChildMeta(node, gmeId);
+            }
 
-        return Result.Ok(new PatchResult(change));
+            return Maybe.some(new PatchResult(chg));
+        });
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [/*"children_meta"*/, idOrUndef] = change.key;
-        const isAddingContainment = !idOrUndef;
-        const isNewChildDefinition = typeof idOrUndef === 'string';
-        if (isAddingContainment) {
-            const {min, max} = change.value;
-            this.core.setChildrenMetaLimits(node, min, max);
-            const childEntries = Object.entries(change.value).filter(pair => !['min', 'max'].includes(pair[0]));
-            for (let i = 0; i < childEntries.length; i++) {
-                const [nodeId, {min, max}] = childEntries[i];
+        return change.asResult().mapAsync(async chg => {
+            const [/*"children_meta"*/, idOrUndef] = chg.key;
+            const isAddingContainment = !idOrUndef;
+            const isNewChildDefinition = typeof idOrUndef === 'string';
+            if (isAddingContainment) {
+                const {min, max} = chg.value;
+                this.core.setChildrenMetaLimits(node, min, max);
+                const childEntries = Object.entries(chg.value).filter(pair => !['min', 'max'].includes(pair[0]));
+                for (let i = 0; i < childEntries.length; i++) {
+                    const [nodeId, {min, max}] = childEntries[i];
+                    const childNode = await this.nodeSearchUtils.getNode(node, nodeId, resolvedSelectors);
+                    this.core.setChildMeta(node, childNode, min, max);
+                    this.core.setChildMeta(node, childNode, min, max);
+                }
+            } else if (isNewChildDefinition) {
+                const nodeId = idOrUndef;
+                const {min, max} = chg.value;
                 const childNode = await this.nodeSearchUtils.getNode(node, nodeId, resolvedSelectors);
                 this.core.setChildMeta(node, childNode, min, max);
-                this.core.setChildMeta(node, childNode, min, max);
             }
-        } else if (isNewChildDefinition) {
-            const nodeId = idOrUndef;
-            const {min, max} = change.value;
-            const childNode = await this.nodeSearchUtils.getNode(node, nodeId, resolvedSelectors);
-            this.core.setChildMeta(node, childNode, min, max);
-        }
 
-        return Result.Ok(new PatchResult(change));
+            return Maybe.some(new PatchResult(chg));
+        });
+
     }
 }

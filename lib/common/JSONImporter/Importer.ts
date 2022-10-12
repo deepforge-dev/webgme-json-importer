@@ -115,7 +115,7 @@ export class Importer {
         const currentChildren = await this.core.loadChildren(node);
         diffs.push(...(await Promise.all(children.map(async childState => {
             const idString = childState.id;
-            const childNode = await this.searchUtils.findNode(node, idString, resolvedSelectors);
+            const childNode = await this.findNode(node, idString, resolvedSelectors);
             const index = currentChildren.indexOf(childNode);
             if (index > -1) {
                 currentChildren.splice(index, 1);
@@ -177,7 +177,7 @@ export class Importer {
                 const isNewNode = (diff.type === 'put' && diff.key[0] === 'children');
                 if (!isNewNode) {
                     const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
-                    node = await this.searchUtils.findNode(parent, diff.nodeId, resolvedSelectors);
+                    node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
                 }
 
                 if(diff.type === 'put') {
@@ -231,7 +231,7 @@ export class Importer {
             tryResolveMore = false;
             for (let i = stateNodePairs.length; i--;) {
                 const [state, parentNode] = stateNodePairs[i];
-                let child = await this.searchUtils.findNode(parentNode, state.id, resolvedSelectors);
+                let child = await this.findNode(parentNode, state.id, resolvedSelectors);
                 //const canCreate = !state.id;
                 if (!child && create) {
                     let baseNode;
@@ -241,7 +241,7 @@ export class Importer {
                             const stateID = state.id || JSON.stringify(state);
                             throw new Error(`No base provided for ${stateID}`);
                         }
-                        baseNode = await this.searchUtils.findNode(parentNode, base, resolvedSelectors);
+                        baseNode = await this.findNode(parentNode, base, resolvedSelectors);
 
 
                     } else {
@@ -320,7 +320,7 @@ export class Importer {
     async createStateSubTree(parentPath, state, resolvedSelectors) {
         const base = state.pointers?.base;
         const parent = await this.core.loadByPath(this.rootNode, parentPath);
-        const baseNode = await this.searchUtils.findNode(parent, base, resolvedSelectors);
+        const baseNode = await this.findNode(parent, base, resolvedSelectors);
         const created = await this.createNode(parent, state, baseNode);
         const nodeSelector = new NodeSelector(this.core.getPath(created));
         resolvedSelectors.record(parentPath, nodeSelector, created);
@@ -329,7 +329,7 @@ export class Importer {
             resolvedSelectors.record(parentPath, alternateSelector, created);
         }
         const nodeState = await this.toJSON(created, new OmittedProperties(['children']));
-        const changes = gmeDiff(nodeState, state);
+        const changes = gmeDiff(nodeState, state).map(change => NodeChangeSet.fromChangeSet(parentPath, state.id, change));
         await Promise.all(changes.map(async change => {
             await this._put(created, change, resolvedSelectors);
         }));
@@ -366,5 +366,13 @@ export class Importer {
         const node = await this.createNode(parent, state);
         await this.apply(node, state);
         return node;
+    }
+
+    async getNode(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections = new NodeSelections()): Promise<Core.Node> {
+        return await this.searchUtils.getNode(parent, idString, resolvedSelectors)
+    }
+
+    async findNode(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections = new NodeSelections()): Promise<Core.Node> {
+        return await this.searchUtils.findNode(parent, idString, resolvedSelectors)
     }
 }
