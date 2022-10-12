@@ -2,7 +2,7 @@ import {NodeSelections} from './NodeSelectors';
 import {NodeChangeSet} from './NodeChangeSet';
 import {NodeSearchUtils, setNested} from './Utils';
 import {Maybe, Result} from 'ts-monads';
-import diff from 'changeset';
+import diff, {ChangeSet, ChangeType} from 'changeset';
 import JSONImporter from "../JSONImporter";
 import Core = GmeClasses.Core;
 
@@ -10,10 +10,10 @@ type PatchFunction = (node: Core.Node, change: NodeChangeSet, resolvedSelectors:
 type PatchResultPromise = Promise<Result<PatchResult, PatchError>>;
 
 class PatchResult {
-    patch: NodeChangeSet;
+    patches: NodeChangeSet | NodeChangeSet[];
 
-    constructor(patch) {
-        this.patch = patch;
+    constructor(patches: NodeChangeSet | NodeChangeSet[]) {
+        this.patches = patches;
     }
 }
 
@@ -148,44 +148,50 @@ export class PointersPatch extends NodeStatePatch {
 
 export class GuidPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        return Result.Ok(new PatchResult(change));
+        return change.asResult().map(v => Maybe.some(new PatchResult(v)));
     }
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const {value} = change;
-        this.core.setGuid(node, value);
-        return Result.Ok(new PatchResult(change));
+        return change.asResult().map(chg => {
+            const {value} = chg;
+            this.core.setGuid(node, value);
+            return Maybe.some(new PatchResult(chg));
+        });
     }
 }
 
 export class MixinsPatch extends NodeStatePatch {
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [, index] = change.key;
-        const mixinPath = this.core.getMixinPaths(node)[index];
-        this.core.delMixin(node, mixinPath);
-        return Result.Ok(new PatchResult(change));
+        return change.asResult().map(chg => {
+            const [, index] = chg.key;
+            const mixinPath = this.core.getMixinPaths(node)[index];
+            this.core.delMixin(node, mixinPath);
+            return Maybe.some(new PatchResult(chg));
+        });
     };
 
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const [, index] = change.key;
-        const oldMixinPath = this.core.getMixinPaths(node)[index];
-        if (oldMixinPath) {
-            this.core.delMixin(node, oldMixinPath);
-        }
+        return await change.asResult().mapAsync(async chg => {
+            const [, index] = chg.key;
+            const oldMixinPath = this.core.getMixinPaths(node)[index];
+            if (oldMixinPath) {
+                this.core.delMixin(node, oldMixinPath);
+            }
 
-        const mixinId = change.value;
+            const mixinId = chg.value;
 
-        const mixinPath = await this.nodeSearchUtils.getNodeId(node, mixinId, resolvedSelectors);
-        const canSet = this.core.canSetAsMixin(node, mixinPath);
-        if (canSet.isOk) {
-            this.core.addMixin(node, mixinPath);
-            return Result.Ok(new PatchResult(change));
-        } else {
-            const err = new PatchError(
-                `Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}: ${canSet.reason}`
-            );
-            return Result.Error(err);
-        }
+            const mixinPath = await this.nodeSearchUtils.getNodeId(node, mixinId, resolvedSelectors);
+            const canSet = this.core.canSetAsMixin(node, mixinPath);
+            if (canSet.isOk) {
+                this.core.addMixin(node, mixinPath);
+                return Maybe.some(new PatchResult(chg));
+            } else {
+                throw new PatchError(
+                    `Cannot set ${mixinId} as mixin for ${this.core.getPath(node)}: ${canSet.reason}`
+                );
+            }
+        });
+
     };
 
 }
@@ -373,32 +379,39 @@ export class MemberAttributesPatch extends NodeStatePatch {
 export class MemberRegistryPatch extends NodeStatePatch {
     put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
         const [/*type*/, set, nodeId, name] = change.key;
+        const parent = this.core.getParent(node)
+        const parentPath = parent ? this.core.getPath(parent) : '';
         const isNewSet = nodeId === undefined;
         const isNewMember = name === undefined;
-        if (isNewSet || isNewMember) {
-            const changesets = Object.entries(change.value)
-                .map(entry => ({
-                    type: 'put',
-                    key: change.key.concat([entry[0]]),
-                    value: entry[1],
-                }));
+        return await change.asResult().mapAsync(async chg => {
+            if (isNewSet || isNewMember) {
+                const changesets = Object.entries(chg.value)
+                    .map(entry => {
+                        const changeSet: ChangeSet = ({
+                            type: ChangeType.PUT,
+                            key: chg.key.concat([entry[0]]),
+                            value: entry[1],
+                        });
+                        return NodeChangeSet.fromChangeSet(parentPath, nodeId, changeSet);
+                    });
 
-            for (let i = changesets.length; i--;) {
-                await this.put(node, changesets[i], resolvedSelectors);
-            }
-        } else {
-            const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
-            const isNested = change.key.length > 4;
-            if (isNested) {
-                const value = this.core.getMemberRegistry(node, set, gmeId, name);
-                setNested(value, change.key.slice(4), change.value);
-                this.core.setMemberRegistry(node, set, gmeId, name, value);
+                for (let i = changesets.length; i--;) {
+                    await this.put(node, changesets[i], resolvedSelectors);
+                }
             } else {
-                this.core.setMemberRegistry(node, set, gmeId, name, change.value);
+                const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
+                const isNested = chg.key.length > 4;
+                if (isNested) {
+                    const value = this.core.getMemberRegistry(node, set, gmeId, name);
+                    setNested(value, chg.key.slice(4), chg.value);
+                    this.core.setMemberRegistry(node, set, gmeId, name, value);
+                } else {
+                    this.core.setMemberRegistry(node, set, gmeId, name, chg.value);
+                }
             }
-        }
+            return Maybe.some(new PatchResult(chg));
+        });
 
-        return Result.Ok(new PatchResult(change));
     }
 
     delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
