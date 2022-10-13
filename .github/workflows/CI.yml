@@ -35,3 +35,15 @@ jobs:
 
       - name: "Run Tests"
         run: npm test
+
+  prettify:
+    name: "Prettify (Using Prettier)"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout Branch"
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: creyD/prettier_action@v4.2

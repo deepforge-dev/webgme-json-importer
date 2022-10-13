@@ -37,7 +37,9 @@ class WJIBenchmark {
         const fco = await this.core.loadByPath(root, '/1');
         const importer = new Importer(this.core, root);
         return {
-            root, fco, importer
+            root,
+            fco,
+            importer,
         };
     }
 
@@ -46,22 +48,36 @@ class WJIBenchmark {
     }
 
     async _setupGME() {
-        this.gmeAuth = await testFixture.clearDBAndGetGMEAuth(gmeConfig, projectName);
-        this.storage = testFixture.getMemoryStorage(logger, gmeConfig, this.gmeAuth);
+        this.gmeAuth = await testFixture.clearDBAndGetGMEAuth(
+            gmeConfig,
+            projectName
+        );
+        this.storage = testFixture.getMemoryStorage(
+            logger,
+            gmeConfig,
+            this.gmeAuth
+        );
         await this.storage.openDatabase();
         const importParam = {
-            projectSeed: testFixture.path.join(testFixture.TESTS_SEED_DIR, this.projectSeedName, `${this.projectSeedName}.webgmex`),
+            projectSeed: testFixture.path.join(
+                testFixture.TESTS_SEED_DIR,
+                this.projectSeedName,
+                `${this.projectSeedName}.webgmex`
+            ),
             projectName: projectName,
             branchName: 'master',
             logger: logger,
-            gmeConfig: gmeConfig
+            gmeConfig: gmeConfig,
         };
 
-        const importResult = await testFixture.importProject(this.storage, importParam);
+        const importResult = await testFixture.importProject(
+            this.storage,
+            importParam
+        );
         this.project = importResult.project;
         this.core = new Core(this.project, {
             globConf: gmeConfig,
-            logger: logger.fork('core')
+            logger: logger.fork('core'),
         });
         this.commitHash = importResult.commitHash;
     }
@@ -73,11 +89,19 @@ class WJIBenchmark {
 
     async run() {
         await this.before();
-        const {root, fco, importer} = await this.getNewProject();
-        await this.callable({root, fco, importer, core: this.core, suite: this.suite});
-        this.suite.on('complete', function() {
-            this.forEach(bench => console.log(bench.stats));
-        }).run({ 'async': true }); // runAsync
+        const { root, fco, importer } = await this.getNewProject();
+        await this.callable({
+            root,
+            fco,
+            importer,
+            core: this.core,
+            suite: this.suite,
+        });
+        this.suite
+            .on('complete', function () {
+                this.forEach((bench) => console.log(bench.stats));
+            })
+            .run({ async: true }); // runAsync
         await this.after();
     }
 }

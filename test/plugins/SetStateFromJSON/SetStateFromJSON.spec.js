@@ -2,7 +2,7 @@
 
 describe('SetStateFromJSON', function () {
     const assert = require('assert').strict;
-    const {promisify} = require('util');
+    const { promisify } = require('util');
     var testFixture = require('../../globals'),
         gmeConfig = testFixture.getGmeConfig(),
         expect = testFixture.expect,
@@ -19,31 +19,39 @@ describe('SetStateFromJSON', function () {
     manager.executePlugin = promisify(manager.executePlugin.bind(manager));
 
     before(async function () {
-        gmeAuth = await testFixture.clearDBAndGetGMEAuth(gmeConfig, projectName)
+        gmeAuth = await testFixture.clearDBAndGetGMEAuth(
+            gmeConfig,
+            projectName
+        );
         storage = testFixture.getMemoryStorage(logger, gmeConfig, gmeAuth);
         await storage.openDatabase();
         const importParam = {
-            projectSeed: testFixture.path.join(testFixture.SEED_DIR, 'EmptyProject.webgmex'),
+            projectSeed: testFixture.path.join(
+                testFixture.SEED_DIR,
+                'EmptyProject.webgmex'
+            ),
             projectName: projectName,
             branchName: 'master',
             logger: logger,
-            gmeConfig: gmeConfig
+            gmeConfig: gmeConfig,
         };
 
-        const importResult = await testFixture.importProject(storage, importParam);
+        const importResult = await testFixture.importProject(
+            storage,
+            importParam
+        );
         project = importResult.project;
         commitHash = importResult.commitHash;
         await project.createBranch('test', commitHash);
     });
 
     after(async function () {
-        await storage.closeDatabase()
+        await storage.closeDatabase();
         await gmeAuth.unload();
     });
 
     it('should require JSON file', async function () {
-        var pluginConfig = {
-            },
+        var pluginConfig = {},
             context = {
                 project: project,
                 commitHash: commitHash,

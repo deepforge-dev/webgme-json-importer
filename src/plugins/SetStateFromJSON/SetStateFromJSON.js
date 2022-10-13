@@ -4,12 +4,8 @@
 define([
     'webgme-json-importer/JSONImporter',
     'text!./metadata.json',
-    'plugin/PluginBase'
-], function (
-    JSONImporter,
-    pluginMetadata,
-    PluginBase
-) {
+    'plugin/PluginBase',
+], function (JSONImporter, pluginMetadata, PluginBase) {
     'use strict';
 
     pluginMetadata = JSON.parse(pluginMetadata);
@@ -21,15 +17,17 @@ define([
         }
 
         async main() {
-            const {srcHash} = this.getCurrentConfig();
+            const { srcHash } = this.getCurrentConfig();
             if (!srcHash) {
                 throw new Error('JSON file required.');
             }
-            const srcContents = await this.blobClient.getObjectAsString(srcHash);
+            const srcContents = await this.blobClient.getObjectAsString(
+                srcHash
+            );
             const newState = JSON.parse(srcContents);
             const importer = new JSONImporter(this.core, this.rootNode);
             await importer.apply(this.activeNode, newState);
-            await this.save('Model updated to new state.')
+            await this.save('Model updated to new state.');
             this.result.setSuccess(true);
         }
     }
