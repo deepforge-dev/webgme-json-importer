@@ -4,12 +4,8 @@
 define([
     'webgme-json-importer/JSONImporter',
     'text!./metadata.json',
-    'plugin/PluginBase'
-], function (
-    JSONImporter,
-    pluginMetadata,
-    PluginBase
-) {
+    'plugin/PluginBase',
+], function (JSONImporter, pluginMetadata, PluginBase) {
     'use strict';
     pluginMetadata = JSON.parse(pluginMetadata);
 
