@@ -42,37 +42,43 @@ export abstract class NodeStatePatch implements PatchOperation {
         return change.key.length === 2;
     }
 
-    abstract delete: PatchFunction;
-    abstract put: PatchFunction;
+    async put(node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): PatchResultPromise {
+        return this._validChange(change)
+            .map(validChange => this._put(node, change, resolvedSelectors));
+    }
+
+    async delete(node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): PatchResultPromise {
+        return this._validChange(change)
+            .map(validChange => this._delete(node, change, resolvedSelectors));
+    }
+
+    _validChange(change: NodeChangeSet): Result<NodeChangeSet, PatchError> {
+        return Result.Ok(change);  // override this as needed in child classes
+    }
+
+    abstract _delete: PatchFunction;
+    abstract _put: PatchFunction;
 }
 
 export class AttributesPatch extends NodeStatePatch {
-    put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): PatchResultPromise => {
-        const errMsg = `Complex attributes not currently supported: ${change.key.join(', ')}`;
-        return change
-            .validated(this.keyLengthValidator, errMsg)
-            .map(chg => {
-                const [/*type*/, name] = chg.key;
-                this.core.setAttribute(node, name, chg.value || '');
-                return Maybe.fromValue(new PatchResult(chg));
-            }).mapError(err => {
-                return Maybe.fromValue(new PatchError(err.message));
-            });
+    _validChange(change: NodeChangeSet): Result<NodeChangeSet, PatchError> {
+        if (change.key.length === 2) {
+            return Result.Ok(change);
+        }
+        const msg = `Complex attributes not currently supported: ${change.key.join(', ')}`;
+        return Result.Error(PatchError(msg));
+    }
 
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): PatchResultPromise => {
+        const [/*type*/, name] = change.key;
+        this.core.setAttribute(node, name, change.value || '');
+        return new PatchResult(change);  // I am not sure we need this PatchResult as it seems that it only ever returns the NodeChangeSet that was passed to it...?
     };
 
-    delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
-        const errMsg = `Complex attributes not currently supported: ${change.key.join(', ')}`;
-
-        return change
-            .validated(this.keyLengthValidator, errMsg)
-            .map(chg => {
-                const [/*type*/, name] = change.key;
-                this.core.delAttribute(node, name);
-                return Maybe.fromValue(new PatchResult(chg))
-            }).mapError(err => {
-                return Maybe.fromValue(new PatchError(err.message));
-            });
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<Result<PatchResult, PatchError>> => {
+        const [/*type*/, name] = change.key;
+        this.core.delAttribute(node, name);
+        return Maybe.fromValue(new PatchResult(change))
     };
 }
 
