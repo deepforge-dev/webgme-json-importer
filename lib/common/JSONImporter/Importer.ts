@@ -1,16 +1,14 @@
 import { Exporter } from './Exporter';
 import { NodeSelections, NodeSelector } from './NodeSelectors';
-import { assert, partition, setNested, NodeSearchUtils } from './Utils';
+import { partition, NodeSearchUtils } from './Utils';
 import { NodeChangeSet } from './NodeChangeSet';
 import { OmittedProperties } from './OmittedProperties';
 import { gmeDiff } from './SortedChanges';
-import diff from 'changeset';
 import NodeState from './NodeState';
 import { ChangeType } from 'changeset';
 import {
     NodeStatePatch,
     AttributesPatch,
-    PatchOperation,
     AttributeMetaPatch,
     PointersPatch,
     GuidPatch,
