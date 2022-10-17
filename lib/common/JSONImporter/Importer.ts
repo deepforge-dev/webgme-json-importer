@@ -29,7 +29,10 @@ export class Importer {
     exporter: Exporter;
     searchUtils: NodeSearchUtils;
     patchers: {
-        [key in Exclude<keyof NodeState, 'id' | 'path' | 'alias'>]: NodeStatePatch;
+        [key in Exclude<
+            keyof NodeState,
+            'id' | 'path' | 'alias'
+        >]: NodeStatePatch;
     };
 
     constructor(core: GmeClasses.Core, rootNode: Core.Node) {
