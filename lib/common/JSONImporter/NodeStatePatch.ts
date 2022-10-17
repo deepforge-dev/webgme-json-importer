@@ -5,18 +5,19 @@ import {Ok, Err} from 'ts-monads';
 import {Result} from 'ts-monads/lib/Result';
 import diff, {ChangeSet, ChangeType} from 'changeset';
 import JSONImporter from '../JSONImporter';
+import NodeState from "./NodeState";
 
 type PatchResultType = Result<PatchInfo, PatchError>
 type PatchResultPromise = Promise<PatchResultType>;
-type PatchFunction = (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections) => Promise<PatchInfo>;
+type PatchFunction = (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections) => Promise<void>;
 
 class PatchInfo {
     nodeId: GmeCommon.Path;
     nodeGuid: Core.GUID;
-    target: string;
+    target: keyof NodeState;
     appliedPatch: ChangeSet;
 
-    constructor(nodeId: GmeCommon.Path, nodeGuid: Core.GUID, target: string, appliedPatch: ChangeSet) {
+    constructor(nodeId: GmeCommon.Path, nodeGuid: Core.GUID, target: keyof NodeState, appliedPatch: ChangeSet) {
         this.nodeGuid = nodeGuid;
         this.nodeId = nodeId;
         this.target = target;
@@ -27,7 +28,7 @@ class PatchInfo {
     static create(core: GmeClasses.Core, node: Core.Node, nodeChangeSet: NodeChangeSet) {
         const nodeGuid = core.getGuid(node);
         const nodePath = core.getPath(node);
-        const [target,] = nodeChangeSet.key;
+        const [target,] = nodeChangeSet.key as keyof NodeState;
 
         const {key, type, value} = nodeChangeSet;
 
@@ -107,19 +108,19 @@ export class AttributesPatch extends NodeStatePatch {
         return new Err(new PatchError(msg));
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         this.core.setAttribute(node, name, change.value || '');
     };
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         this.core.delAttribute(node, name);
     };
 }
 
 export class AttributeMetaPatch extends NodeStatePatch {
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const isAttrDeletion = change.key.length === 2;
         const [/*type*/, name] = change.key;
         if (isAttrDeletion) {
@@ -132,7 +133,7 @@ export class AttributeMetaPatch extends NodeStatePatch {
         }
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         const keys = change.key.slice(2);
 
@@ -157,12 +158,12 @@ export class PointersPatch extends NodeStatePatch {
         }
     }
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         this.core.delPointer(node, name);
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         let target = null;
         let targetPath = null;
@@ -180,22 +181,22 @@ export class PointersPatch extends NodeStatePatch {
 }
 
 export class GuidPatch extends NodeStatePatch {
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {};
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {};
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const {value} = change;
         await this.core.setGuid(node, value);
     };
 }
 
 export class MixinsPatch extends NodeStatePatch {
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [, index] = change.key;
         const mixinPath = this.core.getMixinPaths(node)[index];
         this.core.delMixin(node, mixinPath);
     };
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [, index] = change.key;
         const oldMixinPath = this.core.getMixinPaths(node)[index];
         if (oldMixinPath) {
@@ -218,7 +219,7 @@ export class MixinsPatch extends NodeStatePatch {
 }
 
 export class PointerMetaPatch extends NodeStatePatch {
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*"pointer_meta"*/, name, idOrMinMax] = change.key;
         const isNewPointer = change.key.length === 2;
 
@@ -254,7 +255,7 @@ export class PointerMetaPatch extends NodeStatePatch {
         }
     };
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name, targetId] = change.key;
         const removePointer = targetId === undefined;
         if (removePointer) {
@@ -274,18 +275,18 @@ export class ChildrenPatch extends NodeStatePatch {
         this.importer = importer;
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         await this.importer.createStateSubTree(change.parentPath, change.value, resolvedSelectors);
         const parent = await this.core.loadByPath(this.nodeSearchUtils.getRoot(), change.parentPath);
     };
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         this.core.deleteNode(node);
     };
 }
 
 export class SetsPatch extends NodeStatePatch {
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         const isNewSet = change.key.length === 2;
         if (isNewSet) {
@@ -302,7 +303,7 @@ export class SetsPatch extends NodeStatePatch {
         }
     };
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name, index] = change.key;
         const removeSet = index === undefined;
         if (removeSet) {
@@ -331,7 +332,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
         }
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, set, nodeId, name] = change.key;
         const isNewSet = nodeId === undefined;
         const isNewMember = name === undefined;
@@ -353,7 +354,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
 
     };
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const {
             isMember,
             deleteAllAttributes,
@@ -383,7 +384,7 @@ export class MemberAttributesPatch extends NodeStatePatch {
 
 
 export class MemberRegistryPatch extends NodeStatePatch {
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, set, nodeId, name] = change.key;
         const parent = this.core.getParent(node)
         const parentPath = parent ? this.core.getPath(parent) : '';
@@ -416,7 +417,7 @@ export class MemberRegistryPatch extends NodeStatePatch {
         }
     }
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, set, nodeId, name] = change.key;
         const gmeId = await this.nodeSearchUtils.getNodeId(node, nodeId, resolvedSelectors);
         const deleteAllRegistryValues = name === undefined;
@@ -450,7 +451,7 @@ export class RegistryPatch extends NodeStatePatch {
         }
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         const keys = change.key.slice(2);
         if (keys.length) {
@@ -462,14 +463,14 @@ export class RegistryPatch extends NodeStatePatch {
         }
     };
 
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*type*/, name] = change.key;
         this.core.delRegistry(node, name);
     };
 }
 
 export class ChildrenMetaPatch extends NodeStatePatch {
-    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _delete = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*"children_meta"*/, idOrMinMax] = change.key;
         const isNodeId = !['min', 'max'].includes(idOrMinMax);
         if (isNodeId) {
@@ -478,7 +479,7 @@ export class ChildrenMetaPatch extends NodeStatePatch {
         }
     }
 
-    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<PatchInfo> => {
+    _put = async (node: Core.Node, change: NodeChangeSet, resolvedSelectors: NodeSelections): Promise<void> => {
         const [/*"children_meta"*/, idOrUndef] = change.key;
         const isAddingContainment = !idOrUndef;
         const isNewChildDefinition = typeof idOrUndef === 'string';

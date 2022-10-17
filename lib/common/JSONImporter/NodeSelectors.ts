@@ -1,4 +1,4 @@
-import {Constants, assert} from './Utils';
+import { Constants, assert } from './Utils';
 
 export class NodeSelector {
     tag: string;
@@ -46,8 +46,13 @@ export class NodeSelector {
         if (this.tag === '@meta') {
             core.setAttribute(node, 'name', this.value as string);
 
-            const metaSheetSet = core.getSetNames(rootNode)
-                .find(name => name !== Constants.META_ASPECT_SET_NAME && name.startsWith(Constants.META_ASPECT_SET_NAME));
+            const metaSheetSet = core
+                .getSetNames(rootNode)
+                .find(
+                    (name) =>
+                        name !== Constants.META_ASPECT_SET_NAME &&
+                        name.startsWith(Constants.META_ASPECT_SET_NAME)
+                );
 
             core.addMember(rootNode, Constants.META_ASPECT_SET_NAME, node);
             core.addMember(rootNode, metaSheetSet as GmeCommon.Name, node);
@@ -57,46 +62,52 @@ export class NodeSelector {
         }
     }
 
-    async findNode(core: GmeClasses.Core, rootNode: Core.Node, parent: Core.Node, nodeCache: NodeSelections) {
+    async findNode(
+        core: GmeClasses.Core,
+        rootNode: Core.Node,
+        parent: Core.Node,
+        nodeCache: NodeSelections
+    ) {
         if (this.tag === '@path') {
             return await core.loadByPath(rootNode, this.value as string);
         }
 
         if (this.tag === '@meta') {
             const metanodes = Object.values(core.getAllMetaNodes(rootNode));
-            const libraries = core.getLibraryNames(rootNode)
-                .map(name => {
-                    const libraryRoot = core.getLibraryRoot(rootNode, name) as Core.Node;
-                    return [
-                        core.getPath(libraryRoot),
-                        name,
-                    ]
-                });
+            const libraries = core.getLibraryNames(rootNode).map((name) => {
+                const libraryRoot = core.getLibraryRoot(
+                    rootNode,
+                    name
+                ) as Core.Node;
+                return [core.getPath(libraryRoot), name];
+            });
 
             const getFullyQualifiedName = (node: Core.Node) => {
                 const name = core.getAttribute(node, 'name');
                 const path = core.getPath(node);
-                const libraryPair = libraries.find(([rootPath,]) => path.startsWith(rootPath));
+                const libraryPair = libraries.find(([rootPath]) =>
+                    path.startsWith(rootPath)
+                );
                 if (libraryPair) {
                     const [, libraryName] = libraryPair;
                     return libraryName + '.' + name;
                 }
                 return name;
-            }
+            };
 
-            return metanodes
-                .find(child => {
-                    const name = core.getAttribute(child, 'name');
-                    const fullName = getFullyQualifiedName(child);
-                    return name === this.value || fullName === this.value;
-                });
+            return metanodes.find((child) => {
+                const name = core.getAttribute(child, 'name');
+                const fullName = getFullyQualifiedName(child);
+                return name === this.value || fullName === this.value;
+            });
         }
 
         if (this.tag === '@attribute') {
             const [attr, value] = this.value;
             const children = await core.loadChildren(parent);
-            return children
-                .find(child => core.getAttribute(child, attr) === value);
+            return children.find(
+                (child) => core.getAttribute(child, attr) === value
+            );
         }
 
         if (this.tag === '@id' || this.tag === '@internal') {
@@ -104,30 +115,33 @@ export class NodeSelector {
         }
 
         if (this.tag === '@guid') {
-            const getCacheKey = node => new NodeSelector(`@guid:${core.getGuid(node)}`);
-            const opts = (new NodeSearchOpts())
-                .withCache(
-                    nodeCache,
-                    getCacheKey
-                )
+            const getCacheKey = (node) =>
+                new NodeSelector(`@guid:${core.getGuid(node)}`);
+            const opts = new NodeSearchOpts()
+                .withCache(nodeCache, getCacheKey)
                 .firstCheck(parent);
 
             return await this.nodeSearch(
                 core,
                 rootNode,
-                node => core.getGuid(node) === this.value,
-                opts,
+                (node) => core.getGuid(node) === this.value,
+                opts
             );
         }
 
         throw new Error(`Unknown tag: ${this.tag}`);
     }
 
-    async nodeSearch(core: GmeClasses.Core, node: Core.Node, fn: (node: Core.Node) => boolean, searchOpts = new NodeSearchOpts()) {
+    async nodeSearch(
+        core: GmeClasses.Core,
+        node: Core.Node,
+        fn: (node: Core.Node) => boolean,
+        searchOpts = new NodeSearchOpts()
+    ) {
         if (searchOpts.cache && searchOpts.cacheKey) {
-            const {cache, cacheKey} = searchOpts;
+            const { cache, cacheKey } = searchOpts;
             const checkNode = fn;
-            fn = node => {
+            fn = (node) => {
                 if (checkNode(node)) {
                     return true;
                 } else {
@@ -148,7 +162,12 @@ export class NodeSelector {
             let startNode: Core.Node | null = searchOpts.startHint;
             let match = null;
             while (startNode) {
-                match = await this.findNodeWhere(core, startNode, fn, skipNodes);
+                match = await this.findNodeWhere(
+                    core,
+                    startNode,
+                    fn,
+                    skipNodes
+                );
                 if (match) {
                     return match;
                 }
@@ -160,26 +179,33 @@ export class NodeSelector {
         return await this.findNodeWhere(core, node, fn, skipNodes);
     }
 
-    async cachedSearch(core: GmeClasses.Core, node: Core.Node, fn: (node: Core.Node) => boolean, cacheKey: (node: Core.Node) => any, nodeCache: NodeSelections) {
-        return await this.findNodeWhere(
-            core,
-            node,
-            async node => {
-                if (fn(node)) {
-                    return true;
-                } else {
-                    const key = cacheKey(node);
-                    const parent = core.getParent(node);
-                    if (parent) {
-                        nodeCache.record(core.getPath(parent), key, node);
-                    }
-                    return false;
+    async cachedSearch(
+        core: GmeClasses.Core,
+        node: Core.Node,
+        fn: (node: Core.Node) => boolean,
+        cacheKey: (node: Core.Node) => any,
+        nodeCache: NodeSelections
+    ) {
+        return await this.findNodeWhere(core, node, async (node) => {
+            if (fn(node)) {
+                return true;
+            } else {
+                const key = cacheKey(node);
+                const parent = core.getParent(node);
+                if (parent) {
+                    nodeCache.record(core.getPath(parent), key, node);
                 }
-            },
-        );
+                return false;
+            }
+        });
     }
 
-    async findNodeWhere(core: GmeClasses.Core, node: Core.Node, fn: (node: Core.Node) => Promise<boolean> | boolean, skipNodes: Core.Node[] = []) {
+    async findNodeWhere(
+        core: GmeClasses.Core,
+        node: Core.Node,
+        fn: (node: Core.Node) => Promise<boolean> | boolean,
+        skipNodes: Core.Node[] = []
+    ) {
         if (skipNodes.includes(node)) {
             return;
         }
@@ -190,7 +216,12 @@ export class NodeSelector {
 
         const children = await core.loadChildren(node);
         for (let i = 0; i < children.length; i++) {
-            const match = await this.findNodeWhere(core, children[i], fn, skipNodes);
+            const match = await this.findNodeWhere(
+                core,
+                children[i],
+                fn,
+                skipNodes
+            );
             if (match) {
                 return match;
             }
@@ -203,8 +234,13 @@ export class NodeSelector {
     }
 
     isAbsolute() {
-        return this.tag === '@meta' || this.tag === '@path' ||
-            this.tag === '@id' || this.tag === '@guid' || this.tag === '@internal';
+        return (
+            this.tag === '@meta' ||
+            this.tag === '@path' ||
+            this.tag === '@id' ||
+            this.tag === '@guid' ||
+            this.tag === '@internal'
+        );
     }
 }
 
@@ -275,7 +311,6 @@ class NodeSearchOpts {
     startHint: Core.Node | null;
     cacheKey: ((node: Core.Node) => any) | null;
     cache: NodeCache | null;
-
 
     constructor() {
         this.cache = null;
