@@ -1,5 +1,4 @@
 import {ChangeSet, ChangeType} from 'changeset';
-import {Result} from 'ts-monads';
 
 export type NodeChangeSetType = ChangeType;
 
@@ -26,18 +25,5 @@ export class NodeChangeSet implements ChangeSet {
             diffObj.key,
             diffObj.value
         );
-    }
-
-    validated(fn: (ch: NodeChangeSet) => boolean, errMsg: string): Result<NodeChangeSet, Error> {
-        if (fn(this)) {
-            return Result.Ok(this);
-        } else {
-            const err = new Error(errMsg);
-            return Result.Error(err);
-        }
-    }
-
-    asResult(): Result<NodeChangeSet, Error> {
-        return Result.Ok(this);
     }
 }

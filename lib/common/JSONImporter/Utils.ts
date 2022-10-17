@@ -1,7 +1,6 @@
 import NodeState from './NodeState';
 import diff from 'changeset';
 import {ChangeSet} from 'changeset';
-import Core = GmeClasses.Core;
 import {NodeSelections, NodeSelector} from "./NodeSelectors";
 
 export const Constants = {
