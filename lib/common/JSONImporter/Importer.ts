@@ -1,12 +1,12 @@
-import {Exporter} from './Exporter';
-import {NodeSelections, NodeSelector} from './NodeSelectors';
-import {assert, partition, setNested, NodeSearchUtils} from './Utils';
-import {NodeChangeSet} from './NodeChangeSet';
-import {OmittedProperties} from './OmittedProperties';
-import {gmeDiff} from './SortedChanges';
+import { Exporter } from './Exporter';
+import { NodeSelections, NodeSelector } from './NodeSelectors';
+import { assert, partition, setNested, NodeSearchUtils } from './Utils';
+import { NodeChangeSet } from './NodeChangeSet';
+import { OmittedProperties } from './OmittedProperties';
+import { gmeDiff } from './SortedChanges';
 import diff from 'changeset';
 import NodeState from './NodeState';
-import {ChangeType} from 'changeset';
+import { ChangeType } from 'changeset';
 import {
     NodeStatePatch,
     AttributesPatch,
@@ -21,17 +21,18 @@ import {
     MemberRegistryPatch,
     RegistryPatch,
     ChildrenPatch,
-    ChildrenMetaPatch
+    ChildrenMetaPatch,
 } from './NodeStatePatch';
 
 export class Importer {
-
     _nodeIDCounter: number = 1;
     core: GmeClasses.Core;
     rootNode: Core.Node;
     exporter: Exporter;
     searchUtils: NodeSearchUtils;
-    patchers: {[key in keyof Exclude<NodeState, 'id'|'path'>]: NodeStatePatch};
+    patchers: {
+        [key in keyof Exclude<NodeState, 'id' | 'path'>]: NodeStatePatch;
+    };
 
     constructor(core: GmeClasses.Core, rootNode: Core.Node) {
         this.core = core;
@@ -39,34 +40,13 @@ export class Importer {
         this.exporter = new Exporter(this.core, this.rootNode);
         this.searchUtils = new NodeSearchUtils(this.core, this.rootNode);
         this.patchers = {
-            attributes: new AttributesPatch(
-                this.core,
-                this.searchUtils
-            ),
-            attribute_meta: new AttributeMetaPatch(
-                this.core,
-                this.searchUtils
-            ),
-            pointers: new PointersPatch(
-                this.core,
-                this.searchUtils
-            ),
-            pointer_meta: new PointerMetaPatch(
-                this.core,
-                this.searchUtils
-            ),
-            guid: new GuidPatch(
-                this.core,
-                this.searchUtils
-            ),
-            mixins: new MixinsPatch(
-                this.core,
-                this.searchUtils
-            ),
-            sets: new SetsPatch(
-                this.core,
-                this.searchUtils
-            ),
+            attributes: new AttributesPatch(this.core, this.searchUtils),
+            attribute_meta: new AttributeMetaPatch(this.core, this.searchUtils),
+            pointers: new PointersPatch(this.core, this.searchUtils),
+            pointer_meta: new PointerMetaPatch(this.core, this.searchUtils),
+            guid: new GuidPatch(this.core, this.searchUtils),
+            mixins: new MixinsPatch(this.core, this.searchUtils),
+            sets: new SetsPatch(this.core, this.searchUtils),
             member_attributes: new MemberAttributesPatch(
                 this.core,
                 this.searchUtils
@@ -75,37 +55,42 @@ export class Importer {
                 this.core,
                 this.searchUtils
             ),
-            registry: new RegistryPatch(
-                this.core,
-                this.searchUtils
-            ),
-            children: new ChildrenPatch(
-                this.core,
-                this.searchUtils,
-                this
-            ),
-            children_meta: new ChildrenMetaPatch(
-                this.core,
-                this.searchUtils,
-            )
+            registry: new RegistryPatch(this.core, this.searchUtils),
+            children: new ChildrenPatch(this.core, this.searchUtils, this),
+            children_meta: new ChildrenMetaPatch(this.core, this.searchUtils),
         };
     }
 
-    getPatcher(key: keyof NodeState): NodeStatePatch|undefined {
+    getPatcher(key: keyof NodeState): NodeStatePatch | undefined {
         return this.patchers[key];
     }
 
-    async toJSON(node: Core.Node, omittedProperties: OmittedProperties | boolean = new OmittedProperties()) {
+    async toJSON(
+        node: Core.Node,
+        omittedProperties: OmittedProperties | boolean = new OmittedProperties()
+    ) {
         return await this.exporter.toJSON(node, omittedProperties);
     }
 
-    async apply(node: Core.Node, state: NodeState, resolvedSelectors = new NodeSelections()) {
+    async apply(
+        node: Core.Node,
+        state: NodeState,
+        resolvedSelectors = new NodeSelections()
+    ) {
         const diffs = await this.diff(node, state, resolvedSelectors);
         await this._patch(diffs, resolvedSelectors);
     }
 
-    async diff(node: Core.Node, state: NodeState, resolvedSelectors=new NodeSelections()) {
-        await this.resolveSelectorsForExistingNodes(node, state, resolvedSelectors);
+    async diff(
+        node: Core.Node,
+        state: NodeState,
+        resolvedSelectors = new NodeSelections()
+    ) {
+        await this.resolveSelectorsForExistingNodes(
+            node,
+            state,
+            resolvedSelectors
+        );
 
         const parent = this.core.getParent(node);
         const parentPath = this.core.getPath(parent) || '';
@@ -113,42 +98,61 @@ export class Importer {
         const diffs = [];
         const children = state.children || [];
         const currentChildren = await this.core.loadChildren(node);
-        diffs.push(...(await Promise.all(children.map(async childState => {
-            const idString = childState.id;
-            const childNode = await this.findNode(node, idString, resolvedSelectors);
-            const index = currentChildren.indexOf(childNode);
-            if (index > -1) {
-                currentChildren.splice(index, 1);
-            }
-            if (childNode) {
-                const childDiffs = await this.diff(childNode, childState, resolvedSelectors);
-                return childDiffs;
-            } else {
-                return [
-                    new NodeChangeSet(
-                        nodePath,
-                        childState.id || '',
-                        ChangeType.PUT,
-                        ['children'],
-                        childState
-                    )
-                ];
-            }
-        }))).flat());
-        const current = await this.toJSON(node, new OmittedProperties(['children']));
-        const changes = gmeDiff(current, state);
-        if(changes.length) {
-            diffs.push(...changes.map(
-                change => NodeChangeSet.fromChangeSet(
-                    parentPath,
-                    state.id || nodePath,
-                    change
+        diffs.push(
+            ...(
+                await Promise.all(
+                    children.map(async (childState) => {
+                        const idString = childState.id;
+                        const childNode = await this.findNode(
+                            node,
+                            idString,
+                            resolvedSelectors
+                        );
+                        const index = currentChildren.indexOf(childNode);
+                        if (index > -1) {
+                            currentChildren.splice(index, 1);
+                        }
+                        if (childNode) {
+                            const childDiffs = await this.diff(
+                                childNode,
+                                childState,
+                                resolvedSelectors
+                            );
+                            return childDiffs;
+                        } else {
+                            return [
+                                new NodeChangeSet(
+                                    nodePath,
+                                    childState.id || '',
+                                    ChangeType.PUT,
+                                    ['children'],
+                                    childState
+                                ),
+                            ];
+                        }
+                    })
                 )
-            ));
+            ).flat()
+        );
+        const current = await this.toJSON(
+            node,
+            new OmittedProperties(['children'])
+        );
+        const changes = gmeDiff(current, state);
+        if (changes.length) {
+            diffs.push(
+                ...changes.map((change) =>
+                    NodeChangeSet.fromChangeSet(
+                        parentPath,
+                        state.id || nodePath,
+                        change
+                    )
+                )
+            );
         }
 
-        if(state.children && currentChildren.length) {
-            const deletions = currentChildren.map(child =>{
+        if (state.children && currentChildren.length) {
+            const deletions = currentChildren.map((child) => {
                 const childPath = this.core.getPath(child);
                 return new NodeChangeSet(
                     nodePath,
@@ -156,7 +160,7 @@ export class Importer {
                     ChangeType.DEL,
                     ['children'],
                     childPath
-                )
+                );
             });
             diffs.push(...deletions);
         }
@@ -164,25 +168,34 @@ export class Importer {
         return diffs;
     }
 
-    async patch(node, diffs, resolvedSelectors=new NodeSelections()) {
+    async patch(node, diffs, resolvedSelectors = new NodeSelections()) {
         await this.resolveSelectorsFromDiffs(node, diffs, resolvedSelectors);
         await this._patch(diffs, resolvedSelectors);
     }
 
     async _patch(diffs, resolvedSelectors) {
-        const [firstOrderDiffs, dependentDiffs] = this._partitionDiffsByPriority(diffs);
-        const apply = diffs => {
-            return diffs.map(async diff => {
+        const [firstOrderDiffs, dependentDiffs] =
+            this._partitionDiffsByPriority(diffs);
+        const apply = (diffs) => {
+            return diffs.map(async (diff) => {
                 let node = null;
-                const isNewNode = (diff.type === 'put' && diff.key[0] === 'children');
+                const isNewNode =
+                    diff.type === 'put' && diff.key[0] === 'children';
                 if (!isNewNode) {
-                    const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
-                    node = await this.findNode(parent, diff.nodeId, resolvedSelectors);
+                    const parent = await this.core.loadByPath(
+                        this.rootNode,
+                        diff.parentPath
+                    );
+                    node = await this.findNode(
+                        parent,
+                        diff.nodeId,
+                        resolvedSelectors
+                    );
                 }
 
-                if(diff.type === 'put') {
+                if (diff.type === 'put') {
                     return await this._put(node, diff, resolvedSelectors);
-                } else if(diff.type === 'del') {
+                } else if (diff.type === 'del') {
                     return await this._delete(node, diff, resolvedSelectors);
                 }
             });
@@ -195,14 +208,16 @@ export class Importer {
     _partitionDiffsByPriority(diffs) {
         const isIdBasedCreation = (diff) => {
             const type = diff.type;
-            const [key,] = diff.key;
+            const [key] = diff.key;
             const nodeSelectorKey = diff.nodeId.slice(0, 2);
-            return type === 'put' && key === 'children' && nodeSelectorKey === '@id';
+            return (
+                type === 'put' &&
+                key === 'children' &&
+                nodeSelectorKey === '@id'
+            );
         };
         return partition(diffs, isIdBasedCreation);
     }
-
-
 
     resolveSelector(node, state, resolvedSelectors) {
         const parent = this.core.getParent(node);
@@ -222,40 +237,58 @@ export class Importer {
     }
 
     getChildStateNodePairs(node, state) {
-        return (state.children || []).map(s => [s, node]);
+        return (state.children || []).map((s) => [s, node]);
     }
 
     async tryResolveSelectors(stateNodePairs, resolvedSelectors, create) {
         let tryResolveMore = true;
         while (tryResolveMore) {
             tryResolveMore = false;
-            for (let i = stateNodePairs.length; i--;) {
+            for (let i = stateNodePairs.length; i--; ) {
                 const [state, parentNode] = stateNodePairs[i];
-                let child = await this.findNode(parentNode, state.id, resolvedSelectors);
+                let child = await this.findNode(
+                    parentNode,
+                    state.id,
+                    resolvedSelectors
+                );
                 //const canCreate = !state.id;
                 if (!child && create) {
                     let baseNode;
                     if (state.pointers) {
-                        const {base} = state.pointers;
+                        const { base } = state.pointers;
                         if (!base) {
                             const stateID = state.id || JSON.stringify(state);
                             throw new Error(`No base provided for ${stateID}`);
                         }
-                        baseNode = await this.findNode(parentNode, base, resolvedSelectors);
-
-
+                        baseNode = await this.findNode(
+                            parentNode,
+                            base,
+                            resolvedSelectors
+                        );
                     } else {
-                        const fco = await this.core.loadByPath(this.rootNode, '/1');
+                        const fco = await this.core.loadByPath(
+                            this.rootNode,
+                            '/1'
+                        );
                         baseNode = fco;
                     }
 
                     if (baseNode) {
-                        child = await this.createNode(parentNode, state, baseNode);
+                        child = await this.createNode(
+                            parentNode,
+                            state,
+                            baseNode
+                        );
                     }
                 }
                 let pairs = [];
                 if (child) {
-                    this.resolveSelector(child, state, resolvedSelectors, create);
+                    this.resolveSelector(
+                        child,
+                        state,
+                        resolvedSelectors,
+                        create
+                    );
                     pairs = this.getChildStateNodePairs(child, state);
                     tryResolveMore = true;
                 }
@@ -264,7 +297,9 @@ export class Importer {
         }
 
         if (stateNodePairs.length) {
-            throw new Error('Cannot resolve all node selectors (circular references)');
+            throw new Error(
+                'Cannot resolve all node selectors (circular references)'
+            );
         }
     }
 
@@ -273,30 +308,48 @@ export class Importer {
     }
 
     async resolveSelectorsFromDiffs(node, diffs, resolvedSelectors) {
-        await Promise.all(diffs.map(async diff => {
-            const selector = new NodeSelector(diff.nodeId);
-            const parent = await this.core.loadByPath(this.rootNode, diff.parentPath);
-            const node = await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors);
-            if(node) {
-                resolvedSelectors.record(diff.parentPath, selector, node);
-            }
-        }));
+        await Promise.all(
+            diffs.map(async (diff) => {
+                const selector = new NodeSelector(diff.nodeId);
+                const parent = await this.core.loadByPath(
+                    this.rootNode,
+                    diff.parentPath
+                );
+                const node = await selector.findNode(
+                    this.core,
+                    this.rootNode,
+                    parent,
+                    resolvedSelectors
+                );
+                if (node) {
+                    resolvedSelectors.record(diff.parentPath, selector, node);
+                }
+            })
+        );
     }
 
-    async resolveSelectors(node, state, resolvedSelectors, create=true) {
+    async resolveSelectors(node, state, resolvedSelectors, create = true) {
         const parent = this.core.getParent(node);
-        if(parent) {
-            this.resolveSelector(node, {id: this.core.getPath(node)}, resolvedSelectors);
+        if (parent) {
+            this.resolveSelector(
+                node,
+                { id: this.core.getPath(node) },
+                resolvedSelectors
+            );
         }
         if (state.id && parent) {
             this.resolveSelector(node, state, resolvedSelectors);
         }
 
         const stateNodePairs = this.getChildStateNodePairs(node, state);
-        await this.tryResolveSelectors(stateNodePairs, resolvedSelectors, create);
+        await this.tryResolveSelectors(
+            stateNodePairs,
+            resolvedSelectors,
+            create
+        );
     }
 
-    async createNode(parent, state={}, base) {
+    async createNode(parent, state = {}, base) {
         if (!state.id) {
             state.id = `@internal:${this._nodeIDCounter++}`;
         }
@@ -304,10 +357,10 @@ export class Importer {
         const fco = await this.core.loadByPath(this.rootNode, '/1');
         const selector = new NodeSelector(idString);
         const params = selector.prepareCreateParams({
-                base: base || fco,
-                parent,
-                relid: state.path?.split('/').pop()
-            });
+            base: base || fco,
+            parent,
+            relid: state.path?.split('/').pop(),
+        });
 
         if (state.guid) {
             params.guid = state.guid;
@@ -324,18 +377,31 @@ export class Importer {
         const created = await this.createNode(parent, state, baseNode);
         const nodeSelector = new NodeSelector(this.core.getPath(created));
         resolvedSelectors.record(parentPath, nodeSelector, created);
-        if(state.id && !state.id.startsWith('@internal')) {
+        if (state.id && !state.id.startsWith('@internal')) {
             const alternateSelector = new NodeSelector(state.id);
             resolvedSelectors.record(parentPath, alternateSelector, created);
         }
-        const nodeState = await this.toJSON(created, new OmittedProperties(['children']));
-        const changes = gmeDiff(nodeState, state).map(change => NodeChangeSet.fromChangeSet(parentPath, state.id, change));
-        await Promise.all(changes.map(async change => {
-            await this._put(created, change, resolvedSelectors);
-        }));
-        await Promise.all((state.children || []).map(async child => {
-            await this.createStateSubTree(this.core.getPath(created), child, resolvedSelectors);
-        }));
+        const nodeState = await this.toJSON(
+            created,
+            new OmittedProperties(['children'])
+        );
+        const changes = gmeDiff(nodeState, state).map((change) =>
+            NodeChangeSet.fromChangeSet(parentPath, state.id, change)
+        );
+        await Promise.all(
+            changes.map(async (change) => {
+                await this._put(created, change, resolvedSelectors);
+            })
+        );
+        await Promise.all(
+            (state.children || []).map(async (child) => {
+                await this.createStateSubTree(
+                    this.core.getPath(created),
+                    child,
+                    resolvedSelectors
+                );
+            })
+        );
 
         return created;
     }
@@ -345,18 +411,26 @@ export class Importer {
         if (type !== 'path' && type !== 'id') {
             const patcher = this.getPatcher(type);
             if (patcher) {
-                const result = await patcher.put(node, change, resolvedSelectors);
+                const result = await patcher.put(
+                    node,
+                    change,
+                    resolvedSelectors
+                );
                 return result.unwrap();
             }
         }
     }
 
-    async _delete (node, change, resolvedSelectors: NodeSelections) {
+    async _delete(node, change, resolvedSelectors: NodeSelections) {
         const [type] = change.key;
         if (change.key.length > 1 || type === 'children') {
             const patcher = this.getPatcher(type);
-            if(patcher) {
-                const result = await patcher.delete(node, change, resolvedSelectors);
+            if (patcher) {
+                const result = await patcher.delete(
+                    node,
+                    change,
+                    resolvedSelectors
+                );
                 return result.unwrap();
             }
         }
@@ -368,11 +442,27 @@ export class Importer {
         return node;
     }
 
-    async getNode(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections = new NodeSelections()): Promise<Core.Node> {
-        return await this.searchUtils.getNode(parent, idString, resolvedSelectors)
+    async getNode(
+        parent: Core.Node,
+        idString: string,
+        resolvedSelectors: NodeSelections = new NodeSelections()
+    ): Promise<Core.Node> {
+        return await this.searchUtils.getNode(
+            parent,
+            idString,
+            resolvedSelectors
+        );
     }
 
-    async findNode(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections = new NodeSelections()): Promise<Core.Node> {
-        return await this.searchUtils.findNode(parent, idString, resolvedSelectors)
+    async findNode(
+        parent: Core.Node,
+        idString: string,
+        resolvedSelectors: NodeSelections = new NodeSelections()
+    ): Promise<Core.Node> {
+        return await this.searchUtils.findNode(
+            parent,
+            idString,
+            resolvedSelectors
+        );
     }
 }

@@ -2,9 +2,7 @@ import NodeState from './NodeState';
 import diff from 'changeset';
 
 import { ChangeSet } from 'changeset';
-import {NodeSelections, NodeSelector} from "./NodeSelectors";
-
-
+import { NodeSelections, NodeSelector } from './NodeSelectors';
 
 export const Constants = {
     META_ASPECT_SET_NAME: 'MetaAspectSet',
@@ -64,24 +62,37 @@ export class NodeSearchUtils {
         return this.rootNode;
     }
 
-    async getNodeId(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections): Promise<GmeCommon.Path>{
+    async getNodeId(
+        parent: Core.Node,
+        idString: string,
+        resolvedSelectors: NodeSelections
+    ): Promise<GmeCommon.Path> {
         const node = await this.getNode(parent, idString, resolvedSelectors);
         return this.core.getPath(node);
     }
 
-    async getNode(parent: Core.Node, idString: string, resolvedSelectors: NodeSelections): Promise<Core.Node> {
+    async getNode(
+        parent: Core.Node,
+        idString: string,
+        resolvedSelectors: NodeSelections
+    ): Promise<Core.Node> {
         const node = await this.findNode(parent, idString, resolvedSelectors);
         if (!node) {
-            throw new Error(`Could not resolve ${idString} to an existing node.`);
+            throw new Error(
+                `Could not resolve ${idString} to an existing node.`
+            );
         }
         return node;
     }
 
-    async findNode(parent, idString, resolvedSelectors=new NodeSelections()) {
+    async findNode(parent, idString, resolvedSelectors = new NodeSelections()) {
         if (idString === undefined) {
             return;
         }
-        assert(typeof idString === 'string', `Expected ID to be a string but found ${JSON.stringify(idString)}`);
+        assert(
+            typeof idString === 'string',
+            `Expected ID to be a string but found ${JSON.stringify(idString)}`
+        );
 
         const parentId = this.core.getPath(parent);
         const selector = new NodeSelector(idString);
@@ -90,6 +101,11 @@ export class NodeSearchUtils {
             return resolved;
         }
 
-        return await selector.findNode(this.core, this.rootNode, parent, resolvedSelectors.cache as NodeSelections);
+        return await selector.findNode(
+            this.core,
+            this.rootNode,
+            parent,
+            resolvedSelectors.cache as NodeSelections
+        );
     }
 }
