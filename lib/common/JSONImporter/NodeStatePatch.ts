@@ -77,7 +77,7 @@ export abstract class NodeStatePatch implements PatchOperation {
         this.nodeSearchUtils = nodeSearchUtils;
     }
 
-    keyLengthValidator(change) {
+    hasValidKeyLength(change) {
         return change.key.length === 2;
     }
 
@@ -210,7 +210,7 @@ export class PointersPatch extends NodeStatePatch {
         const errMsg = `Invalid key for pointer: ${change.key
             .slice(1)
             .join(', ')}`;
-        if (this.keyLengthValidator(change)) {
+        if (this.hasValidKeyLength(change)) {
             return new Ok(change);
         } else {
             return new Err(new PatchError(errMsg));
@@ -652,7 +652,7 @@ export class RegistryPatch extends NodeStatePatch {
     _validChangeDelete(
         change: NodeChangeSet
     ): Ok<NodeChangeSet> | Err<PatchError> {
-        if (this.keyLengthValidator(change)) {
+        if (this.hasValidKeyLength(change)) {
             return new Ok(change);
         } else {
             const errMsg = `Complex registry values not currently supported: ${change.key.join(
