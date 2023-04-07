@@ -18,6 +18,7 @@
     "prepare": "npm run build"
   },
   "version": "1.4.0",
+  "files": ["config/", "src/", "app.js", "webgme-setup.json"],
   "peerDependencies": {
     "webgme": "^2.23.0"
   },
