@@ -2,7 +2,7 @@
   "name": "webgme-json-importer",
   "scripts": {
     "start": "node app.js",
-    "test": "node ./node_modules/mocha/bin/mocha --recursive test",
+    "test": "node ./node_modules/mocha/bin/mocha --require source-map-support/register --recursive test",
     "build": "npm run build:lib",
     "build:lib": "vite build",
     "typecheck": "tsc --noEmit",
@@ -29,6 +29,8 @@
     "commander": "^9.4.0",
     "mocha": "^5.2.0",
     "prettier": "^2.7.1",
+    "source-map-support": "^0.5.21",
+    "ts-monads": "github:umesh-timalsina/ts-monads",
     "typescript": "^4.8.3",
     "vite": "^3.1.4",
     "vite-plugin-dts": "^1.6.1",
