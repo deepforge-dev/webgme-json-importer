@@ -1,17 +1,17 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import dts from 'vite-plugin-dts';
+import { defineConfig } from "vite";
+import { resolve } from "path";
+import dts from "vite-plugin-dts";
 
 export default defineConfig({
-    build: {
-        lib: {
-            formats: ['umd'],
-            entry: resolve(__dirname, 'lib', 'common', 'JSONImporter.ts'),
-            fileName: 'JSONImporter',
-            name: 'JSONImporter',
-        },
-        sourcemap: true,
-        outDir: 'src/common/build',
+  build: {
+    lib: {
+      formats: ["umd"],
+      entry: resolve(__dirname, "lib", "common", "JSONImporter.ts"),
+      fileName: "JSONImporter",
+      name: "JSONImporter",
     },
-    plugins: [dts()],
+    sourcemap: true,
+    outDir: "src/common/build",
+  },
+  plugins: [dts()],
 });
