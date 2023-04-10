@@ -12,13 +12,13 @@
   "dependencies": [],
   "writeAccessRequired": false,
   "configStructure": [
-      {
-          "name": "srcHash",
-          "displayName": "JSON file",
-          "description": "The active node will be updated to reflect the state in the JSON",
-          "value": "",
-          "valueType": "asset",
-          "readOnly": false
-      }
+    {
+      "name": "srcHash",
+      "displayName": "JSON file",
+      "description": "The active node will be updated to reflect the state in the JSON",
+      "value": "",
+      "valueType": "asset",
+      "readOnly": false
+    }
   ]
 }
