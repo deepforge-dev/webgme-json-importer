@@ -34,8 +34,8 @@ jobs:
       - name: "Run Tests"
         run: npm test
 
-  prettify:
-    name: "Prettify (Using Prettier)"
+  format:
+    name: "Format (deno fmt)"
     runs-on: "ubuntu-latest"
 
     steps:
@@ -44,6 +44,21 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: creyD/prettier_action@v4.2
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
         with:
-          prettier_options: --write **/*.{js,ts} --ignore-path ./.gitignore
+          deno-version: v1.x
+      - name: Format with Deno
+        id: deno-fmt
+        run: deno fmt
+      - name: Check for modified files
+        id: git-check
+        run: echo "modified=$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
+      - name: Push changes
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'Format Bot'
+          git config --global user.email 'format-bot@netsblox.org'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "Fix code formatting"
+          git push
