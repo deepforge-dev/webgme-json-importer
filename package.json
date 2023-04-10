@@ -17,7 +17,7 @@
     "clean_up": "node ./node_modules/webgme-engine/src/bin/clean_up.js",
     "prepare": "npm run build"
   },
-  "version": "1.4.0",
+  "version": "1.4.1",
   "files": ["config/", "src/", "app.js", "webgme-setup.json"],
   "peerDependencies": {
     "webgme": "^2.23.0"
