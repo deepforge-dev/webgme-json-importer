@@ -14,9 +14,11 @@
     "plugin": "node ./node_modules/webgme-engine/src/bin/run_plugin.js",
     "pluginHook": "node ./node_modules/webgme-engine/src/bin/plugin_hook.js",
     "users": "node ./node_modules/webgme-engine/src/bin/usermanager.js",
-    "clean_up": "node ./node_modules/webgme-engine/src/bin/clean_up.js"
+    "clean_up": "node ./node_modules/webgme-engine/src/bin/clean_up.js",
+    "prepare": "npm run build"
   },
   "version": "1.4.0",
+  "files": ["config/", "src/", "app.js", "webgme-setup.json"],
   "peerDependencies": {
     "webgme": "^2.23.0"
   },
